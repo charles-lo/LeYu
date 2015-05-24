@@ -12,10 +12,10 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/logo"
+        android:icon="@drawable/love"
         android:label="@string/app_name" >
         <activity
-            android:name="com.ezhair.MainActivity"
+            android:name="com.leyu.MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="portrait"

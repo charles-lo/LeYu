@@ -15,7 +15,8 @@ import android.view.MenuItem;
 import android.view.Window;
 
 public class MainActivity extends Activity {
-	FragmentTransaction ft = null;
+	private int m_DeviceWidth;
+	private int m_DeviceHeight;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +24,13 @@ public class MainActivity extends Activity {
 		Fresco.initialize(MainActivity.this);
 		setContentView(R.layout.activity_main);
 
+		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
+		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
+
 		new PageHome();
 		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction().add(R.id.container, new PageHome()).commit();
+			getFragmentManager().beginTransaction()
+					.add(R.id.container, new PageHome()).commit();
 		}
 		// Uri uri =
 		// Uri.parse("http://upload.wikimedia.org/wikipedia/commons/5/53/Zhuangzong_of_Later_Tang.jpg");
@@ -61,6 +66,16 @@ public class MainActivity extends Activity {
 	}
 
 	public void replaceFragment(Fragment newFragment) {
-		getFragmentManager().beginTransaction().replace(R.id.container, newFragment).addToBackStack(null).commit();
+		getFragmentManager().beginTransaction()
+				.replace(R.id.container, newFragment).addToBackStack(null)
+				.commit();
+	}
+
+	public int getDeviceWidth() {
+		return m_DeviceWidth;
+	}
+
+	public int getDeviceHeight() {
+		return m_DeviceHeight;
 	}
 }

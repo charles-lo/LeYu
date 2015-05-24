@@ -2,14 +2,20 @@
 <resources>
 
     <!-- common -->
-    <string name="app_name">ezhair</string>
+    <string name="app_name">樂育</string>
+    <string name="weekend">周末</string>
+    <string name="free">免費</string>
+    <string name="hot">熱門</string>
+    <string name="onsale">優惠\n搶購</string>
+    
     <string name="page_signin_sumbit">送出</string>
     <string name="hine01">請輸入手機號碼</string>
     <string name="hine02">密碼 (至少6個字元)</string>
     <string name="hine03">確認密碼</string>
     <string name="hine04">請輸入email</string>
     <!-- page home -->
-    <string name="page_home_title">輕鬆預約你專屬的髮型設計師</string>
+    <string name="home_title_01">mommy</string>
+    <string name="home_title_02">Love</string>
     <string name="page_home_hot">熱門</string>
     <string name="page_home_near">最近</string>
     <string name="page_home_search">自訂</string>
