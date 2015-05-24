@@ -1,0 +1,173 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_index" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:animateLayoutChanges="true" >
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/logo" >
+            </ImageView>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/logo"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
+                android:text="@string/page_home_title"
+                android:textColor="@color/font_color" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/notification"
+                android:layout_width="@dimen/page_home_notification_width"
+                android:layout_height="@dimen/page_home_notification_height"
+                android:layout_below="@id/logo"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
+                android:text="您已預約:\n2015/5/25 pm:2:30 鍾大尾設計師"
+                android:textColor="@color/font_color"
+                android:visibility="gone" >
+            </TextView>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/notification"
+                android:layout_centerHorizontal="true"
+                android:animateLayoutChanges="true" >
+
+                <RelativeLayout
+                    android:id="@+id/hot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/page_home_margin"
+                    android:layout_marginRight="@dimen/page_home_margin"
+                    android:layout_marginTop="@dimen/page_home_margin"
+                    android:visibility="gone" >
+
+                    <ImageView
+                        android:id="@+id/hot_image"
+                        android:layout_width="@dimen/page_home_btn_len"
+                        android:layout_height="@dimen/page_home_btn_len"
+                        android:src="@drawable/btn_id1" >
+                    </ImageView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/hot_image"
+                        android:layout_alignLeft="@+id/hot_image"
+                        android:layout_alignRight="@+id/hot_image"
+                        android:layout_marginBottom="@dimen/page_home_margin"
+                        android:gravity="center"
+                        android:text="@string/page_home_hot"
+                        android:textColor="@android:color/white" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/near"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/page_home_margin"
+                    android:layout_marginLeft="@dimen/page_home_margin"
+                    android:layout_marginTop="@dimen/page_home_margin"
+                    android:layout_toRightOf="@id/hot"
+                    android:visibility="gone" >
+
+                    <ImageView
+                        android:id="@+id/near_image"
+                        android:layout_width="@dimen/page_home_btn_len"
+                        android:layout_height="@dimen/page_home_btn_len"
+                        android:src="@drawable/btn_id2" >
+                    </ImageView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/near_image"
+                        android:layout_alignLeft="@+id/near_image"
+                        android:layout_alignRight="@+id/near_image"
+                        android:layout_marginBottom="@dimen/page_home_margin"
+                        android:gravity="center"
+                        android:text="@string/page_home_near"
+                        android:textColor="@android:color/white" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/hot"
+                    android:layout_marginRight="@dimen/page_home_margin"
+                    android:layout_marginTop="@dimen/page_home_margin"
+                    android:visibility="gone" >
+
+                    <ImageView
+                        android:id="@+id/search_omage"
+                        android:layout_width="@dimen/page_home_btn_len"
+                        android:layout_height="@dimen/page_home_btn_len"
+                        android:src="@drawable/btn_id3" >
+                    </ImageView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/search_omage"
+                        android:layout_alignLeft="@+id/search_omage"
+                        android:layout_alignRight="@+id/search_omage"
+                        android:layout_marginBottom="@dimen/page_home_margin"
+                        android:gravity="center"
+                        android:text="@string/page_home_search"
+                        android:textColor="@android:color/white" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/mail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/near"
+                    android:layout_marginLeft="@dimen/page_home_margin"
+                    android:layout_marginTop="@dimen/page_home_margin"
+                    android:layout_toRightOf="@id/search"
+                    android:visibility="gone" >
+
+                    <ImageView
+                        android:id="@+id/mail_image"
+                        android:layout_width="@dimen/page_home_btn_len"
+                        android:layout_height="@dimen/page_home_btn_len"
+                        android:src="@drawable/btn_id4" >
+                    </ImageView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/mail_image"
+                        android:layout_alignLeft="@+id/mail_image"
+                        android:layout_alignRight="@+id/mail_image"
+                        android:layout_marginBottom="@dimen/page_home_margin"
+                        android:gravity="center"
+                        android:text="@string/page_home_mail"
+                        android:textColor="@android:color/white" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
