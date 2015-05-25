@@ -51,6 +51,7 @@
             android:id="@+id/headline_continer"
             android:layout_width="match_parent"
             android:layout_height="160dp"
+            android:background="@drawable/rectanglebackground"
             android:orientation="vertical" >
 
             <TextView
@@ -105,12 +106,62 @@
             android:layout_height="55dp"
             android:layout_alignParentRight="true"
             android:layout_below="@id/headline_continer"
-            android:background="@drawable/ringbutton"
             android:layout_marginRight="10dp"
-            android:translationY="-33dp"
+            android:background="@drawable/ringbutton"
             android:gravity="center"
             android:text="@string/onsale"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:translationY="-33dp" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/list_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:text="@string/home_title_01"
+        android:textColor="#000000"
+        android:textSize="@dimen/font_size" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="150dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight" >
+
+        <Button
+            android:id="@+id/must"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/must"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/font_size" />
+
+        <Button
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/search"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/font_size" />
+
+        <Button
+            android:id="@+id/mine"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/mine"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/font_size" />
+    </LinearLayout>
 
 </LinearLayout>

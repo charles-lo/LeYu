@@ -7,6 +7,9 @@
     <string name="free">免費</string>
     <string name="hot">熱門</string>
     <string name="onsale">優惠\n搶購</string>
+    <string name="must">必看</string>
+    <string name="search">搜尋</string>
+    <string name="mine">我的</string>
     
     <string name="page_signin_sumbit">送出</string>
     <string name="hine01">請輸入手機號碼</string>
