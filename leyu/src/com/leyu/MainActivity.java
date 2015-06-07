@@ -27,17 +27,12 @@ public class MainActivity extends Activity {
 		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
 
-		new PageHome();
+		new PageRecommand();
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PageHome()).commit();
+					.add(R.id.container, new PageRecommand()).commit();
 		}
-		// Uri uri =
-		// Uri.parse("http://upload.wikimedia.org/wikipedia/commons/5/53/Zhuangzong_of_Later_Tang.jpg");
-		// SimpleDraweeView draweeView = (SimpleDraweeView)
-		// findViewById(R.id.my_image_view);
-		// draweeView.setImageURI(uri);
-		// draweeView.invalidate();
+	
 	}
 
 	@Override
@@ -54,6 +49,10 @@ public class MainActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void back() {
+		onBackPressed();
 	}
 
 	@Override

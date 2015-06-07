@@ -2,6 +2,8 @@
 <resources>
 
     <!-- common -->
-	<color name="basic">#FF0000</color>
+	<color name="footer">#6c542f</color>
+	<color name="black">#000</color>
+	<color name="title">#cdb48c</color>
 
 </resources>
