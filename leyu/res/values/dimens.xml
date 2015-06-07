@@ -3,6 +3,7 @@
     <!-- font -->
     <dimen name="font_01">16sp</dimen>
     <dimen name="font_02">19sp</dimen>
+    <dimen name="font_03">14sp</dimen>
     <!-- dimension -->
     <dimen name="header_height">140dp</dimen>
     

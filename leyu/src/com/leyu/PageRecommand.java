@@ -15,6 +15,7 @@ import com.leyu.PageEvent.EventArgs;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class PageRecommand extends Fragment {
 	ValueAnimator mDrawerAnimator = null;
 	private View mContainer, mButtons;
 	//view
+	private Resources mRes;
 	Button mWeekend, mFree, mHot, mNear;
 	// Data
 	private String mHeadPic = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_030.jpg";
@@ -51,6 +53,7 @@ public class PageRecommand extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.page_recommand, container, false);
+		mRes = getResources();
 
 		mContainer = rootView.findViewById(R.id.container);
 
@@ -60,7 +63,15 @@ public class PageRecommand extends Fragment {
 
 		mButtons = rootView.findViewById(R.id.buttons);
 
+		//
+		((TextView) rootView.findViewById(R.id.recommand)).setTextColor(mRes.getColor(R.color.red));
+		rootView.findViewById(R.id.find).setOnClickListener(new OnClickListener(){
 
+			@Override
+			public void onClick(View v) {
+				((MainActivity) getActivity()).replaceFragment(new PageFind());
+				
+			}});
 
 		int width, height;
 		View header = inflater.inflate(R.layout.header_recommand, null);

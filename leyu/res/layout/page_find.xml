@@ -1,61 +1,107 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@android:color/white" >
+
+    <RelativeLayout
+        android:id="@+id/top_menu"
+        android:layout_width="match_parent"
+        android:layout_height="53.33dp"
+        android:background="@android:color/white" >
+
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@android:color/white" >
+
+            <RelativeLayout
+                android:id="@+id/region"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/region_text"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@android:color/white"
+                    android:paddingRight="8dp"
+                    android:text="@string/region"
+                    android:textColor="@color/footer"
+                    android:textSize="@dimen/font_03" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/region_text"
+                    android:src="@drawable/spinners" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/calendar_text"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@android:color/white"
+                    android:paddingRight="8dp"
+                    android:text="@string/calendar"
+                    android:textColor="@color/footer"
+                    android:textSize="@dimen/font_03" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/calendar_text"
+                    android:src="@drawable/spinners" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/category_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@android:color/white"
+                    android:paddingRight="8dp"
+                    android:text="@string/category"
+                    android:textColor="@color/footer"
+                    android:textSize="@dimen/font_03" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/category_text"
+                    android:src="@drawable/spinners" />
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/top_menu"
         android:background="@android:color/white"
         android:orientation="vertical" >
-
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/headline"
-            android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:layout_margin="6.67dp"
-            fresco:placeholderImage="@color/black"
-            fresco:roundedCornerRadius="10dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6.67dp" >
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6.67dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_weekend"
-                android:text="@string/weekend" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6.67dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_hot"
-                android:text="@string/free" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6.67dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_free"
-                android:text="@string/hot" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6.67dp"
-                android:layout_marginRight="6.67dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_near"
-                android:text="@string/near" />
-        </LinearLayout>
 
         <ListView
             android:id="@+id/list"

@@ -5,6 +5,8 @@
     android:background="@android:color/white" >
 
     <Button
+        android:id="@+id/recommand"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -14,6 +16,8 @@
         android:textSize="@dimen/font_01" />
 
     <Button
+        android:id="@+id/find"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
