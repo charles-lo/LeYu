@@ -17,6 +17,7 @@ import android.view.Window;
 public class MainActivity extends Activity {
 	private int m_DeviceWidth;
 	private int m_DeviceHeight;
+	private boolean mFinishOnBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,6 @@ public class MainActivity extends Activity {
 		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
 
-		new PageRecommand();
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PageRecommand()).commit();
@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 
-		if (!getFragmentManager().popBackStackImmediate()) {
+		if (mFinishOnBack || !getFragmentManager().popBackStackImmediate()) {
 			finish();
 		}
 
@@ -68,6 +68,14 @@ public class MainActivity extends Activity {
 		getFragmentManager().beginTransaction()
 				.replace(R.id.container, newFragment).addToBackStack(null)
 				.commit();
+		mFinishOnBack = false;
+	}
+	
+	public void replaceFragment(Fragment newFragment, boolean finishOnBack) {
+		getFragmentManager().beginTransaction()
+				.replace(R.id.container, newFragment).addToBackStack(null)
+				.commit();
+		mFinishOnBack = finishOnBack;
 	}
 
 	public int getDeviceWidth() {

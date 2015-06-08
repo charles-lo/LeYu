@@ -69,7 +69,7 @@ public class PageRecommand extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).replaceFragment(new PageFind());
+				((MainActivity) getActivity()).replaceFragment(new PageFind(), true);
 				
 			}});
 

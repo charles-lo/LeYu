@@ -137,7 +137,7 @@ public class PageFind extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).replaceFragment(new PageRecommand());
+				((MainActivity) getActivity()).replaceFragment(new PageRecommand(), true);
 
 			}
 		});
