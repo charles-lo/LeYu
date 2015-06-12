@@ -6,5 +6,6 @@
     <dimen name="font_03">14sp</dimen>
     <!-- dimension -->
     <dimen name="header_height">140dp</dimen>
+    <dimen name="list_item_height">83.33dp</dimen>
     
 </resources>
