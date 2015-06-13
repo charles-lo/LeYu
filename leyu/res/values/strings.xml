@@ -11,6 +11,26 @@
     <string name="region">地區</string>
     <string name="calendar">日曆</string>
     <string name="category">類型</string>
+    <string name="collection">收藏</string>
+    <string name="share">分享</string>
+    <string name="time">時間:</string>
+    <string name="address">地點:</string>
+    <string name="price">價錢:</string>
+    <string name="holder">主辦單位:</string>
+    <string name="onsale_01">超級</string>
+    <string name="onsale_02">優惠</string>
+    <string name="description">活動說明</string>
+    <string name="extend"><u>展開看更多</u></string>
+    <string name="fitage">適合年齡:</string>
+    <string name="add">恭喜你收藏成功，可以在"我的"裡面找到這些資訊呦</string>
+    <string name="wechat">微信</string>
+    <string name="weibo">微博</string>
+    <string name="facebook">facebook</string>
+    <string name="friends">朋友圈</string>
+    <string name="message">簡訊</string>
+    <string name="mail">郵件</string>
+    <string name="share_title">分享這個資訊</string>
+    
 
     <string-array name="regions">
         <item>臺北市</item>

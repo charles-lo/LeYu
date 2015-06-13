@@ -12,12 +12,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -25,37 +19,25 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
+import com.leyu.PageDetail.DetailArgs;
 import com.leyu.PageEvent.EventArgs;
 
 import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.telephony.TelephonyManager;
-import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -64,18 +46,16 @@ import android.widget.TextView;
 
 public class PageRecommand extends Fragment {
 	static final String TAG = PageRecommand.class.getSimpleName();
-	// Cover Drawer
-	private int mMin, mMax, mMid, mPreviousY, mDiffY, mPaddingY;
-	private boolean isOpened = true, overScroll = true;
+
 	ValueAnimator mDrawerAnimator = null;
-	private View mContainer, mButtons;
 	//view
 	private Resources mRes;
-	Button mWeekend, mFree, mHot, mNear;
+	private Button mWeekend, mFree, mHot, mNear;
+	private ListView mList;
+	private int mScrollState;
+	private boolean mScroll;
 	// Data
 	private String mHeadPic = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_030.jpg";
-	// test
-	private	double latitude, longitude;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -94,96 +74,24 @@ public class PageRecommand extends Fragment {
             Log.e(TAG, "MalformedURLException");  
         }
         if (url != null) {
-        	new AsyncTask(){
-
-				@Override
-				protected Object doInBackground(Object... params) {
-					try {
-						JSONArray array = new JSONArray(getJSON(httpUrl, 10000));
-						Log.d(TAG, "");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					return null;
-				}}.execute();
+//        	new AsyncTask(){
+//
+//				@Override
+//				protected Object doInBackground(Object... params) {
+//					try {
+//						JSONArray array = new JSONArray(getJSON(httpUrl, 10000));
+//						Log.d(TAG, "");
+//					} catch (JSONException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					return null;
+//				}}.execute();
 		}
-        
-        LocationManager locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-//        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-//            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//            if(location != null){
-//                latitude = location.getLatitude();
-//                longitude = location.getLongitude();
-//                Log.d(TAG, "charles case 01 latitude: " + latitude + " longitude: " +longitude );
-//                }
-//        }else
-        {
-            LocationListener locationListener = new LocationListener() {
-                 
-                // Provider的状态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                     
-                }
-                 
-                // Provider被enable时触发此函数，比如GPS被打开
-                @Override
-                public void onProviderEnabled(String provider) {
-                     
-                }
-                 
-                // Provider被disable时触发此函数，比如GPS被关闭 
-                @Override
-                public void onProviderDisabled(String provider) {
-                     
-                }
-                 
-                //当坐标改变时触发此函数，如果Provider传进相同的坐标，它就不会被触发 
-                @Override
-                public void onLocationChanged(Location location) {
-                    if (location != null) {   
-                        Log.e("Map", "Location changed : Lat: " 
-                        + location.getLatitude() + " Lng: " 
-                        + location.getLongitude());   
-                    }
-                }
-            };
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000, 0,locationListener);   
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);   
-            if(location != null){   
-                latitude = location.getLatitude(); //经度   
-                longitude = location.getLongitude(); //纬度
-                Log.d(TAG, "charles case 02 latitude: " + latitude + " longitude: " +longitude );
-            }
-            
-            location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);   
-            if(location != null){   
-                latitude = location.getLatitude(); //经度   
-                longitude = location.getLongitude(); //纬度
-                Log.d(TAG, "charles case 03 latitude: " + latitude + " longitude: " +longitude );
-            }   
-            
-            TelephonyManager telephonyManager = (TelephonyManager)getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-            GsmCellLocation cellLocation = (GsmCellLocation)telephonyManager.getCellLocation();
-
-            int cid = cellLocation.getCid();
-            int lac = cellLocation.getLac();
-            Log.d(TAG, "charles case 04 cid: " + cid + " lac: " +lac );
-            
-        }
-
-		mContainer = rootView.findViewById(R.id.container);
-
-		mMin = -1 * PageRecommand.this.getResources().getDimensionPixelSize(R.dimen.header_height);
-		mContainer.setPadding(0, 0, 0, mMin);
-		mMid = mMin / 2;
-
-		mButtons = rootView.findViewById(R.id.buttons);
 
 		//
-		((TextView) rootView.findViewById(R.id.recommand)).setTextColor(mRes.getColor(R.color.red));
-		rootView.findViewById(R.id.find).setOnClickListener(new OnClickListener(){
+		((TextView) rootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
+		rootView.findViewById(R.id.right).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
@@ -253,16 +161,16 @@ public class PageRecommand extends Fragment {
 				.setOldController(image.getController()).build();
 		image.setController(controller);
 
-		final ListView list = ((ListView) rootView.findViewById(R.id.list));
+		mList = ((ListView) rootView.findViewById(R.id.list));
 		ViewGroup footer = new LinearLayout(PageRecommand.this.getActivity());
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				(int) (PageRecommand.this.getResources().getDisplayMetrics().heightPixels)/3);
+				(int) (PageRecommand.this.getResources().getDisplayMetrics().heightPixels)/2);
 		footer.setLayoutParams(lp);
-		list.setOnScrollListener(new OnScrollListener(){
+		mList.setOnScrollListener(new OnScrollListener(){
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				// TODO Auto-generated method stub
+				mScrollState = scrollState;
 				
 			}
 
@@ -273,19 +181,12 @@ public class PageRecommand extends Fragment {
 //				Log.d(TAG, loc[1]  + "  " + loc[0] + "    charles");
 				
 			}});
-		list.addHeaderView(header);
-		list.addFooterView(footer);
-		list.setAdapter(new LeyuAdapter());
+		mList.addHeaderView(header);
+		mList.addFooterView(footer);
+		mList.setAdapter(new LeyuAdapter());
 
 
 		return rootView;
-	}
-	
-	private int getRelativeTop(View myView) {
-	    if (myView.getParent() == myView.getRootView())
-	        return myView.getTop();
-	    else
-	        return myView.getTop() + getRelativeTop((View) myView.getParent());
 	}
 	
 	public String getJSON(String url, int timeout) {
@@ -329,77 +230,7 @@ public class PageRecommand extends Fragment {
 	       }
 	    }
 	    return null;
-	}
-
-	public boolean isDrawerOpened() {
-		return isOpened;
-	}
-
-	public boolean drawerTouchHandler(MotionEvent event) {
-		if (mDrawerAnimator != null && mDrawerAnimator.isStarted()) {
-			return true;
-		}
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			mPreviousY = 0;
-			return true;
-		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-			if (mPreviousY == 0) {
-				mDiffY = 0;
-				mPreviousY = (int) event.getRawY();
-				return true;
-			}
-			mDiffY = (int) event.getRawY() - mPreviousY;
-			mPaddingY += mDiffY;
-			if (mPaddingY > mMax) {
-				mPaddingY = mMax;
-			} else if (mPaddingY < mMin) {
-				mPaddingY = mMin;
-			}
-			if (mDiffY >= 0 && mPaddingY == mMax) {
-				overScroll = true;
-			} else {
-				overScroll = false;
-			}
-			mPreviousY = (int) event.getRawY();
-			mContainer.scrollTo(0, -1 * mPaddingY);
-			return true;
-		} else if (event.getAction() == MotionEvent.ACTION_UP) {
-			finishDrawer();
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private void finishDrawer() {
-		if (mPaddingY == mMin) {
-			isOpened = false;
-		} else if (mPaddingY == mMax) {
-			isOpened = true;
-		} else {
-			if (mPaddingY > mMid) {
-				mDrawerAnimator = ValueAnimator.ofInt(mPaddingY, mMax);
-			} else if (mPaddingY <= mMid) {
-				mDrawerAnimator = ValueAnimator.ofInt(mPaddingY, mMin);
-			}
-			mDrawerAnimator.setDuration(180);
-			mDrawerAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-				public void onAnimationUpdate(ValueAnimator animation) {
-					Integer value = (Integer) animation.getAnimatedValue();
-					mPaddingY = value.intValue();
-					mContainer.scrollTo(0, -1 * mPaddingY);
-					if (mPaddingY == mMin) {
-						isOpened = false;
-					} else if (mPaddingY == mMax) {
-						isOpened = true;
-					} else {
-					}
-				}
-			});
-			mDrawerAnimator.start();
-		}
-		mPreviousY = 0;
-	}
+	}	
 
 	class LeyuAdapter extends BaseAdapter {
 
@@ -469,7 +300,7 @@ public class PageRecommand extends Fragment {
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(final int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = new ViewHolder();
 			if (convertView == null) {
 				convertView = LayoutInflater.from(getActivity()).inflate(
@@ -479,27 +310,38 @@ public class PageRecommand extends Fragment {
 
 				final View root = convertView;
 				final View img = holder.image;
+				final int factor = 10000;
 				convertView.getViewTreeObserver().addOnScrollChangedListener(new OnScrollChangedListener(){
 
 					@Override
 					public void onScrollChanged() {
 						int [] loc = new int [2];
 						root.getLocationOnScreen(loc);
-						Log.d(TAG, "charles  A " + loc[0] +"   " +  loc[1]);
 						android.view.ViewGroup.LayoutParams layoutParams = img.getLayoutParams();
 						layoutParams.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-						if(loc[1] < mMax &&  loc[1] > 0){
-							layoutParams.height = Math.min(mMax, mItemHeight + (mMax - loc[1]));
-							
-//							img.setPadding(100, 0, 0, 0);
-						}else if(loc[1] <= 0){
-							layoutParams.height = Math.max(0, mMax + loc[1]);
-							
-						}else if(loc[1] <= -400){
-							layoutParams.height = 0;
-							
+						if(loc[1] < mMax &&  loc[1] > mMax/factor){
+							layoutParams.height = Math.min(mMax, mItemHeight + (mMax - loc[1])*factor/(factor-1));
+						}else if(loc[1] <=  mMax/factor){
+							layoutParams.height = mMax;
 						}else {
 							layoutParams.height = mItemHeight;
+						}
+						if(!mScroll && mScrollState == OnScrollListener.SCROLL_STATE_IDLE){
+							if(loc[1] > -mMax && loc[1] <=0){
+								mScroll = true;
+								if(loc[1]< -mMax /3){
+									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition()+1,0,100);
+								}else{
+									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition(),0,100);
+								}
+								new Handler().postDelayed(new Runnable(){
+	
+									@Override
+									public void run() {
+										mScroll = false;
+										
+									}}, 500);
+							}
 						}
 						img.setLayoutParams(layoutParams);
 					}});
@@ -507,6 +349,10 @@ public class PageRecommand extends Fragment {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
+			android.view.ViewGroup.LayoutParams layoutParams = holder.image.getLayoutParams();
+			layoutParams.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+			layoutParams.height = mMax;
+			holder.image.setLayoutParams(layoutParams);
 
 			holder.mTitle.setText(m_Data.get(position).mTitle);
 			String uriBase = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_";
@@ -525,7 +371,17 @@ public class PageRecommand extends Fragment {
 					.build();
 			holder.image.setController(controller);
 			
-			
+			convertView.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					Fragment event = new PageDetail();
+					Bundle bundle = new Bundle();
+					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mTitle, uri.toString())));
+					event.setArguments(bundle);
+					((MainActivity) getActivity()).replaceFragment(event);;
+					
+				}});
 
 			return convertView;
 		}

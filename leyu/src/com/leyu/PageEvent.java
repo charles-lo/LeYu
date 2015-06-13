@@ -12,6 +12,7 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
+import com.leyu.PageDetail.DetailArgs;
 
 import android.R.color;
 import android.app.Fragment;
@@ -213,7 +214,7 @@ public class PageEvent extends Fragment {
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(final int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = new ViewHolder();
 			if (convertView == null) {
 				convertView = LayoutInflater.from(getActivity()).inflate(R.layout.listitem_event,
@@ -241,6 +242,18 @@ public class PageEvent extends Fragment {
 					.setImageRequest(request).setOldController(holder.image.getController())
 					.build();
 			holder.image.setController(controller);
+			
+			convertView.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					Fragment event = new PageDetail();
+					Bundle bundle = new Bundle();
+					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mTitle, uri.toString())));
+					event.setArguments(bundle);
+					((MainActivity) getActivity()).replaceFragment(event);;
+					
+				}});
 
 			return convertView;
 		}

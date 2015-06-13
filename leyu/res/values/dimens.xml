@@ -4,6 +4,10 @@
     <dimen name="font_01">16sp</dimen>
     <dimen name="font_02">19sp</dimen>
     <dimen name="font_03">14sp</dimen>
+    <dimen name="font_04">17sp</dimen>
+    <dimen name="font_05">13sp</dimen>
+    <dimen name="font_06">12sp</dimen>
+    <dimen name="font_07">10sp</dimen>
     <!-- dimension -->
     <dimen name="header_height">140dp</dimen>
     <dimen name="list_item_height">83.33dp</dimen>

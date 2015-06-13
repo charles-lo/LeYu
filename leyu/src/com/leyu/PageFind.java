@@ -12,6 +12,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.google.gson.Gson;
+import com.leyu.PageDetail.DetailArgs;
 import com.leyu.PageEvent.LeyuAdapter.Item;
 import com.leyu.PageEvent.LeyuAdapter.ViewHolder;
 
@@ -132,8 +134,8 @@ public class PageFind extends Fragment {
 		category.setOnClickListener(clickCategory);
 		categoryText.setOnClickListener(clickCategory);
 		//
-		((TextView) mRootView.findViewById(R.id.find)).setTextColor(mRes.getColor(R.color.red));
-		mRootView.findViewById(R.id.recommand).setOnClickListener(new OnClickListener() {
+		((TextView) mRootView.findViewById(R.id.right)).setTextColor(mRes.getColor(R.color.red));
+		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -222,7 +224,7 @@ public class PageFind extends Fragment {
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(final int position, View convertView, ViewGroup parent) {
 			if (m_Data.get(position).mType == 1) {
 				Holder02 holder = new Holder02();
 				if (convertView == null || convertView.getTag() == null
@@ -257,6 +259,17 @@ public class PageFind extends Fragment {
 							.setOldController(image.getController()).build();
 					image.setController(controller);
 				}
+				convertView.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						Fragment event = new PageDetail();
+						Bundle bundle = new Bundle();
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mTitle, uri.toString())));
+						event.setArguments(bundle);
+						((MainActivity) getActivity()).replaceFragment(event);;
+						
+					}});
 			}
 			else{
 				Holder01 holder = new Holder01();
@@ -289,10 +302,19 @@ public class PageFind extends Fragment {
 						.setImageRequest(request).setOldController(holder.image.getController())
 						.build();
 				holder.image.setController(controller);
+				//
+				convertView.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						Fragment event = new PageDetail();
+						Bundle bundle = new Bundle();
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mTitle, uri.toString())));
+						event.setArguments(bundle);
+						((MainActivity) getActivity()).replaceFragment(event);;
+						
+					}});
 			}
-			
-			
-			
 
 			return convertView;
 		}

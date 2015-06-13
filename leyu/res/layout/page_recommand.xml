@@ -11,64 +11,12 @@
         android:background="@android:color/white"
         android:orientation="vertical" >
 
-<!--         <com.facebook.drawee.view.SimpleDraweeView -->
-<!--             android:id="@+id/headline" -->
-<!--             android:layout_width="match_parent" -->
-<!--             android:layout_height="@dimen/header_height" -->
-<!--             android:layout_margin="6.67dp" -->
-<!--             fresco:placeholderImage="@color/black" -->
-<!--             fresco:roundedCornerRadius="10dp" /> -->
-
-<!--         <LinearLayout -->
-<!--             android:id="@+id/buttons" -->
-<!--             android:layout_width="match_parent" -->
-<!--             android:layout_height="wrap_content" -->
-<!--             android:layout_marginBottom="6.67dp" > -->
-
-<!--             <Button -->
-<!--                 android:id="@+id/weekend" -->
-<!--                 android:layout_width="wrap_content" -->
-<!--                 android:layout_height="wrap_content" -->
-<!--                 android:layout_marginLeft="6.67dp" -->
-<!--                 android:layout_weight="1" -->
-<!--                 android:background="@drawable/btn_weekend" -->
-<!--                 android:text="@string/weekend" /> -->
-
-<!--             <Button -->
-<!--                 android:id="@+id/free" -->
-<!--                 android:layout_width="wrap_content" -->
-<!--                 android:layout_height="wrap_content" -->
-<!--                 android:layout_marginLeft="6.67dp" -->
-<!--                 android:layout_weight="1" -->
-<!--                 android:background="@drawable/btn_free" -->
-<!--                 android:text="@string/free" /> -->
-
-<!--             <Button -->
-<!--                 android:id="@+id/hot" -->
-<!--                 android:layout_width="wrap_content" -->
-<!--                 android:layout_height="wrap_content" -->
-<!--                 android:layout_marginLeft="6.67dp" -->
-<!--                 android:layout_weight="1" -->
-<!--                 android:background="@drawable/btn_hot" -->
-<!--                 android:text="@string/hot" /> -->
-
-<!--             <Button -->
-<!--                 android:id="@+id/near" -->
-<!--                 android:layout_width="wrap_content" -->
-<!--                 android:layout_height="wrap_content" -->
-<!--                 android:layout_marginLeft="6.67dp" -->
-<!--                 android:layout_marginRight="6.67dp" -->
-<!--                 android:layout_weight="1" -->
-<!--                 android:background="@drawable/btn_near" -->
-<!--                 android:text="@string/near" /> -->
-<!--         </LinearLayout> -->
-
         <ListView
             android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@null"
-            android:layout_marginTop="23.33dp" />
+            android:layout_marginTop="23.33dp"
+            android:divider="@null" />
     </LinearLayout>
 
     <include

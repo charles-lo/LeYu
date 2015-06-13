@@ -1,0 +1,125 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/share"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone" >
+
+    <View
+        android:id="@+id/share_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:background="@android:color/white"
+        android:orientation="vertical" >
+    </View>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/list"
+        android:layout_marginBottom="15.33dp"
+        android:layout_marginLeft="16.67dp"
+        android:text="@string/share_title"
+        android:textColor="@color/red_02"
+        android:textSize="@dimen/font_04" />
+
+    <ImageView
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/list"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="15.33dp"
+        android:layout_marginLeft="33dp"
+        android:layout_marginRight="16.67dp"
+        android:layout_marginTop="33dp"
+        android:src="@drawable/close" />
+
+    <LinearLayout
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="46.67dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/rectanglebackground_02"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="39.33dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/community_icon_01"
+                android:gravity="center"
+                android:text="@string/wechat"
+                android:textColor="#000"
+                android:textSize="@dimen/font_07" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/community_icon_02"
+                android:gravity="center"
+                android:text="@string/weibo"
+                android:textColor="#000"
+                android:textSize="@dimen/font_07" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/community_icon_03"
+                android:gravity="center"
+                android:text="@string/facebook"
+                android:textColor="#000"
+                android:textSize="@dimen/font_07" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36.67dp"
+            android:layout_marginTop="30dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/community_icon_04"
+                android:gravity="center"
+                android:text="@string/friends"
+                android:textColor="#000"
+                android:textSize="@dimen/font_07" />
+
+            <TextView
+                android:id="@+id/message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/community_icon_05"
+                android:gravity="center"
+                android:text="@string/message"
+                android:textColor="#000"
+                android:textSize="@dimen/font_07" />
+
+            <TextView
+                android:id="@+id/mail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/community_icon_06"
+                android:gravity="center"
+                android:text="@string/mail"
+                android:textColor="#000"
+                android:textSize="@dimen/font_07" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
