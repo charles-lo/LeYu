@@ -51,6 +51,7 @@ public class PageRecommand extends Fragment {
 	//view
 	private Resources mRes;
 	private Button mWeekend, mFree, mHot, mNear;
+	private int mItemHeight, mMax;
 	private ListView mList;
 	private int mScrollState;
 	private boolean mScroll;
@@ -61,6 +62,8 @@ public class PageRecommand extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.page_recommand, container, false);
 		mRes = getResources();
+		mItemHeight = PageRecommand.this.getActivity().getResources().getDimensionPixelOffset(R.dimen.list_item_height);
+		mMax = 3 * mItemHeight;
 		// internet
 		final String httpUrl = "http://leibaoserver.azurewebsites.net/api/activity";
 		URL url = null;  
@@ -245,12 +248,11 @@ public class PageRecommand extends Fragment {
 				mUrl = url;
 			}
 		}
-		private int mItemHeight, mMax;
+		
 
 		LeyuAdapter() {
 			
-			mItemHeight = PageRecommand.this.getActivity().getResources().getDimensionPixelOffset(R.dimen.list_item_height);
-			mMax = 3 * mItemHeight;
+			
 			
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("手作趣味多", ""));
@@ -327,13 +329,15 @@ public class PageRecommand extends Fragment {
 							layoutParams.height = mItemHeight;
 						}
 						if(!mScroll && mScrollState == OnScrollListener.SCROLL_STATE_IDLE){
-							if(loc[1] > -mMax && loc[1] <=0){
+							if(loc[1] > -mMax && loc[1] <0){
 								mScroll = true;
 								if(loc[1]< -mMax /3){
 									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition()+1,0,100);
 								}else{
 									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition(),0,100);
 								}
+								
+								Log.d(TAG, "Charles " + mMax + "   " + loc[1]);
 								new Handler().postDelayed(new Runnable(){
 	
 									@Override
