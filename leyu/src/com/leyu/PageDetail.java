@@ -20,6 +20,11 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.google.gson.Gson;
+import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.SendMessageToWX;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.tencent.mm.sdk.openapi.WXMediaMessage;
+import com.tencent.mm.sdk.openapi.WXTextObject;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -27,6 +32,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -47,6 +53,8 @@ public class PageDetail extends Fragment {
 	private BarChart mChart;
 	private TextView mLeft, mRight;
 	private View mShare;
+	private IWXAPI api;
+	public static final String APP_ID = "wx6dbf5e76d03452da";
 	// Data
 	private	List<String> category = new ArrayList<String>(Arrays.asList("美感", "體能", "社交", "科普", "文化"));
 	
@@ -54,7 +62,10 @@ public class PageDetail extends Fragment {
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final DetailArgs args = new Gson().fromJson((String) getArguments().getString(ARG), DetailArgs.class);
 		mRes = PageDetail.this.getResources();
-		
+		//
+		api = WXAPIFactory.createWXAPI(getActivity(), APP_ID, false);
+		api.registerApp(APP_ID);
+		//
 		final View rootView = inflater.inflate(R.layout.page_detail, container, false);
 
 		TextView title = ((TextView) rootView.findViewById(R.id.title));
@@ -101,6 +112,27 @@ public class PageDetail extends Fragment {
 			public void onClick(View v) {
 				mShare.setVisibility(View.GONE);
 				
+			}});
+		
+		rootView.findViewById(R.id.wechat).setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				WXTextObject textObj = new WXTextObject();
+				textObj.text = "樂育 ";//\n title: " + args.mTitle + "\n  " + args.mUrl;
+
+				WXMediaMessage msg = new WXMediaMessage();
+				msg.mediaObject = textObj;
+				msg.description = "樂育";
+
+				SendMessageToWX.Req req = new SendMessageToWX.Req();
+				req.transaction = "text" + System.currentTimeMillis();
+				req.message = msg;
+				req.scene = SendMessageToWX.Req.WXSceneSession;
+				
+				
+				api.sendReq(req);
+	    
 			}});
 		
 		rootView.findViewById(R.id.mail).setOnClickListener(new OnClickListener(){

@@ -16,6 +16,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.request.BaseRepeatedPostProcessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
@@ -25,10 +26,15 @@ import com.leyu.PageEvent.EventArgs;
 import android.animation.ValueAnimator;
 import android.app.Fragment;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -179,9 +185,6 @@ public class PageRecommand extends Fragment {
 
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-				int [] loc = new int [2];
-				view.getLocationOnScreen(loc);
-//				Log.d(TAG, loc[1]  + "  " + loc[0] + "    charles");
 				
 			}});
 		mList.addHeaderView(header);
@@ -308,10 +311,12 @@ public class PageRecommand extends Fragment {
 				convertView = LayoutInflater.from(getActivity()).inflate(
 						R.layout.listitem_recommand, parent, false);
 				holder.mTitle = (TextView) convertView.findViewById(R.id.headline);
-				holder.image = (SimpleDraweeView) convertView.findViewById(R.id.headline_value);
+				holder.mImage = (SimpleDraweeView) convertView.findViewById(R.id.headline_value);
+				holder.mProcessor = new MeshPostprocessor();
 
 				final View root = convertView;
-				final View img = holder.image;
+				final View img = holder.mImage;
+				final MeshPostprocessor processor = holder.mProcessor;
 				final int factor = 10000;
 				convertView.getViewTreeObserver().addOnScrollChangedListener(new OnScrollChangedListener(){
 
@@ -322,10 +327,13 @@ public class PageRecommand extends Fragment {
 						android.view.ViewGroup.LayoutParams layoutParams = img.getLayoutParams();
 						layoutParams.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 						if(loc[1] < mMax &&  loc[1] > mMax/factor){
+							processor.setBlurRadius(false, 0);
 							layoutParams.height = Math.min(mMax, mItemHeight + (mMax - loc[1])*factor/(factor-1));
 						}else if(loc[1] <=  mMax/factor){
 							layoutParams.height = mMax;
+							processor.setBlurRadius(true, Math.min(25, Math.max(5f, ((float)Math.abs(mMax/factor - loc[1])*2)/mMax * 25)));
 						}else {
+							processor.setBlurRadius(false, 0);
 							layoutParams.height = mItemHeight;
 						}
 						if(!mScroll && mScrollState == OnScrollListener.SCROLL_STATE_IDLE){
@@ -336,8 +344,7 @@ public class PageRecommand extends Fragment {
 								}else{
 									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition(),0,100);
 								}
-								
-								Log.d(TAG, "Charles " + mMax + "   " + loc[1]);
+
 								new Handler().postDelayed(new Runnable(){
 	
 									@Override
@@ -353,10 +360,10 @@ public class PageRecommand extends Fragment {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			android.view.ViewGroup.LayoutParams layoutParams = holder.image.getLayoutParams();
+			android.view.ViewGroup.LayoutParams layoutParams = holder.mImage.getLayoutParams();
 			layoutParams.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 			layoutParams.height = mMax;
-			holder.image.setLayoutParams(layoutParams);
+			holder.mImage.setLayoutParams(layoutParams);
 
 			holder.mTitle.setText(m_Data.get(position).mTitle);
 			String uriBase = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_";
@@ -368,12 +375,13 @@ public class PageRecommand extends Fragment {
 					.getDisplayMetrics().density * 115);
 			ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
 					.setResizeOptions(new ResizeOptions(width, height))
+					.setPostprocessor(holder.mProcessor)
 					.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
 					.build();
 			DraweeController controller = Fresco.newDraweeControllerBuilder()
-					.setImageRequest(request).setOldController(holder.image.getController())
+					.setImageRequest(request).setOldController(holder.mImage.getController())
 					.build();
-			holder.image.setController(controller);
+			holder.mImage.setController(controller);
 			
 			convertView.setOnClickListener(new OnClickListener(){
 
@@ -389,10 +397,64 @@ public class PageRecommand extends Fragment {
 
 			return convertView;
 		}
+		
+	
+		 
+		public class MeshPostprocessor extends BaseRepeatedPostProcessor {
+			private float mBlurRadius = 5f;
+			private boolean mBlur;
+			private RenderScript mRs;
+			private Allocation mInput, mOutput;
+			private ScriptIntrinsicBlur mScript;
+			
+			MeshPostprocessor(){
+				super();
+				mRs = RenderScript.create(getActivity());
+				mScript = ScriptIntrinsicBlur.create(mRs, Element.U8_4(mRs));
+			}
+
+			public void setBlurRadius(boolean blur, float blurRadius) {
+				if(mBlur == blur && mBlurRadius == blurRadius){
+					return;
+				}
+				if(blur && (blurRadius > 25 || blurRadius<5)){
+					return;
+				}
+				Log.d(TAG, "Charles " + blurRadius);
+				mBlurRadius = blurRadius;
+				mBlur = blur;
+				update();
+			}
+
+			@Override
+			public String getName() {
+				return "meshPostprocessor";
+			}
+
+			@Override
+			public void process(Bitmap bitmap) {
+				if(mBlur){
+					if(mBlurRadius <=25 && mBlurRadius >= 5){
+						blur(bitmap);
+					}
+				}
+			}
+			
+			private void blur(Bitmap src) {
+				mInput = Allocation.createFromBitmap(mRs, src,
+						Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
+				mOutput = Allocation.createTyped(mRs, mInput.getType());
+				mScript.setRadius(mBlurRadius);
+				mScript.setInput(mInput);
+				mScript.forEach(mOutput);
+				mOutput.copyTo(src);
+			}
+		}
 
 		class ViewHolder {
 			TextView mTitle;
-			SimpleDraweeView image;
+			SimpleDraweeView mImage;
+			MeshPostprocessor mProcessor;
 		}
 	}
 }
