@@ -397,28 +397,32 @@ public class PageRecommand extends Fragment {
 
 			return convertView;
 		}
-		
-	
-		 
+
 		public class MeshPostprocessor extends BaseRepeatedPostProcessor {
 			private float mBlurRadius = 5f;
-			private boolean mBlur;
+			private boolean mBlur, mLock;
 			private RenderScript mRs;
 			private Allocation mInput, mOutput;
 			private ScriptIntrinsicBlur mScript;
-			
-			MeshPostprocessor(){
+
+			MeshPostprocessor() {
 				super();
 				mRs = RenderScript.create(getActivity());
 				mScript = ScriptIntrinsicBlur.create(mRs, Element.U8_4(mRs));
 			}
 
 			public void setBlurRadius(boolean blur, float blurRadius) {
-				if(mBlur == blur && mBlurRadius == blurRadius){
+				if(mLock){
 					return;
 				}
-				if(blur && (blurRadius > 25 || blurRadius<5)){
+				if (mBlur == blur && mBlurRadius == blurRadius) {
 					return;
+				}
+				if (blur && (blurRadius > 25 || blurRadius < 5)) {
+					return;
+				}
+				if(blur){
+					mLock = true;
 				}
 				Log.d(TAG, "Charles " + blurRadius);
 				mBlurRadius = blurRadius;
@@ -433,13 +437,14 @@ public class PageRecommand extends Fragment {
 
 			@Override
 			public void process(Bitmap bitmap) {
-				if(mBlur){
-					if(mBlurRadius <=25 && mBlurRadius >= 5){
+				if (mBlur) {
+					if (mBlurRadius <= 25 && mBlurRadius >= 5) {
 						blur(bitmap);
 					}
+					mLock = false;
 				}
 			}
-			
+
 			private void blur(Bitmap src) {
 				mInput = Allocation.createFromBitmap(mRs, src,
 						Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);

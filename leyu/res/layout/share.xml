@@ -30,9 +30,9 @@
         android:layout_above="@+id/list"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="15.33dp"
-        android:layout_marginLeft="33dp"
+        android:paddingLeft="33dp"
         android:layout_marginRight="16.67dp"
-        android:layout_marginTop="33dp"
+        android:paddingTop="33dp"
         android:src="@drawable/close" />
 
     <LinearLayout
