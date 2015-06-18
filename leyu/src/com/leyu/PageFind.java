@@ -1,10 +1,13 @@
 package com.leyu;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -16,32 +19,44 @@ import com.google.gson.Gson;
 import com.leyu.PageDetail.DetailArgs;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.DatePickerDialog.OnDateSetListener;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.DatePicker;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class PageFind extends Fragment {
 	static final String TAG = PageFind.class.getSimpleName();
 	//
 	private Resources mRes;
-	private int myYear, myMonth, myDay;
 	View mRootView;
+	// Calendar
+	public GregorianCalendar mMonth, mItemMonth;// calendar instances.
+	public CalendarAdapter mAdapter;// adapter instance
+	public Handler mHandler;// for grabbing some event values for showing the dot  marker.
+	public ArrayList<String> mItems; // container to store calendar items which needs showing the event marker
+	private ArrayList<String> mEvent;
+	private LinearLayout mLayout;
+	private ArrayList<String> desc;
+	private TextView calendarText;
 	// Data
 
 	@Override
@@ -72,31 +87,7 @@ public class PageFind extends Fragment {
 		regions.setOnClickListener(clickRegion);
 		regionsText.setOnClickListener(clickRegion);
 
-		final View calendar = mRootView.findViewById(R.id.calendar);
-		final TextView calendarText = (TextView) mRootView.findViewById(R.id.calendar_text);
-		final Calendar c = Calendar.getInstance();
-	    myYear = c.get(Calendar.YEAR);
-	    myMonth = c.get(Calendar.MONTH);
-	    myDay = c.get(Calendar.DAY_OF_MONTH);
-	    final DatePickerDialog dialog = new DatePickerDialog(getActivity(),
-	    	      new OnDateSetListener (){
 
-					@Override
-					public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-						calendarText.setText((monthOfYear+1) + "/" + dayOfMonth + "/" + year);
-						
-					}},
-	    	      myYear, myMonth, myDay);
-	    OnClickListener clickCalendar = new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				dialog.show();
-			}
-		};
-		calendar.setOnClickListener(clickCalendar);
-		calendarText.setOnClickListener(clickCalendar);
 
 		final View category = mRootView.findViewById(R.id.category);
 		final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
@@ -142,9 +133,186 @@ public class PageFind extends Fragment {
 		footer.setLayoutParams(lp);
 		list.addFooterView(footer);
 		list.setAdapter(new LeyuAdapter());
+		
+		//calendar
+		final View calendar = mRootView.findViewById(R.id.calendar);
+		final View calendarView = mRootView.findViewById(R.id.calendar_view);
+		calendarText = (TextView) mRootView.findViewById(R.id.calendar_text);
+		
+	    OnClickListener clickCalendar = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				calendarText.setText(mAdapter.curentDateString);
+				calendarView.setVisibility(View.VISIBLE);
+			}
+		};
+		calendar.setOnClickListener(clickCalendar);
+		calendarText.setOnClickListener(clickCalendar);
+		View calendarOK = (TextView) mRootView.findViewById(R.id.btn_ok);
+		calendarOK.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				calendarView.setVisibility(View.GONE);
+				
+			}});
+		
+		Locale.setDefault(Locale.US);
+
+		mLayout = (LinearLayout) mRootView.findViewById(R.id.text);
+		mMonth = (GregorianCalendar) GregorianCalendar.getInstance();
+		mItemMonth = (GregorianCalendar) mMonth.clone();
+
+		mItems = new ArrayList<String>();
+
+		mAdapter = new CalendarAdapter(getActivity(), mMonth);
+
+		GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
+		gridview.setAdapter(mAdapter);
+
+		mHandler = new Handler();
+		mHandler.post(calendarUpdater);
+
+		TextView title = (TextView) mRootView.findViewById(R.id.title);
+		title.setText(android.text.format.DateFormat.format("MMMM yyyy", mMonth));
+
+		RelativeLayout previous = (RelativeLayout) mRootView.findViewById(R.id.previous);
+
+		previous.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				setPreviousMonth();
+				refreshCalendar();
+			}
+		});
+
+		RelativeLayout next = (RelativeLayout) mRootView.findViewById(R.id.next);
+		next.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				setNextMonth();
+				refreshCalendar();
+
+			}
+		});
+
+		gridview.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View v,
+					int position, long id) {
+				// removing the previous view if added
+				if (((LinearLayout) mLayout).getChildCount() > 0) {
+					((LinearLayout) mLayout).removeAllViews();
+				}
+				desc = new ArrayList<String>();
+				((CalendarAdapter) parent.getAdapter()).setSelected(v);
+				String selectedGridDate = CalendarAdapter.dayString.get(position);
+				
+				calendarText.setText(selectedGridDate);
+				String[] separatedTime = selectedGridDate.split("-");
+				String gridvalueString = separatedTime[2].replaceFirst("^0*",
+						"");// taking last part of date. ie; 2 from 2012-12-02.
+				int gridvalue = Integer.parseInt(gridvalueString);
+				// navigate to next or previous month on clicking offdays.
+				if ((gridvalue > 10) && (position < 8)) {
+					setPreviousMonth();
+					refreshCalendar();
+				} else if ((gridvalue < 7) && (position > 28)) {
+					setNextMonth();
+					refreshCalendar();
+				}
+				((CalendarAdapter) parent.getAdapter()).setSelected(v);
+
+				for (int i = 0; i < Utility.startDates.size(); i++) {
+					if (Utility.startDates.get(i).equals(selectedGridDate)) {
+						desc.add(Utility.nameOfEvent.get(i));
+					}
+				}
+
+				if (desc.size() > 0) {
+					for (int i = 0; i < desc.size(); i++) {
+						TextView rowTextView = new TextView(getActivity());
+
+						// set some properties of rowTextView or something
+						rowTextView.setText("Event:" + desc.get(i));
+						rowTextView.setTextColor(Color.BLACK);
+
+						// add the textview to the linearlayout
+						mLayout.addView(rowTextView);
+
+					}
+
+				}
+
+				desc = null;
+
+			}
+
+		});
 
 		return mRootView;
 	}
+	
+	protected void setNextMonth() {
+		if (mMonth.get(GregorianCalendar.MONTH) == mMonth
+				.getActualMaximum(GregorianCalendar.MONTH)) {
+			mMonth.set((mMonth.get(GregorianCalendar.YEAR) + 1),
+					mMonth.getActualMinimum(GregorianCalendar.MONTH), 1);
+		} else {
+			mMonth.set(GregorianCalendar.MONTH,
+					mMonth.get(GregorianCalendar.MONTH) + 1);
+		}
+
+	}
+	
+	protected void setPreviousMonth() {
+		if (mMonth.get(GregorianCalendar.MONTH) == mMonth
+				.getActualMinimum(GregorianCalendar.MONTH)) {
+			mMonth.set((mMonth.get(GregorianCalendar.YEAR) - 1),
+					mMonth.getActualMaximum(GregorianCalendar.MONTH), 1);
+		} else {
+			mMonth.set(GregorianCalendar.MONTH,
+					mMonth.get(GregorianCalendar.MONTH) - 1);
+		}
+
+	}
+	
+	public void refreshCalendar() {
+		TextView title = (TextView) mRootView.findViewById(R.id.title);
+
+		mAdapter.refreshDays();
+		mAdapter.notifyDataSetChanged();
+		mHandler.post(calendarUpdater); // generate some calendar items
+
+		title.setText(android.text.format.DateFormat.format("MMMM yyyy", mMonth));
+	}
+	
+	public Runnable calendarUpdater = new Runnable() {
+
+		@Override
+		public void run() {
+			mItems.clear();
+
+			// Print dates of the current week
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+			String itemvalue;
+			mEvent = Utility.readCalendarEvent(getActivity());
+			Log.d("=====Event====", mEvent.toString());
+			Log.d("=====Date ARRAY====", Utility.startDates.toString());
+
+			for (int i = 0; i < Utility.startDates.size(); i++) {
+				itemvalue = df.format(mItemMonth.getTime());
+				mItemMonth.add(GregorianCalendar.DATE, 1);
+				mItems.add(Utility.startDates.get(i).toString());
+			}
+			mAdapter.setItems(mItems);
+			mAdapter.notifyDataSetChanged();
+		}
+	};
+	
+	//
 
 	class LeyuAdapter extends BaseAdapter {
 		

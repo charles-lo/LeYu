@@ -116,4 +116,12 @@
         android:layout_alignParentBottom="true"
         layout="@layout/footer" />
 
+    <include
+        android:id="@+id/calendar_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/top_menu"
+        layout="@layout/calendar"
+        android:visibility="gone" />
+
 </RelativeLayout>
