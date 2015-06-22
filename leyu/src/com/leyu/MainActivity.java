@@ -9,6 +9,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +19,7 @@ public class MainActivity extends Activity {
 	private int m_DeviceWidth;
 	private int m_DeviceHeight;
 	private boolean mFinishOnBack;
+	private Handler mHandler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,7 @@ public class MainActivity extends Activity {
 
 		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
+		mHandler = new Handler();
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
@@ -78,6 +81,10 @@ public class MainActivity extends Activity {
 		mFinishOnBack = finishOnBack;
 	}
 
+	Handler getHandler(){
+		return mHandler;
+	}
+	
 	public int getDeviceWidth() {
 		return m_DeviceWidth;
 	}

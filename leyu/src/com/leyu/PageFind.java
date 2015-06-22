@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -158,7 +157,6 @@ public class PageFind extends Fragment {
 				
 			}});
 		
-		Locale.setDefault(Locale.US);
 
 		mLayout = (LinearLayout) mRootView.findViewById(R.id.text);
 		mMonth = (GregorianCalendar) GregorianCalendar.getInstance();
@@ -296,7 +294,7 @@ public class PageFind extends Fragment {
 			mItems.clear();
 
 			// Print dates of the current week
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String itemvalue;
 			mEvent = Utility.readCalendarEvent(getActivity());
 			Log.d("=====Event====", mEvent.toString());

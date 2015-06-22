@@ -1,16 +1,7 @@
 package com.leyu;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -20,6 +11,9 @@ import com.facebook.imagepipeline.request.BaseRepeatedPostProcessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
+import com.leyu.Gateway.Listener;
+import com.leyu.Gateway.MainPageData;
+import com.leyu.Gateway.Topic;
 import com.leyu.PageDetail.DetailArgs;
 import com.leyu.PageEvent.EventArgs;
 
@@ -28,14 +22,12 @@ import android.app.Fragment;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -62,7 +54,7 @@ public class PageRecommand extends Fragment {
 	private int mScrollState;
 	private boolean mScroll;
 	// Data
-	private String mHeadPic = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_030.jpg";
+	private List<Topic> m_Data = new ArrayList<Topic>();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,33 +62,8 @@ public class PageRecommand extends Fragment {
 		mRes = getResources();
 		mItemHeight = PageRecommand.this.getActivity().getResources().getDimensionPixelOffset(R.dimen.list_item_height);
 		mMax = 3 * mItemHeight;
-		// internet
-		final String httpUrl = "http://leibaoserver.azurewebsites.net/api/activity";
-		URL url = null;  
-        try  
-        {  
-            //构造一个URL对象  
-            url = new URL(httpUrl);   
-        }  
-        catch (MalformedURLException e)  
-        {  
-            Log.e(TAG, "MalformedURLException");  
-        }
-        if (url != null) {
-//        	new AsyncTask(){
-//
-//				@Override
-//				protected Object doInBackground(Object... params) {
-//					try {
-//						JSONArray array = new JSONArray(getJSON(httpUrl, 10000));
-//						Log.d(TAG, "");
-//					} catch (JSONException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//					return null;
-//				}}.execute();
-		}
+		
+        
 
 		//
 		((TextView) rootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
@@ -108,8 +75,8 @@ public class PageRecommand extends Fragment {
 				
 			}});
 
-		int width, height;
-		View header = inflater.inflate(R.layout.header_recommand, null);
+
+		final View header = inflater.inflate(R.layout.header_recommand, null);
 		mWeekend = (Button) header.findViewById(R.id.weekend);
 		mWeekend.setOnClickListener(new OnClickListener(){
 
@@ -159,16 +126,7 @@ public class PageRecommand extends Fragment {
 				
 			}});
 
-		width = PageRecommand.this.getActivity().getResources().getDisplayMetrics().widthPixels;
-		height = (int) (PageRecommand.this.getActivity().getResources().getDisplayMetrics().density * 140);
-		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(mHeadPic))
-				.setResizeOptions(new ResizeOptions(width, height))
-				.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
-				.build();
-		SimpleDraweeView image = ((SimpleDraweeView) header.findViewById(R.id.headline));
-		DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request)
-				.setOldController(image.getController()).build();
-		image.setController(controller);
+		
 
 		mList = ((ListView) rootView.findViewById(R.id.list));
 		ViewGroup footer = new LinearLayout(PageRecommand.this.getActivity());
@@ -189,101 +147,45 @@ public class PageRecommand extends Fragment {
 			}});
 		mList.addHeaderView(header);
 		mList.addFooterView(footer);
-		mList.setAdapter(new LeyuAdapter());
 
+		// get server data
+		Gateway gateway = GatewayImpl.getInstance();
+        gateway.getMainPageData(new Listener(){
 
+			@Override
+			public void onComplete(MainPageData data) {
+				// headline
+				int width, height;
+				width = PageRecommand.this.getActivity().getResources().getDisplayMetrics().widthPixels;
+				height = (int) (PageRecommand.this.getActivity().getResources().getDisplayMetrics().density * 140);
+				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mUrl))
+						.setResizeOptions(new ResizeOptions(width, height))
+						.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
+						.build();
+				SimpleDraweeView image = ((SimpleDraweeView) header.findViewById(R.id.headline));
+				DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request)
+						.setOldController(image.getController()).build();
+				image.setController(controller);
+				// top list
+				m_Data = data.mTopList;
+				((MainActivity)getActivity()).getHandler().post(new Runnable(){
+
+					@Override
+					public void run() {
+						mList.setAdapter(new LeyuAdapter());
+						
+					}});
+				
+			}});
 		return rootView;
 	}
 	
-	public String getJSON(String url, int timeout) {
-	    HttpURLConnection c = null;
-	    try {
-	        URL u = new URL(url);
-	        c = (HttpURLConnection) u.openConnection();
-	        c.setRequestMethod("GET");
-	        c.setRequestProperty("Content-length", "0");
-	        c.setUseCaches(false);
-	        c.setAllowUserInteraction(false);
-	        c.setConnectTimeout(timeout);
-	        c.setReadTimeout(timeout);
-	        c.connect();
-	        int status = c.getResponseCode();
 
-	        switch (status) {
-	            case 200:
-	            case 201:
-	                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-	                StringBuilder sb = new StringBuilder();
-	                String line;
-	                while ((line = br.readLine()) != null) {
-	                    sb.append(line+"\n");
-	                }
-	                br.close();
-	                return sb.toString();
-	        }
-
-	    } catch (MalformedURLException ex) {
-	        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-	    } catch (IOException ex) {
-	        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-	    } finally {
-	       if (c != null) {
-	          try {
-	              c.disconnect();
-	          } catch (Exception ex) {
-	             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-	          }
-	       }
-	    }
-	    return null;
-	}	
 
 	class LeyuAdapter extends BaseAdapter {
 
-		private List<Item> m_Data = new ArrayList<Item>();
-
-		class Item {
-			String mTitle;
-			String mUrl;
-
-			Item(String title, String url) {
-				mTitle = title;
-				mUrl = url;
-			}
-		}
-		
-
 		LeyuAdapter() {
 			
-			
-			
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("手作趣味多", ""));
-			m_Data.add(new Item("創意小天才", ""));
 		}
 
 		@Override
@@ -366,9 +268,7 @@ public class PageRecommand extends Fragment {
 			holder.mImage.setLayoutParams(layoutParams);
 
 			holder.mTitle.setText(m_Data.get(position).mTitle);
-			String uriBase = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_";
-			DecimalFormat df = new DecimalFormat("'0'.jpg");
-			final Uri uri = Uri.parse(uriBase + df.format(position + 20));
+			final Uri uri = Uri.parse(m_Data.get(position).mPicture);
 			//
 			int width, height;
 			width = height = (int) (PageRecommand.this.getActivity().getResources()
@@ -424,7 +324,6 @@ public class PageRecommand extends Fragment {
 				if(blur){
 					mLock = true;
 				}
-				Log.d(TAG, "Charles " + blurRadius);
 				mBlurRadius = blurRadius;
 				mBlur = blur;
 				update();

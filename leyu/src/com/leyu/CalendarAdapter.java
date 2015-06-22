@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -61,13 +60,12 @@ public class CalendarAdapter extends BaseAdapter {
 
 	public CalendarAdapter(Context c, GregorianCalendar monthCalendar) {
 		CalendarAdapter.dayString = new ArrayList<String>();
-		Locale.setDefault(Locale.US);
 		month = monthCalendar;
 		selectedDate = (GregorianCalendar) monthCalendar.clone();
 		mContext = c;
 		month.set(GregorianCalendar.DAY_OF_MONTH, 1);
 		this.items = new ArrayList<String>();
-		df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+		df = new SimpleDateFormat("yyyy-MM-dd");
 		curentDateString = df.format(selectedDate.getTime());
 		refreshDays();
 	}
@@ -166,7 +164,6 @@ public class CalendarAdapter extends BaseAdapter {
 		// clear items
 		items.clear();
 		dayString.clear();
-		Locale.setDefault(Locale.US);
 		pmonth = (GregorianCalendar) month.clone();
 		// month start day. ie; sun, mon, etc
 		firstDay = month.get(GregorianCalendar.DAY_OF_WEEK);
