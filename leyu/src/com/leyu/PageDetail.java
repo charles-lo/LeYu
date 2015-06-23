@@ -42,6 +42,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -184,11 +185,24 @@ public class PageDetail extends Fragment {
 		((TextView) rootView.findViewById(R.id.time_value)).setText("9月13日");
 		((TextView) rootView.findViewById(R.id.address_value)).setText("台北市內湖區民權東路200段3000號40000樓50000室");
 		((TextView) rootView.findViewById(R.id.price_value)).setText("免費");
-		((TextView) rootView.findViewById(R.id.price_onsale)).setText("優惠價倒數1天29分");
 		((TextView) rootView.findViewById(R.id.holder_value)).setText("何嘉仁新湖分校");
-		((TextView) rootView.findViewById(R.id.event_description))
-				.setText("讓小朋友從花園觀察中，了解蝴蝶的生態以及日常活動，也讓小朋友彼此可以有良好的互動，過程中，老師會帶領高年級的小朋友做和蝴蝶進行生死格鬥，從中學會野外求生技能，並了解生存競爭有多殘酷");
+		((TextView) rootView.findViewById(R.id.price_onsale)).setText("優惠價倒數1天29分");
+		
+		final String eventDescriptionOrigin = "讓小朋友從花園觀察中，了解蝴蝶的生態以及日常活動，也讓小朋友彼此可以有良好的互動，過程中，老師會帶領高年級的小朋友做和蝴蝶進行生死格鬥，從中學會野外求生技能，並了解生存競爭有多殘酷";
+		String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
+		final TextView eventDescription = (TextView) rootView.findViewById(R.id.event_description);
+		eventDescription.setText(eventDescriptionTxt + "...");
 		((TextView) rootView.findViewById(R.id.fitage)).setText("2-4歲");
+		
+		TextView extend= (TextView) rootView.findViewById(R.id.extend);
+		extend.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				eventDescription.setText(eventDescriptionOrigin);
+				eventDescription.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+			}});
+		
 		mChart = (BarChart) rootView.findViewById(R.id.chart1);
 		mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);

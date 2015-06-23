@@ -33,20 +33,26 @@ public class GatewayImpl implements Gateway{
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					JSONObject response = new JSONObject(getJSON(url, 10000));
-					MainPageData data = new MainPageData();
-					JSONObject tmp = response.getJSONObject("Headline");
-					data.mTitle = tmp.getString("Title");
-					data.mUrl = tmp.getString("Picture");
-					JSONArray tmpArray = response.getJSONArray("TopicList");
-					for (int i = 0, size = tmpArray.length(); i < size; i++)
-				    {
-				      JSONObject objectInArray = tmpArray.getJSONObject(i);
-				      data.mTopList.add(new Topic(objectInArray.getString("TopicID"), 
-				    		  objectInArray.getString("Picture") , objectInArray.getString("Title")));
-				     
-				    }
-					listener.onComplete(data);
+					String response = getJSON(url, 10000);
+					
+					if (response == null){
+						
+					}else{
+						JSONObject root = new JSONObject(response);
+						MainPageData data = new MainPageData();
+						JSONObject tmp = root.getJSONObject("Headline");
+						data.mTitle = tmp.getString("Title");
+						data.mUrl = tmp.getString("Picture");
+						JSONArray tmpArray = root.getJSONArray("TopicList");
+						for (int i = 0, size = tmpArray.length(); i < size; i++)
+					    {
+					      JSONObject objectInArray = tmpArray.getJSONObject(i);
+					      data.mTopList.add(new Topic(objectInArray.getString("TopicID"), 
+					    		  objectInArray.getString("Picture") , objectInArray.getString("Title")));
+					     
+					    }
+						listener.onComplete(data);
+					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

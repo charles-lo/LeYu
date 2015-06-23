@@ -8,7 +8,7 @@
     <include
         android:id="@+id/topbar"
         android:layout_width="match_parent"
-        android:layout_height="38.33dp"
+        android:layout_height="41.67dp"
         android:layout_alignParentTop="true"
         layout="@layout/title_bar" />
 
@@ -31,7 +31,7 @@
                 <com.facebook.drawee.view.SimpleDraweeView
                     android:id="@+id/cover"
                     android:layout_width="match_parent"
-                    android:layout_height="151.33dp"
+                    android:layout_height="155.67dp"
                     fresco:placeholderImage="@color/black"
                     fresco:retryImageScaleType="focusCrop" />
 
@@ -50,12 +50,39 @@
                         android:textColor="#000"
                         android:textSize="@dimen/font_04" />
                 </RelativeLayout>
+                
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="284dp"
+                    android:layout_marginTop="76dp" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/font_05"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/interested"
+                            android:textSize="@dimen/font_05"
+                            android:textColor="@android:color/white" />
+                    </LinearLayout>
+                </RelativeLayout>
 
                 <RelativeLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:layout_marginLeft="282dp"
-                    android:layout_marginTop="122.67dp"
+                    android:layout_marginLeft="272dp"
+                    android:layout_marginTop="124.67dp"
                     android:background="@drawable/ringbutton" >
 
                     <LinearLayout
@@ -82,9 +109,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="@drawable/rectanglebackground" >
+                android:background="@color/orange" >
 
                 <LinearLayout
                     android:id="@+id/time"
@@ -139,6 +164,7 @@
                         android:singleLine="true"
                         android:textColor="#000"
                         android:textSize="@dimen/font_05" />
+                    
                 </LinearLayout>
 
                 <LinearLayout
@@ -167,7 +193,7 @@
                         android:singleLine="true"
                         android:textColor="#000"
                         android:textSize="@dimen/font_05" />
-
+                    
                     <TextView
                         android:id="@+id/price_onsale"
                         android:layout_width="wrap_content"
@@ -179,6 +205,7 @@
                         android:singleLine="true"
                         android:textColor="@color/red_01"
                         android:textSize="@dimen/font_06" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -214,7 +241,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8.67dp"
+                android:layout_marginBottom="22dp"
                 android:layout_marginLeft="16.67dp"
                 android:layout_marginTop="22dp"
                 android:text="@string/description"
@@ -224,38 +251,30 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="@drawable/rectanglebackground_01"
+                android:paddingLeft="12.67dp"
+                android:paddingRight="12.67dp"
                 android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/event_description"
                     android:layout_width="wrap_content"
                     android:layout_height="51.67dp"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginLeft="12.67dp"
-                    android:layout_marginRight="12.67dp"
-                    android:layout_marginTop="2dp"
                     android:ellipsize="end"
-                    android:maxLines="3"
                     android:textColor="#000"
                     android:textSize="@dimen/font_05" />
 
                 <TextView
+                    android:id="@+id/extend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="1dp"
-                    android:layout_marginLeft="12.67dp"
+                    android:layout_gravity="right"
                     android:layout_marginRight="12.67dp"
+                    android:padding="5dp"
                     android:text="@string/extend"
                     android:textColor="@color/brown"
+                    android:background="@drawable/rounded_brown_01"
                     android:textSize="@dimen/font_07" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/brown01" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
