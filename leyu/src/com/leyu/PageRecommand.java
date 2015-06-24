@@ -11,7 +11,7 @@ import com.facebook.imagepipeline.request.BaseRepeatedPostProcessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
-import com.leyu.Gateway.Listener;
+import com.leyu.Gateway.MainPageDataListener;
 import com.leyu.Gateway.MainPageData;
 import com.leyu.Gateway.Topic;
 import com.leyu.PageDetail.DetailArgs;
@@ -148,17 +148,19 @@ public class PageRecommand extends Fragment {
 		mList.addHeaderView(header);
 		mList.addFooterView(footer);
 
+		final TextView status = (TextView)rootView.findViewById(R.id.status);
 		// get server data
 		Gateway gateway = GatewayImpl.getInstance();
-        gateway.getMainPageData(new Listener(){
+        gateway.getMainPageData(new MainPageDataListener(){
 
 			@Override
 			public void onComplete(MainPageData data) {
+				status.setVisibility(View.GONE);
 				// headline
 				int width, height;
 				width = PageRecommand.this.getActivity().getResources().getDisplayMetrics().widthPixels;
 				height = (int) (PageRecommand.this.getActivity().getResources().getDisplayMetrics().density * 140);
-				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mUrl))
+				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mHeadlines.get(0).mPicture))
 						.setResizeOptions(new ResizeOptions(width, height))
 						.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
 						.build();
@@ -168,13 +170,13 @@ public class PageRecommand extends Fragment {
 				image.setController(controller);
 				// top list
 				m_Data = data.mTopList;
-				((MainActivity)getActivity()).getHandler().post(new Runnable(){
+				mList.setAdapter(new LeyuAdapter());
+				
+			}
 
-					@Override
-					public void run() {
-						mList.setAdapter(new LeyuAdapter());
-						
-					}});
+			@Override
+			public void onError() {
+				status.setText(R.string.network_error);
 				
 			}});
 		return rootView;
@@ -287,9 +289,9 @@ public class PageRecommand extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					Fragment event = new PageDetail();
+					Fragment event = new PageTopic();
 					Bundle bundle = new Bundle();
-					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mTitle, uri.toString())));
+					bundle.putString(PageTopic.ARG, new Gson().toJson(m_Data.get(position)));
 					event.setArguments(bundle);
 					((MainActivity) getActivity()).replaceFragment(event);;
 					

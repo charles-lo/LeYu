@@ -32,7 +32,8 @@
     <string name="share_title">分享這個資訊</string>
     <string name="interested">感興趣</string>
     <string name="man">人</string>
-    
+    <string name="loading">載入中</string>
+    <string name="network_error">網路發生錯誤</string>
 
     <string-array name="regions">
         <item>臺北市</item>

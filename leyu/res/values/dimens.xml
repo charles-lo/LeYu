@@ -8,6 +8,7 @@
     <dimen name="font_05">13sp</dimen>
     <dimen name="font_06">12sp</dimen>
     <dimen name="font_07">10sp</dimen>
+    <dimen name="font_08">30sp</dimen>
     <!-- dimension -->
     <dimen name="header_height">140dp</dimen>
     <dimen name="list_item_height">83.33dp</dimen>

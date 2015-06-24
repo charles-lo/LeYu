@@ -13,7 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.leyu.Gateway.Listener;
+import com.leyu.Gateway.MainPageDataListener;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -25,39 +25,100 @@ public class GatewayImpl implements Gateway{
 	final String baseUrl = "http://leibaoserver.azurewebsites.net/api/Leibao/";
 	
 	@Override
-	public void getMainPageData(final Listener listener) {
-		final String url = baseUrl + "GetMainPageData";
-		
-		new AsyncTask<Void,Void,Void>(){
+	public void getTopic(final TopicListener listener, String id) {
+		final String url = baseUrl + "GetTopic?id=" + id;
+		new AsyncTask<Void,Void,TopicData>(){
 
 			@Override
-			protected Void doInBackground(Void... params) {
+			protected void onPostExecute(TopicData result) {
+				if (result == null){
+					listener.onError();
+				}else{
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected TopicData doInBackground(Void... params) {
+				TopicData data = null;
 				try {
 					String response = getJSON(url, 10000);
 					
 					if (response == null){
-						
+						listener.onError();
 					}else{
 						JSONObject root = new JSONObject(response);
-						MainPageData data = new MainPageData();
-						JSONObject tmp = root.getJSONObject("Headline");
-						data.mTitle = tmp.getString("Title");
-						data.mUrl = tmp.getString("Picture");
-						JSONArray tmpArray = root.getJSONArray("TopicList");
+						data = new TopicData();
+						data.mTitle = root.getString("Title");
+						data.mPicture = root.getString("Picture");
+						JSONArray tmpArray = root.getJSONArray("Contents");
 						for (int i = 0, size = tmpArray.length(); i < size; i++)
 					    {
 					      JSONObject objectInArray = tmpArray.getJSONObject(i);
+					      data.mContents.add(new Content(objectInArray.getString("Type"), 
+					    		  objectInArray.getString("Text") , objectInArray.getString("Picture")
+					    		  , objectInArray.getString("ActivityID")));
+					     
+					    }
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}}.execute();
+	}
+	
+	@Override
+	public void getMainPageData(final MainPageDataListener listener) {
+		final String url = baseUrl + "getrecmd";
+		
+		new AsyncTask<Void,Void,MainPageData>(){
+
+			@Override
+			protected void onPostExecute(MainPageData result) {
+				if (result == null){
+					listener.onError();
+				}else{
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected MainPageData doInBackground(Void... params) {
+				MainPageData data = null;
+				try {
+					String response = getJSON(url, 10000);
+					
+					if (response == null){
+					}else{
+						JSONObject root = new JSONObject(response);
+						data = new MainPageData();
+						JSONArray tmp = root.getJSONArray("Headline");
+						for (int i = 0, size = tmp.length(); i < size; i++)
+					    {
+					      JSONObject objectInArray = tmp.getJSONObject(i);
+					      data.mHeadlines.add(new Headline(objectInArray.getString("ActivityID"), 
+					    		  objectInArray.getString("Picture") , objectInArray.getString("Title")
+					    		  , objectInArray.getString("Area")));
+					     
+					    }
+						tmp = root.getJSONArray("TopicList");
+						for (int i = 0, size = tmp.length(); i < size; i++)
+					    {
+					      JSONObject objectInArray = tmp.getJSONObject(i);
 					      data.mTopList.add(new Topic(objectInArray.getString("TopicID"), 
 					    		  objectInArray.getString("Picture") , objectInArray.getString("Title")));
 					     
 					    }
-						listener.onComplete(data);
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
+					data = null;
 					e.printStackTrace();
 				}
-				return null;
+				return data;
 			}}.execute();
 	}
 
