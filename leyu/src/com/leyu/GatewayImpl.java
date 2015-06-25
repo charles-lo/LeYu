@@ -13,10 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.leyu.Gateway.MainPageDataListener;
 
 import android.os.AsyncTask;
-import android.util.Log;
+import android.text.TextUtils;
 
 public class GatewayImpl implements Gateway{
 	
@@ -71,8 +70,12 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void getMainPageData(final MainPageDataListener listener) {
-		final String url = baseUrl + "getrecmd";
+	public void getMainPageData(final MainPageDataListener listener, String AdminArea) {
+		String urlCmd = baseUrl + "getrecmd?";
+		if(!TextUtils.isEmpty(AdminArea)){
+			urlCmd += "area=" + AdminArea;
+		}
+		final String url = urlCmd;
 		
 		new AsyncTask<Void,Void,MainPageData>(){
 

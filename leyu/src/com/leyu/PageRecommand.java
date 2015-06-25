@@ -14,13 +14,13 @@ import com.google.gson.Gson;
 import com.leyu.Gateway.MainPageDataListener;
 import com.leyu.Gateway.MainPageData;
 import com.leyu.Gateway.Topic;
-import com.leyu.PageDetail.DetailArgs;
 import com.leyu.PageEvent.EventArgs;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,10 +60,8 @@ public class PageRecommand extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.page_recommand, container, false);
 		mRes = getResources();
-		mItemHeight = PageRecommand.this.getActivity().getResources().getDimensionPixelOffset(R.dimen.list_item_height);
+		mItemHeight = mRes.getDimensionPixelOffset(R.dimen.list_item_height);
 		mMax = 3 * mItemHeight;
-		
-        
 
 		//
 		((TextView) rootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
@@ -151,6 +149,13 @@ public class PageRecommand extends Fragment {
 		final TextView status = (TextView)rootView.findViewById(R.id.status);
 		// get server data
 		Gateway gateway = GatewayImpl.getInstance();
+		
+		Address address = ((MainActivity)getActivity()).getAddress();
+		String adminArea = null;
+		if(address != null){
+			adminArea = address.getAdminArea();
+		}
+		
         gateway.getMainPageData(new MainPageDataListener(){
 
 			@Override
@@ -178,7 +183,7 @@ public class PageRecommand extends Fragment {
 			public void onError() {
 				status.setText(R.string.network_error);
 				
-			}});
+			}}, adminArea);
 		return rootView;
 	}
 	
