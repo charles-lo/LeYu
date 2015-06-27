@@ -5,22 +5,31 @@ import java.util.List;
 
 public interface Gateway {
 
-	void getTopic(TopicListener listener, String id);
-
 	void getMainPageData(MainPageDataListener listener, String AdminArea);
+	
+	void getTopic(TopicListener listener, String id);
+	
+	void getActivity(ActivityListener listener, String id);
 
 	
 	//
+	public interface MainPageDataListener {
+
+		void onComplete(MainPageData data);
+
+		void onError();
+	}
+	
 	public interface TopicListener {
 
 		void onComplete(TopicData data);
 
 		void onError();
 	}
+	
+	public interface ActivityListener {
 
-	public interface MainPageDataListener {
-
-		void onComplete(MainPageData data);
+		void onComplete(ActivityData data);
 
 		void onError();
 	}
@@ -64,16 +73,44 @@ public interface Gateway {
 	}
 
 	class Content {
-		String mType;
+		int mType;
 		String mText;
 		String mPicture;
 		String mActivityID;
 
-		Content(String type, String text, String picture, String activityID) {
+		Content(int type, String text, String picture, String activityID) {
 			mType = type;
 			mText = text;
 			mPicture = picture;
 			mActivityID = activityID;
+		}
+	}
+	
+	class ActivityData {
+		String mID;
+		String mPicture;
+		String mTitle;
+		String mBeginDate;
+		String mEndDate;
+		String mPlace;
+		String mAddress;
+		String mOrganizer;
+		String mDescription;
+		int mPhysical;
+		int mAesthetic;
+		int mScience;
+		int mSocially;
+		int mCulture;
+		List<ActivityAgeLevelSetting> mActivityAgeLevelSettings = new ArrayList<ActivityAgeLevelSetting>();
+	}
+	
+	class ActivityAgeLevelSetting {
+		String mID;
+		String mDescription;
+
+		ActivityAgeLevelSetting(String ID, String description) {
+			mID = ID;
+			mDescription = description;
 		}
 	}
 }

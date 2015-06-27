@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.leyu.Gateway.MainPageDataListener;
 import com.leyu.Gateway.MainPageData;
 import com.leyu.Gateway.Topic;
+import com.leyu.PageDetail.DetailArgs;
 import com.leyu.PageEvent.EventArgs;
 
 import android.animation.ValueAnimator;
@@ -159,7 +160,7 @@ public class PageRecommand extends Fragment {
         gateway.getMainPageData(new MainPageDataListener(){
 
 			@Override
-			public void onComplete(MainPageData data) {
+			public void onComplete(final MainPageData data) {
 				status.setVisibility(View.GONE);
 				// headline
 				int width, height;
@@ -173,6 +174,18 @@ public class PageRecommand extends Fragment {
 				DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request)
 						.setOldController(image.getController()).build();
 				image.setController(controller);
+				
+				image.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						Fragment event = new PageDetail();
+						Bundle bundle = new Bundle();
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
+						event.setArguments(bundle);
+						((MainActivity) getActivity()).replaceFragment(event);;
+						
+					}});
 				// top list
 				m_Data = data.mTopList;
 				mList.setAdapter(new LeyuAdapter());
@@ -248,11 +261,11 @@ public class PageRecommand extends Fragment {
 						if(!mScroll && mScrollState == OnScrollListener.SCROLL_STATE_IDLE){
 							if(loc[1] > -mMax && loc[1] <0){
 								mScroll = true;
-								if(loc[1]< -mMax /3){
-									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition()+1,0,100);
-								}else{
-									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition(),0,100);
-								}
+//								if(loc[1]< -mMax /3){
+//									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition()+1,0,100);
+//								}else{
+//									mList.smoothScrollToPositionFromTop(mList.getFirstVisiblePosition(),0,100);
+//								}
 
 								new Handler().postDelayed(new Runnable(){
 	

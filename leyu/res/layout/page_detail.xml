@@ -50,7 +50,7 @@
                         android:textColor="#000"
                         android:textSize="@dimen/font_04" />
                 </RelativeLayout>
-                
+
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -66,15 +66,15 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="@dimen/font_05"
-                            android:textColor="@android:color/white" />
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/font_05" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/interested"
-                            android:textSize="@dimen/font_05"
-                            android:textColor="@android:color/white" />
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/font_05" />
                     </LinearLayout>
                 </RelativeLayout>
 
@@ -128,7 +128,7 @@
 
                     <TextView
                         android:id="@+id/time_value"
-                        android:layout_width="160dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="4dp"
                         android:ellipsize="end"
@@ -164,7 +164,6 @@
                         android:singleLine="true"
                         android:textColor="#000"
                         android:textSize="@dimen/font_05" />
-                    
                 </LinearLayout>
 
                 <LinearLayout
@@ -193,7 +192,7 @@
                         android:singleLine="true"
                         android:textColor="#000"
                         android:textSize="@dimen/font_05" />
-                    
+
                     <TextView
                         android:id="@+id/price_onsale"
                         android:layout_width="wrap_content"
@@ -205,7 +204,6 @@
                         android:singleLine="true"
                         android:textColor="@color/red_01"
                         android:textSize="@dimen/font_06" />
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -251,9 +249,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:paddingLeft="12.67dp"
-                android:paddingRight="12.67dp"
-                android:orientation="vertical" >
+                android:paddingRight="12.67dp" >
 
                 <TextView
                     android:id="@+id/event_description"
@@ -269,12 +267,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:layout_marginRight="12.67dp"
+                    android:background="@drawable/rounded_brown_01"
                     android:padding="5dp"
                     android:text="@string/extend"
                     android:textColor="@color/brown"
-                    android:background="@drawable/rounded_brown_01"
                     android:textSize="@dimen/font_07" />
-
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -317,5 +314,14 @@
         layout="@layout/footer" />
 
     <include layout="@layout/share" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:text="@string/loading"
+        android:textSize="@dimen/font_08" />
 
 </RelativeLayout>

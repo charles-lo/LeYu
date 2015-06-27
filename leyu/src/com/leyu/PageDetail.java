@@ -1,7 +1,10 @@
 package com.leyu;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -19,7 +22,11 @@ import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.utils.ValueFormatter;
 import com.google.gson.Gson;
+import com.leyu.Gateway.ActivityAgeLevelSetting;
+import com.leyu.Gateway.ActivityData;
+import com.leyu.Gateway.ActivityListener;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.SendMessageToWX;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
@@ -32,7 +39,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -142,7 +148,7 @@ public class PageDetail extends Fragment {
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("message/rfc822");
-				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mUrl  );
+				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture  );
 
 				startActivity(Intent.createChooser(intent, getString(R.string.mail)));
 			}});
@@ -153,7 +159,7 @@ public class PageDetail extends Fragment {
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_VIEW);         
 				intent.setData(Uri.parse("sms:"));
-				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mUrl  );
+				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture  );
 
 				startActivity(Intent.createChooser(intent, getString(R.string.message)));
 			}});
@@ -170,10 +176,72 @@ public class PageDetail extends Fragment {
 		//
 		((TextView) rootView.findViewById(R.id.description)).setText(args.mTitle);
 		//
+		final TextView status = (TextView)rootView.findViewById(R.id.status);
+		Gateway gateway = GatewayImpl.getInstance();
+		gateway.getActivity(new ActivityListener(){
+
+			@Override
+			public void onComplete(ActivityData data) {
+				status.setVisibility(View.GONE);
+				// time
+				Date beginDate = null, endDate = null;
+				SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+				SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MMdd-HH:mm");
+				try {  
+					beginDate = readFormat.parse(data.mBeginDate);
+					endDate = readFormat.parse(data.mEndDate);
+				} catch (ParseException e) {  
+				    // TODO Auto-generated catch block  
+				    e.printStackTrace();  
+				}
+				
+				((TextView) rootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
+				((TextView) rootView.findViewById(R.id.address_value)).setText(data.mPlace + " : " + data.mAddress);
+				((TextView) rootView.findViewById(R.id.holder_value)).setText(data.mOrganizer);
+				
+//				final String eventDescriptionOrigin = "讓小朋友從花園觀察中，了解蝴蝶的生態以及日常活動，也讓小朋友彼此可以有良好的互動，過程中，老師會帶領高年級的小朋友做和蝴蝶進行生死格鬥，從中學會野外求生技能，並了解生存競爭有多殘酷";
+				final String eventDescriptionOrigin = data.mDescription;
+				if (eventDescriptionOrigin.length() > 60) {
+					String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
+					final TextView eventDescription = (TextView) rootView.findViewById(R.id.event_description);
+					eventDescription.setText(eventDescriptionTxt + "...");
+
+					TextView extend = (TextView) rootView.findViewById(R.id.extend);
+					extend.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							eventDescription.setText(eventDescriptionOrigin);
+							eventDescription.setLayoutParams(new TableLayout.LayoutParams(
+									LinearLayout.LayoutParams.WRAP_CONTENT,
+									LinearLayout.LayoutParams.WRAP_CONTENT));
+						}
+					});
+				}else{
+					final TextView eventDescription = (TextView) rootView.findViewById(R.id.event_description);
+					eventDescription.setText(eventDescriptionOrigin);
+					rootView.findViewById(R.id.extend).setVisibility(View.INVISIBLE);
+				}
+				//
+				String age = "";
+				for(ActivityAgeLevelSetting item : data.mActivityAgeLevelSettings){
+					age += item.mDescription + "  ";
+				}
+				((TextView) rootView.findViewById(R.id.fitage)).setText(age);
+				//
+				setData(5, 5, data);
+			}
+
+			@Override
+			public void onError() {
+				status.setText(R.string.network_error);
+				
+			}}, args.mID);
+		//
 		SimpleDraweeView image = (SimpleDraweeView) rootView.findViewById(R.id.cover);
 		int width, height;
 		width = height = (int) (mRes.getDisplayMetrics().density * 115);
-		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(args.mUrl))
+		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(args.mPicture))
 				.setResizeOptions(new ResizeOptions(width, height))
 				.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
 				.build();
@@ -182,27 +250,12 @@ public class PageDetail extends Fragment {
 				.build();
 		image.setController(controller);
 		//data
-		((TextView) rootView.findViewById(R.id.time_value)).setText("9月13日");
-		((TextView) rootView.findViewById(R.id.address_value)).setText("台北市內湖區民權東路200段3000號40000樓50000室");
+		
+		
 		((TextView) rootView.findViewById(R.id.price_value)).setText("免費");
-		((TextView) rootView.findViewById(R.id.holder_value)).setText("何嘉仁新湖分校");
-		((TextView) rootView.findViewById(R.id.price_onsale)).setText("優惠價倒數1天29分");
 		
-		final String eventDescriptionOrigin = "讓小朋友從花園觀察中，了解蝴蝶的生態以及日常活動，也讓小朋友彼此可以有良好的互動，過程中，老師會帶領高年級的小朋友做和蝴蝶進行生死格鬥，從中學會野外求生技能，並了解生存競爭有多殘酷";
-		String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
-		final TextView eventDescription = (TextView) rootView.findViewById(R.id.event_description);
-		eventDescription.setText(eventDescriptionTxt + "...");
-		((TextView) rootView.findViewById(R.id.fitage)).setText("2-4歲");
-		
-		TextView extend= (TextView) rootView.findViewById(R.id.extend);
-		extend.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				eventDescription.setText(eventDescriptionOrigin);
-				eventDescription.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-			}});
-		
+		((TextView) rootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);//.setText("優惠價倒數1天29分");
+			
 		mChart = (BarChart) rootView.findViewById(R.id.chart1);
 		mChart.setDrawBarShadow(false);
         mChart.setDrawValueAboveBar(true);
@@ -213,7 +266,7 @@ public class PageDetail extends Fragment {
         mChart.setTouchEnabled(false);
         
         mChart.setDescription("");
-        mChart.setMaxVisibleValueCount(60);
+        mChart.setMaxVisibleValueCount(5);
         mChart.setPinchZoom(false);
         mChart.setDrawGridBackground(false);
         
@@ -235,8 +288,6 @@ public class PageDetail extends Fragment {
         
         Legend l = mChart.getLegend();
         l.setEnabled(false);
-        
-        setData(5, 50);
 		// footer
 		ViewGroup footer = new LinearLayout(PageDetail.this.getActivity());
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -247,15 +298,19 @@ public class PageDetail extends Fragment {
 	}
 	
 	static public class DetailArgs{
+		private	String	mID;
+		private	String	mPicture;
 		private	String	mTitle;
-		private	String	mUrl;
-		DetailArgs(String title, String url) {
+		private	String	mArea;
+		DetailArgs(String id, String picture, String title, String area) {
+			mID = id;
 			mTitle = title;
-			mUrl = url;
+			mPicture = picture;
+			mArea = area;
 		}
 	}
-
-	private void setData(int count, float range) {
+	
+	private void setData(int count, float range, ActivityData serverData) {
 
         ArrayList<String> xVals = new ArrayList<String>();
         for (int i = 0; i < count; i++) {
@@ -264,16 +319,40 @@ public class PageDetail extends Fragment {
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
         BarEntry  bar;
-        for (int i = 0; i < count; i++) {
-            float mult = (range + 1);
-            float val = (float) (Math.random() * mult);
-            bar = new BarEntry(val, i);
-            bar.setXIndex(1);
-            yVals1.add(new BarEntry(val, i));
-        }
-
+        float val = (float) serverData.mAesthetic;
+        bar = new BarEntry(val, 0);
+        bar.setXIndex(1);
+        yVals1.add(new BarEntry(val, 0));
+        
+        val = (float) serverData.mPhysical;
+        bar = new BarEntry(val, 1);
+        bar.setXIndex(1);
+        yVals1.add(new BarEntry(val, 1));
+        
+        val = (float) serverData.mSocially;
+		bar = new BarEntry(val, 2);
+		bar.setXIndex(1);
+		yVals1.add(new BarEntry(val, 2));
+		
+        val = (float) serverData.mScience;
+		bar = new BarEntry(val, 3);
+		bar.setXIndex(1);
+		yVals1.add(new BarEntry(val, 3));
+		
+        val = (float) serverData.mCulture;
+		bar = new BarEntry(val, 4);
+		bar.setXIndex(1);
+		yVals1.add(new BarEntry(val, 4));
+        
+        
         BarDataSet set1 = new BarDataSet(yVals1, "");
         set1.setBarSpacePercent(50);
+        set1.setValueFormatter(new ValueFormatter(){
+
+			@Override
+			public String getFormattedValue(float value) {
+				return "" + ((int) value);
+			}});
         set1.setColor(mRes.getColor(R.color.blue));
         ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
         dataSets.add(set1);
@@ -282,5 +361,6 @@ public class PageDetail extends Fragment {
         data.setValueTextSize(10f);
 
         mChart.setData(data);
+        mChart.requestLayout();
     }
 }

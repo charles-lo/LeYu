@@ -249,7 +249,7 @@ public class PageEvent extends Fragment {
 				public void onClick(View v) {
 					Fragment event = new PageDetail();
 					Bundle bundle = new Bundle();
-					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mTitle, uri.toString())));
+					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 					event.setArguments(bundle);
 					((MainActivity) getActivity()).replaceFragment(event);;
 					
