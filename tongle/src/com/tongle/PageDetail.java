@@ -185,14 +185,17 @@ public class PageDetail extends Fragment {
 				status.setVisibility(View.GONE);
 				// time
 				Date beginDate = null, endDate = null;
-				SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+				SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ");
 				SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MMdd-HH:mm");
 				try {  
 					beginDate = readFormat.parse(data.mBeginDate);
 					endDate = readFormat.parse(data.mEndDate);
 				} catch (ParseException e) {  
 				    // TODO Auto-generated catch block  
-				    e.printStackTrace();  
+				    e.printStackTrace();
+				    status.setVisibility(View.VISIBLE);
+				    status.setText(R.string.server_error);
+				    return;
 				}
 				
 				((TextView) rootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
