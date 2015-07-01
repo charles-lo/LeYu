@@ -26,7 +26,7 @@ import android.net.Uri;
 /**
  * @author Mukesh Y
  */
-public class Utility {
+public class CalendarUtility {
 	public static ArrayList<String> nameOfEvent = new ArrayList<String>();
 	public static ArrayList<String> startDates = new ArrayList<String>();
 	public static ArrayList<String> endDates = new ArrayList<String>();

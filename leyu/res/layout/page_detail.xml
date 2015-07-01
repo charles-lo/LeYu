@@ -32,7 +32,7 @@
                     android:id="@+id/cover"
                     android:layout_width="match_parent"
                     android:layout_height="155.67dp"
-                    fresco:placeholderImage="@color/black"
+                    fresco:placeholderImage="@drawable/placeholder"
                     fresco:retryImageScaleType="focusCrop" />
 
                 <RelativeLayout

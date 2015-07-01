@@ -26,7 +26,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -223,9 +222,9 @@ public class PageFind extends Fragment {
 				}
 				((CalendarAdapter) parent.getAdapter()).setSelected(v);
 
-				for (int i = 0; i < Utility.startDates.size(); i++) {
-					if (Utility.startDates.get(i).equals(selectedGridDate)) {
-						desc.add(Utility.nameOfEvent.get(i));
+				for (int i = 0; i < CalendarUtility.startDates.size(); i++) {
+					if (CalendarUtility.startDates.get(i).equals(selectedGridDate)) {
+						desc.add(CalendarUtility.nameOfEvent.get(i));
 					}
 				}
 
@@ -296,14 +295,14 @@ public class PageFind extends Fragment {
 			// Print dates of the current week
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String itemvalue;
-			mEvent = Utility.readCalendarEvent(getActivity());
+			mEvent = CalendarUtility.readCalendarEvent(getActivity());
 			Log.d("=====Event====", mEvent.toString());
-			Log.d("=====Date ARRAY====", Utility.startDates.toString());
+			Log.d("=====Date ARRAY====", CalendarUtility.startDates.toString());
 
-			for (int i = 0; i < Utility.startDates.size(); i++) {
+			for (int i = 0; i < CalendarUtility.startDates.size(); i++) {
 				itemvalue = df.format(mItemMonth.getTime());
 				mItemMonth.add(GregorianCalendar.DATE, 1);
-				mItems.add(Utility.startDates.get(i).toString());
+				mItems.add(CalendarUtility.startDates.get(i).toString());
 			}
 			mAdapter.setItems(mItems);
 			mAdapter.notifyDataSetChanged();

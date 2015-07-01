@@ -16,6 +16,7 @@ import com.leyu.Gateway.MainPageData;
 import com.leyu.Gateway.Topic;
 import com.leyu.PageDetail.DetailArgs;
 import com.leyu.PageEvent.EventArgs;
+import com.udinic.accounts_authenticator_example.authentication.AccountGeneral;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;
@@ -81,11 +82,11 @@ public class PageRecommand extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				Fragment event = new PageEvent();
-				Bundle bundle = new Bundle();
-				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.weekend))));
-				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event);
+//				Fragment event = new PageEvent();
+//				Bundle bundle = new Bundle();
+//				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.weekend))));
+//				event.setArguments(bundle);
+				((MainActivity) getActivity()).addNewAccount(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);;
 				
 			}});
 		mFree = (Button) header.findViewById(R.id.free);

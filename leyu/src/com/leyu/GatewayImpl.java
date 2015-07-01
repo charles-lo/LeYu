@@ -16,7 +16,6 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Log;
 
 public class GatewayImpl implements Gateway{
 	
