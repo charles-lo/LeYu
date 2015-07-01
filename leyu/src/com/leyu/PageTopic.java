@@ -66,7 +66,7 @@ public class PageTopic extends Fragment {
 				(int) (46.67 * PageTopic.this.getResources().getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
 		
-		final View header = inflater.inflate(R.layout.header_recommand, null);
+		final View header = inflater.inflate(R.layout.listitem_image, null);
 		list.addHeaderView(header);
 		list.addFooterView(footer);
 
@@ -86,8 +86,8 @@ public class PageTopic extends Fragment {
 						.setResizeOptions(new ResizeOptions(width, height))
 						.setLocalThumbnailPreviewsEnabled(true)
 						.setProgressiveRenderingEnabled(true).build();
-				SimpleDraweeView image = ((SimpleDraweeView) mRootView
-						.findViewById(R.id.topic_picture));
+				SimpleDraweeView image = ((SimpleDraweeView) header
+						.findViewById(R.id.event_image));
 				DraweeController controller = Fresco.newDraweeControllerBuilder()
 						.setImageRequest(request).setOldController(image.getController()).build();
 				image.setController(controller);

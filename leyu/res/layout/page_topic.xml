@@ -27,14 +27,6 @@
             android:text="@string/loading"
             android:textSize="@dimen/font_08" />
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/topic_picture"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/header_height"
-            android:layout_margin="6.67dp"
-            fresco:placeholderImage="@color/black"
-            fresco:roundedCornerRadius="10dp" />
-
         <ListView
             android:id="@+id/list"
             android:layout_width="match_parent"
