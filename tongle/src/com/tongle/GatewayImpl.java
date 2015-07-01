@@ -20,7 +20,9 @@ import android.text.TextUtils;
 public class GatewayImpl implements Gateway{
 	
 	static final String TAG =  GatewayImpl.class.getSimpleName();
-	static GatewayImpl INSTANCE;
+	static final  int ERROR_NETWORK = 1;
+	static final  int ERROR_SERVER = 2;
+	static GatewayImpl sInstance;
 	final String baseUrl = "http://leibaoserver.azurewebsites.net/api/Leibao/";
 	
 	@Override
@@ -155,6 +157,7 @@ public class GatewayImpl implements Gateway{
 						data.mBeginDate = root.getString("BeginDate");
 						data.mEndDate = root.getString("EndDate");
 						data.mPlace = root.getString("Place");
+						data.mPrice = root.getString("Price");
 						data.mAddress = root.getString("Address");
 						data.mOrganizer = root.getString("Organizer");
 						data.mDescription = root.getString("Description");
@@ -227,11 +230,11 @@ public class GatewayImpl implements Gateway{
 	}	
 	
 	static Gateway getInstance(){
-		if(INSTANCE == null){
-			INSTANCE = new GatewayImpl();
+		if(sInstance == null){
+			sInstance = new GatewayImpl();
 		}
 		
-		return INSTANCE;
+		return sInstance;
 		
 	}
 }

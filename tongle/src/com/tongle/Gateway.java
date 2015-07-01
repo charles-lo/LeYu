@@ -93,6 +93,7 @@ public interface Gateway {
 		String mBeginDate;
 		String mEndDate;
 		String mPlace;
+		String mPrice;
 		String mAddress;
 		String mOrganizer;
 		String mDescription;

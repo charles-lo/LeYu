@@ -63,12 +63,13 @@ public class PageDetail extends Fragment {
 	private IWXAPI api;
 	public static final String APP_ID = "wx6dbf5e76d03452da";
 	// Data
-	private	List<String> category = new ArrayList<String>(Arrays.asList("美�??", "體能", "社交", "科普", "??��??"));
+	private	List<String> category;
 	
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final DetailArgs args = new Gson().fromJson((String) getArguments().getString(ARG), DetailArgs.class);
 		mRes = PageDetail.this.getResources();
+		category = Arrays.asList(mRes.getStringArray(R.array.category));
 		//
 		api = WXAPIFactory.createWXAPI(getActivity(), APP_ID, false);
 		api.registerApp(APP_ID);
@@ -190,8 +191,7 @@ public class PageDetail extends Fragment {
 				try {  
 					beginDate = readFormat.parse(data.mBeginDate);
 					endDate = readFormat.parse(data.mEndDate);
-				} catch (ParseException e) {  
-				    // TODO Auto-generated catch block  
+				} catch (ParseException e) {
 				    e.printStackTrace();
 				    status.setVisibility(View.VISIBLE);
 				    status.setText(R.string.server_error);
@@ -201,6 +201,7 @@ public class PageDetail extends Fragment {
 				((TextView) rootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
 				((TextView) rootView.findViewById(R.id.address_value)).setText(data.mPlace + " : " + data.mAddress);
 				((TextView) rootView.findViewById(R.id.holder_value)).setText(data.mOrganizer);
+				((TextView) rootView.findViewById(R.id.price_value)).setText(data.mPrice);
 				
 //				final String eventDescriptionOrigin = "讓�?��?��?��?�花??��?察中，�?�解?��?��??��?��?�以??�日常活??��?��?��?��?��?��?�彼此可以�?�良好�?��?��?��?��?��?�中，�?�師??�帶??��?�年級�?��?��?��?��?��?�蝴?��?��?��?�死?��鬥�?��?�中學�?��?��?��?��?��??��，並了解??��?�競?��??��?��?�酷";
 				final String eventDescriptionOrigin = data.mDescription;
@@ -237,7 +238,7 @@ public class PageDetail extends Fragment {
 
 			@Override
 			public void onError() {
-				status.setText(R.string.network_error);
+				status.setText(R.string.server_error);
 				
 			}}, args.mID);
 		//
@@ -254,8 +255,6 @@ public class PageDetail extends Fragment {
 		image.setController(controller);
 		//data
 		
-		
-		((TextView) rootView.findViewById(R.id.price_value)).setText("??�費");
 		
 		((TextView) rootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);//.setText("?��??�價?�數1�?29???");
 			

@@ -2,6 +2,6 @@
 <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
     android:accountPreferences="@xml/prefs"
     android:accountType="com.tongle"
-    android:icon="@drawable/ic_udinic"
+    android:icon="@drawable/logo"
     android:label="@string/label"
-    android:smallIcon="@drawable/ic_udinic" />
+    android:smallIcon="@drawable/logo" />

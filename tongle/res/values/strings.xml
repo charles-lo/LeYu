@@ -34,7 +34,7 @@
     <string name="man">人</string>
     <string name="loading">載入中</string>
     <string name="network_error">網路發生錯誤</string>
-    <string name="server_error">server又在那亂動api了，都不會講一聲的</string>
+    <string name="server_error">server又在那亂動api了\n都不會講一聲的</string>
 
     <string-array name="regions">
         <item>臺北市</item>
@@ -59,6 +59,14 @@
         <item>嘉義市</item>
         <item>金門縣</item>
         <item>連江縣</item>
+    </string-array>
+    
+    <string-array name="category">
+        <item>美感</item>
+        <item>體能</item>
+        <item>科普</item>
+        <item>社交</item>
+        <item>文化</item>
     </string-array>
 
 </resources>
