@@ -1,4 +1,4 @@
-package com.udinic.accounts_authenticator_example.authentication;
+package com.tongle.accounts;
 
 import android.accounts.*;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static com.udinic.accounts_authenticator_example.authentication.AccountGeneral.*;
+import static com.tongle.accounts.AccountGeneral.*;
 
 /**
  * Created with IntelliJ IDEA.

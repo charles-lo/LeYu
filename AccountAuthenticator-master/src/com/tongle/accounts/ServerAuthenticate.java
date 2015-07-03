@@ -1,4 +1,4 @@
-package com.udinic.accounts_authenticator_example.authentication;
+package com.tongle.accounts;
 
 /**
  * User: udinic

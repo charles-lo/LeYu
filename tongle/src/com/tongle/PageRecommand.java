@@ -16,7 +16,7 @@ import com.tongle.Gateway.MainPageDataListener;
 import com.tongle.Gateway.Topic;
 import com.tongle.PageDetail.DetailArgs;
 import com.tongle.PageEvent.EventArgs;
-import com.udinic.accounts_authenticator_example.authentication.AccountGeneral;
+import com.tongle.accounts.AccountGeneral;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;

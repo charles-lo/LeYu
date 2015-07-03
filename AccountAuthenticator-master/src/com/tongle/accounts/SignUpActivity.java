@@ -1,4 +1,4 @@
-package com.udinic.accounts_authenticator_example.authentication;
+package com.tongle.accounts;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -11,10 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.udinic.accounts_authenticator_example.R;
 
-import static com.udinic.accounts_authenticator_example.authentication.AccountGeneral.sServerAuthenticate;
-import static com.udinic.accounts_authenticator_example.authentication.AuthenticatorActivity.ARG_ACCOUNT_TYPE;
-import static com.udinic.accounts_authenticator_example.authentication.AuthenticatorActivity.KEY_ERROR_MESSAGE;
-import static com.udinic.accounts_authenticator_example.authentication.AuthenticatorActivity.PARAM_USER_PASS;
+import static com.tongle.accounts.AccountGeneral.sServerAuthenticate;
+import static com.tongle.accounts.AuthenticatorActivity.ARG_ACCOUNT_TYPE;
+import static com.tongle.accounts.AuthenticatorActivity.KEY_ERROR_MESSAGE;
+import static com.tongle.accounts.AuthenticatorActivity.PARAM_USER_PASS;
 
 /**
  * In charge of the Sign up process. Since it's not an AuthenticatorActivity decendent,

@@ -1,6 +1,6 @@
 package com.tongle;
 
-import static com.udinic.accounts_authenticator_example.authentication.AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
+import static com.tongle.accounts.AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -13,7 +13,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.tongle.Gateway.Headline;
 import com.tongle.Gateway.MainPageData;
 import com.tongle.Gateway.Topic;
-import com.udinic.accounts_authenticator_example.authentication.AccountGeneral;
+import com.tongle.accounts.AccountGeneral;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;

@@ -1,4 +1,4 @@
-package com.udinic.accounts_authenticator_example.authentication;
+package com.tongle.accounts;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.udinic.accounts_authenticator_example.R;
 
-import static com.udinic.accounts_authenticator_example.authentication.AccountGeneral.sServerAuthenticate;
+import static com.tongle.accounts.AccountGeneral.sServerAuthenticate;
 
 /**
  * The Authenticator activity.
