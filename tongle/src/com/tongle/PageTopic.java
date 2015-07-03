@@ -210,13 +210,9 @@ public class PageTopic extends Fragment {
 					public void onClick(View v) {
 						Fragment event = new PageDetail();
 						Bundle bundle = new Bundle();
-
-						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(
-								data.mActivityID, data.mPicture, data.mText, null)));
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mActivityID, data.mPicture, data.mText, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event);
-						;
-
+						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);
 					}
 				});
 			} else if (data.mType == 3) {
@@ -259,10 +255,9 @@ public class PageTopic extends Fragment {
 					public void onClick(View v) {
 						Fragment event = new PageDetail();
 						Bundle bundle = new Bundle();
-						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(
-								data.mActivityID, data.mPicture, data.mText, null)));
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mActivityID, data.mPicture, data.mText, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event);
+						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);
 					}
 				});
 

@@ -90,8 +90,8 @@ public class PageFind extends Fragment {
 		final View category = mRootView.findViewById(R.id.category);
 		final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
 		final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(getActivity(),
-				android.R.layout.simple_spinner_dropdown_item, Arrays.asList("類別01", "類別02",
-						"類別03", "類別04", "類別05", "類別06"));
+				android.R.layout.simple_spinner_dropdown_item, Arrays.asList("嚙踝蕭嚙瞌01", "嚙踝蕭嚙瞌02",
+						"嚙踝蕭嚙瞌03", "嚙踝蕭嚙瞌04", "嚙踝蕭嚙瞌05", "嚙踝蕭嚙瞌06"));
 		OnClickListener clickCategory = new OnClickListener() {
 
 			@Override
@@ -117,7 +117,7 @@ public class PageFind extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).replaceFragment(new PageRecommand(), true);
+				((MainActivity) getActivity()).replaceFragment(new PageRecommand(), PageRecommand.TAG, true);
 
 			}
 		});
@@ -329,33 +329,33 @@ public class PageFind extends Fragment {
 
 		LeyuAdapter() {
 
-			m_Data.add(new Item(1, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(1, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(0, "創意小天才", ""));
-			m_Data.add(new Item(0, "其妙大自然", ""));
-			m_Data.add(new Item(0, "手作趣味多", ""));
-			m_Data.add(new Item(1, "創意小天才", ""));
+			m_Data.add(new Item(1, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(1, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(0, "嚙請意嚙緘嚙諸才", ""));
+			m_Data.add(new Item(0, "嚙賭妙嚙篌嚙諛然", ""));
+			m_Data.add(new Item(0, "嚙踝蕭@嚙踝蕭嚙踝蕭h", ""));
+			m_Data.add(new Item(1, "嚙請意嚙緘嚙諸才", ""));
 			
 		}
 
@@ -421,7 +421,7 @@ public class PageFind extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event);;
+						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
 						
 					}});
 			}
@@ -465,7 +465,7 @@ public class PageFind extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event);;
+						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
 						
 					}});
 			}

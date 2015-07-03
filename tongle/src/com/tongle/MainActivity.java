@@ -5,22 +5,33 @@ import static com.udinic.accounts_authenticator_example.authentication.AccountGe
 import java.io.IOException;
 import java.util.Locale;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.tongle.Gateway.Headline;
+import com.tongle.Gateway.MainPageData;
+import com.tongle.Gateway.Topic;
 import com.udinic.accounts_authenticator_example.authentication.AccountGeneral;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -46,6 +57,7 @@ public class MainActivity extends Activity {
 	private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
     private boolean mInvalidate;
+    private Bundle accountInfo; 
 	
 	static private final String TAG = MainActivity.class.getSimpleName();
 
@@ -54,6 +66,9 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Fresco.initialize(MainActivity.this);
 		setContentView(R.layout.activity_main);
+		//
+		mAccountManager = AccountManager.get(this);
+		logOn(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
 
 		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
@@ -67,10 +82,8 @@ public class MainActivity extends Activity {
 		//
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PageRecommand()).commit();
+					.add(R.id.container, new PageRecommand(), PageRecommand.TAG).commit();
 		}
-		//
-		mAccountManager = AccountManager.get(this);
 		
 		if (savedInstanceState != null) {
         	boolean showDialog = savedInstanceState.getBoolean(STATE_DIALOG);
@@ -79,7 +92,6 @@ public class MainActivity extends Activity {
         		showAccountPicker(AUTHTOKEN_TYPE_FULL_ACCESS, invalidate);
         	}
         }
-//		addNewAccount(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
 	}
 	
 	@Override
@@ -151,20 +163,73 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public void addNewAccount(String accountType, String authTokenType) {
-        final AccountManagerFuture<Bundle> future = mAccountManager.addAccount(accountType, authTokenType, null, null, this, new AccountManagerCallback<Bundle>() {
-            @Override
-            public void run(AccountManagerFuture<Bundle> future) {
-                try {
-                    Bundle bnd = future.getResult();
-                    Log.d("udinic", "AddNewAccount Bundle is " + bnd);
+	public Bundle getAccountInfo(){
+		return accountInfo;
+	}
+	
+	private void logOn(String accountType, final String authTokenType) {
+		final Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, null);
-    }
+		if (availableAccounts.length == 0) {
+			AccountManagerFuture<Bundle> future = mAccountManager.addAccount(accountType, authTokenType, null, null, this,
+					new AccountManagerCallback<Bundle>() {
+						@Override
+						public void run(AccountManagerFuture<Bundle> future) {
+							try {
+								accountInfo = future.getResult();
+								Log.d(TAG, "AddNewAccount Bundle is " + accountInfo);
+								Fragment frg = null;
+								frg = getFragmentManager().findFragmentByTag(PageRecommand.TAG);
+								final FragmentTransaction ft = getFragmentManager().beginTransaction();
+								ft.detach(frg);
+								ft.attach(frg);
+								ft.commitAllowingStateLoss();
+
+							} catch (Exception e) {
+								e.printStackTrace();
+//								finish();
+							}
+						}
+					}, null);
+		} else {
+			String name[] = new String[availableAccounts.length];
+			for (int i = 0; i < availableAccounts.length; i++) {
+				name[i] = availableAccounts[i].name;
+			}
+			AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccounts[0], authTokenType,null, this, null, null);
+			
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected void onPostExecute(Boolean result) {
+					if (result){
+//						finish();
+					}
+					super.onPostExecute(result);
+				}
+				
+				@Override
+				protected Boolean doInBackground(Void... params) {
+					boolean ret = false;
+					try {
+						AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccounts[0], authTokenType,null, MainActivity.this, null, null);
+						accountInfo = future.getResult();
+					} catch (OperationCanceledException e) {
+						ret = true;
+						e.printStackTrace();
+					} catch (AuthenticatorException e) {
+						ret = true;
+						e.printStackTrace();
+					} catch (IOException e) {
+						ret = true;
+						e.printStackTrace();
+					}
+					Log.d(TAG, "AddNewAccount Bundle is " + accountInfo);
+					return ret;
+				}}.execute();
+			
+		}
+	}
 	
 	private void showAccountPicker(final String authTokenType, final boolean invalidate) {
     	mInvalidate = invalidate;
@@ -312,16 +377,16 @@ public class MainActivity extends Activity {
 
 	}
 
-	public void replaceFragment(Fragment newFragment) {
+	public void replaceFragment(Fragment newFragment, String tag) {
 		getFragmentManager().beginTransaction()
-				.replace(R.id.container, newFragment).addToBackStack(null)
+				.replace(R.id.container, newFragment, tag).addToBackStack(null)
 				.commit();
 		mFinishOnBack = false;
 	}
 	
-	public void replaceFragment(Fragment newFragment, boolean finishOnBack) {
+	public void replaceFragment(Fragment newFragment, String tag, boolean finishOnBack) {
 		getFragmentManager().beginTransaction()
-				.replace(R.id.container, newFragment).addToBackStack(null)
+				.replace(R.id.container, newFragment, tag).addToBackStack(null)
 				.commit();
 		mFinishOnBack = finishOnBack;
 	}

@@ -71,23 +71,28 @@ public class PageRecommand extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).replaceFragment(new PageFind(), true);
+				((MainActivity) getActivity()).replaceFragment(new PageFind(), PageFind.TAG, true);
 				
 			}});
 
 
 		final View header = inflater.inflate(R.layout.header_recommand, null);
+		Bundle accountInfo = ((MainActivity) getActivity()).getAccountInfo();
+		if (accountInfo != null) {
+			((TextView) header.findViewById(R.id.name)).setText(accountInfo.getString("authAccount"));
+		} else {
+			((TextView) header.findViewById(R.id.name)).setText(R.string.not_logon);
+		}
 		mWeekend = (Button) header.findViewById(R.id.weekend);
 		mWeekend.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-//				Fragment event = new PageEvent();
-//				Bundle bundle = new Bundle();
-//				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.weekend))));
-//				event.setArguments(bundle);
-				((MainActivity) getActivity()).addNewAccount(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);;
-				
+				Fragment event = new PageEvent();
+				Bundle bundle = new Bundle();
+				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.weekend))));
+				event.setArguments(bundle);
+				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 			}});
 		mFree = (Button) header.findViewById(R.id.free);
 		mFree.setOnClickListener(new OnClickListener(){
@@ -98,7 +103,7 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.free))));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event);;
+				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				
 			}});
 		mHot = (Button) header.findViewById(R.id.hot);
@@ -110,7 +115,7 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.hot))));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event);
+				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				
 			}});
 		mNear = (Button) header.findViewById(R.id.near);
@@ -122,7 +127,7 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.near))));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event);
+				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				
 			}});
 
@@ -184,7 +189,7 @@ public class PageRecommand extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event);;
+						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
 						
 					}});
 				// top list
@@ -312,7 +317,7 @@ public class PageRecommand extends Fragment {
 					Bundle bundle = new Bundle();
 					bundle.putString(PageTopic.ARG, new Gson().toJson(m_Data.get(position)));
 					event.setArguments(bundle);
-					((MainActivity) getActivity()).replaceFragment(event);;
+					((MainActivity) getActivity()).replaceFragment(event, PageTopic.TAG);
 					
 				}});
 

@@ -33,6 +33,7 @@
     <string name="interested">感興趣</string>
     <string name="man">人</string>
     <string name="loading">載入中</string>
+    <string name="not_logon">未登入</string>
     <string name="network_error">網路發生錯誤</string>
     <string name="server_error">server又在那亂動api了\n都不會講一聲的</string>
 

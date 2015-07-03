@@ -46,7 +46,7 @@ public class PageEvent extends Fragment {
 	private ListView list;
 	private LeyuAdapter mAdapter;
 	// Data
-	private	List<String> tabName = new ArrayList<String>(Arrays.asList("海�??", "?��?��", "??��??", "展覽", "展覽", "", ""));
+	private	List<String> tabName = new ArrayList<String>(Arrays.asList("海邊", "牧場", "果園", "展覽", "展覽", "", ""));
 	private List<Integer> tabInt = new ArrayList<Integer>(Arrays.asList(20, 30, 40, 50, 60, 70));
 	
 	@Override
@@ -251,7 +251,7 @@ public class PageEvent extends Fragment {
 					Bundle bundle = new Bundle();
 					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 					event.setArguments(bundle);
-					((MainActivity) getActivity()).replaceFragment(event);;
+					((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
 					
 				}});
 
