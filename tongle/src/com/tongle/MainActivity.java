@@ -35,6 +35,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -168,67 +169,27 @@ public class MainActivity extends Activity {
 	}
 	
 	private void logOn(String accountType, final String authTokenType) {
-		final Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
+		final AccountManagerFuture<Bundle> future = mAccountManager.getAuthTokenByFeatures(accountType, authTokenType, null, this, null, null,
+                new AccountManagerCallback<Bundle>() {
+                    @Override
+                    public void run(AccountManagerFuture<Bundle> future) {
 
-		if (availableAccounts.length == 0) {
-			AccountManagerFuture<Bundle> future = mAccountManager.addAccount(accountType, authTokenType, null, null, this,
-					new AccountManagerCallback<Bundle>() {
-						@Override
-						public void run(AccountManagerFuture<Bundle> future) {
-							try {
-								accountInfo = future.getResult();
-								Log.d(TAG, "AddNewAccount Bundle is " + accountInfo);
-								Fragment frg = null;
-								frg = getFragmentManager().findFragmentByTag(PageRecommand.TAG);
-								final FragmentTransaction ft = getFragmentManager().beginTransaction();
-								ft.detach(frg);
-								ft.attach(frg);
-								ft.commitAllowingStateLoss();
-
-							} catch (Exception e) {
-								e.printStackTrace();
-//								finish();
-							}
-						}
-					}, null);
-		} else {
-			String name[] = new String[availableAccounts.length];
-			for (int i = 0; i < availableAccounts.length; i++) {
-				name[i] = availableAccounts[i].name;
-			}
-			AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccounts[0], authTokenType,null, this, null, null);
-			
-			new AsyncTask<Void,Void,Boolean>(){
-
-				@Override
-				protected void onPostExecute(Boolean result) {
-					if (result){
-//						finish();
-					}
-					super.onPostExecute(result);
-				}
-				
-				@Override
-				protected Boolean doInBackground(Void... params) {
-					boolean ret = false;
-					try {
-						AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccounts[0], authTokenType,null, MainActivity.this, null, null);
-						accountInfo = future.getResult();
-					} catch (OperationCanceledException e) {
-						ret = true;
-						e.printStackTrace();
-					} catch (AuthenticatorException e) {
-						ret = true;
-						e.printStackTrace();
-					} catch (IOException e) {
-						ret = true;
-						e.printStackTrace();
-					}
-					Log.d(TAG, "AddNewAccount Bundle is " + accountInfo);
-					return ret;
-				}}.execute();
-			
-		}
+                        try {
+                        	accountInfo = future.getResult();
+                            final String authtoken = accountInfo.getString(AccountManager.KEY_AUTHTOKEN);
+                            Log.d("udinic", "GetTokenForAccount Bundle is " + accountInfo + " authtoken: " + authtoken);
+                            Fragment frg = null;
+							frg = getFragmentManager().findFragmentByTag(PageRecommand.TAG);
+							final FragmentTransaction ft = getFragmentManager().beginTransaction();
+							ft.detach(frg);
+							ft.attach(frg);
+							ft.commitAllowingStateLoss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , null);
 	}
 	
 	private void showAccountPicker(final String authTokenType, final boolean invalidate) {
