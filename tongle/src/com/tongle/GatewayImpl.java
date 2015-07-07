@@ -49,7 +49,7 @@ public class GatewayImpl implements Gateway{
 			protected MainPageData doInBackground(Void... params) {
 				MainPageData data = null;
 				try {
-					String response = getJSON(url, 10000);
+					String response = getResponse(url, 10000);
 					
 					if (response == null){
 					}else{
@@ -100,7 +100,7 @@ public class GatewayImpl implements Gateway{
 			protected TopicData doInBackground(Void... params) {
 				TopicData data = null;
 				try {
-					String response = getJSON(url, 10000);
+					String response = getResponse(url, 10000);
 					
 					if (response == null){
 					}else{
@@ -146,7 +146,7 @@ public class GatewayImpl implements Gateway{
 			protected ActivityData doInBackground(Void... params) {
 				ActivityData data = null;
 				try {
-					String response = getJSON(url, 10000);
+					String response = getResponse(url, 10000);
 					
 					if (response == null){
 					}else{
@@ -186,24 +186,24 @@ public class GatewayImpl implements Gateway{
 		
 	}
 
-	public String getJSON(String url, int timeout) {
-	    HttpURLConnection c = null;
+	public String getResponse(String urlString, int timeout) {
+	    HttpURLConnection connection = null;
 	    try {
-	        URL u = new URL(url);
-	        c = (HttpURLConnection) u.openConnection();
-	        c.setRequestMethod("GET");
-	        c.setRequestProperty("Content-length", "0");
-	        c.setUseCaches(false);
-	        c.setAllowUserInteraction(false);
-	        c.setConnectTimeout(timeout);
-	        c.setReadTimeout(timeout);
-	        c.connect();
-	        int status = c.getResponseCode();
+	        URL url = new URL(urlString);
+	        connection = (HttpURLConnection) url.openConnection();
+	        connection.setRequestMethod("GET");
+	        connection.setRequestProperty("Content-length", "0");
+	        connection.setUseCaches(false);
+	        connection.setAllowUserInteraction(false);
+	        connection.setConnectTimeout(timeout);
+	        connection.setReadTimeout(timeout);
+	        connection.connect();
+	        int status = connection.getResponseCode();
 
 	        switch (status) {
 	            case 200:
 	            case 201:
-	                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+	                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 	                StringBuilder sb = new StringBuilder();
 	                String line;
 	                while ((line = br.readLine()) != null) {
@@ -218,16 +218,16 @@ public class GatewayImpl implements Gateway{
 	    } catch (IOException ex) {
 	        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 	    } finally {
-	       if (c != null) {
+	       if (connection != null) {
 	          try {
-	              c.disconnect();
+	              connection.disconnect();
 	          } catch (Exception ex) {
 	             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 	          }
 	       }
 	    }
 	    return null;
-	}	
+	}
 	
 	static Gateway getInstance(){
 		if(sInstance == null){
