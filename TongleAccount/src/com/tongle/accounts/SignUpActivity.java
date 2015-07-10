@@ -54,6 +54,7 @@ public class SignUpActivity extends Activity {
 			}
 		});
 		mActionBar.setDisplayShowCustomEnabled(true);
+		//
 
         findViewById(R.id.alreadyMember).setOnClickListener(new View.OnClickListener() {
             @Override

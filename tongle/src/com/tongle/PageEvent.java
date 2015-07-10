@@ -37,6 +37,8 @@ import android.widget.TextView;
 public class PageEvent extends Fragment {
 	static final String TAG = PageEvent.class.getSimpleName();
 	public static final String ARG = "event_arg";
+	//
+	private	MainActivity mActivity;
 	// view
 	private LinearLayout mTabBar;
 	private int mPreious;
@@ -53,22 +55,13 @@ public class PageEvent extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		EventArgs args = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
 		mRes = PageEvent.this.getResources();
+		//
+		mActivity = (MainActivity) getActivity();
+		mActivity.initActionBar(args.mTitle);
+		
 		mAdapter = new LeyuAdapter();
 		
 		View rootView = inflater.inflate(R.layout.page_event, container, false);
-
-		TextView title = ((TextView) rootView.findViewById(R.id.title));
-		title.setText(args.mTitle);
-		
-		final View back = rootView.findViewById(R.id.back);
-		back.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				((MainActivity) getActivity()).back();
-
-			}
-		});
 		
 		//
 		list = ((ListView) rootView.findViewById(R.id.list));
@@ -84,7 +77,7 @@ public class PageEvent extends Fragment {
 
 		tabHost = (TabHost) rootView.findViewById(R.id.tabhost);
 		tabHost.setup();
-		tabHost.setup(new LocalActivityManager(this.getActivity(), true));
+		tabHost.setup(new LocalActivityManager(mActivity, true));
 		for (int i = 0; i < tabName.size(); i++) {
 			View tabIndicator = inflater.inflate(R.layout.tabwidget, null);
 			tabs.add(tabIndicator);

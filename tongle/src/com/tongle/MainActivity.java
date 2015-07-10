@@ -11,8 +11,8 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.OnAccountsUpdateListener;
+import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.location.Address;
@@ -24,6 +24,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
@@ -38,6 +41,9 @@ public class MainActivity extends Activity {
 	private Address mAddress;
 	private AccountManager mAccountManager;
     private Bundle mAccountInfo; 
+    // Action Bar
+    private ActionBar mActionBar;
+    private TextView mTitleTextView;
 	
 	static private final String TAG = MainActivity.class.getSimpleName();
 
@@ -46,6 +52,25 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Fresco.initialize(MainActivity.this);
 		setContentView(R.layout.activity_main);
+		// action bar
+		mActionBar = getActionBar();
+		mActionBar.setDisplayShowHomeEnabled(false);
+		mActionBar.setDisplayShowTitleEnabled(false);
+
+		mActionBar.setCustomView(R.layout.title_bar);
+		View customView = mActionBar.getCustomView();
+		mTitleTextView = (TextView) customView.findViewById(R.id.title);
+		final View back = customView.findViewById(R.id.back);
+		back.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+
+			}
+		});
+		mActionBar.setDisplayShowCustomEnabled(true);
+		mActionBar.hide();
 		//
 		mAccountManager = AccountManager.get(this);
 		
@@ -129,6 +154,11 @@ public class MainActivity extends Activity {
 	
 	public Bundle getAccountInfo(){
 		return mAccountInfo;
+	}
+	
+	public void initActionBar(String title){
+		mActionBar.show();
+		mTitleTextView.setText(title);
 	}
 	
 	private void logOn(String accountType, final String authTokenType) {
@@ -225,14 +255,10 @@ public class MainActivity extends Activity {
 	public Address getAddress() {
 		return mAddress;
 	}
-	
-	public void back() {
-		onBackPressed();
-	}
 
 	@Override
 	public void onBackPressed() {
-
+		mActionBar.hide();
 		if (mFinishOnBack || !getFragmentManager().popBackStackImmediate()) {
 			finish();
 		}

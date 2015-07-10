@@ -53,8 +53,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class PageDetail extends Fragment {
+
 	static final String TAG = PageDetail.class.getSimpleName();
 	public static final String ARG = "detail_arg";
+	//
+	private	MainActivity mActivity;
 	// view
 	private Resources mRes;
 	private BarChart mChart;
@@ -71,13 +74,14 @@ public class PageDetail extends Fragment {
 		mRes = PageDetail.this.getResources();
 		category = Arrays.asList(mRes.getStringArray(R.array.category));
 		//
-		api = WXAPIFactory.createWXAPI(getActivity(), APP_ID, false);
+		mActivity = (MainActivity) getActivity();
+		mActivity.initActionBar(args.mTitle);
+		
+		api = WXAPIFactory.createWXAPI(mActivity, APP_ID, false);
 		api.registerApp(APP_ID);
 		//
 		final View rootView = inflater.inflate(R.layout.page_detail, container, false);
 
-		TextView title = ((TextView) rootView.findViewById(R.id.title));
-		title.setText(args.mTitle);
 		
 		mShare = rootView.findViewById(R.id.share);
 		mShare.setOnTouchListener(new OnTouchListener(){
@@ -164,16 +168,7 @@ public class PageDetail extends Fragment {
 
 				startActivity(Intent.createChooser(intent, getString(R.string.message)));
 			}});
-		
-		final View back = rootView.findViewById(R.id.back);
-		back.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				((MainActivity) getActivity()).back();
-
-			}
-		});
 		//
 		((TextView) rootView.findViewById(R.id.description)).setText(args.mTitle);
 		//

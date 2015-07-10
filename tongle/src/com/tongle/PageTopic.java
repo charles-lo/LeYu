@@ -34,6 +34,8 @@ public class PageTopic extends Fragment {
 	static final String TAG = PageTopic.class.getSimpleName();
 	public static final String ARG = "topic_arg";
 	//
+	private	MainActivity mActivity;
+	//
 	private Resources mRes;
 	View mRootView;
 	// Data
@@ -45,17 +47,8 @@ public class PageTopic extends Fragment {
 		mRootView = inflater.inflate(R.layout.page_topic, container, false);
 		mRes = getResources();
 		//
-		TextView title = ((TextView) mRootView.findViewById(R.id.title));
-		title.setText(args.mTitle);
-		final View back = mRootView.findViewById(R.id.back);
-		back.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				((MainActivity) getActivity()).back();
-
-			}
-		});
+		mActivity = (MainActivity) getActivity();
+		mActivity.initActionBar(args.mTitle);
 
 		final TextView status = (TextView) mRootView.findViewById(R.id.status);
 
