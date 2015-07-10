@@ -16,12 +16,12 @@ import static com.tongle.accounts.AccountGeneral.*;
  * Date: 19/03/13
  * Time: 18:58
  */
-public class UdinicAuthenticator extends AbstractAccountAuthenticator {
+public class TongleAuthenticator extends AbstractAccountAuthenticator {
 
-    private String TAG = "UdinicAuthenticator";
+    private String TAG = TongleAuthenticator.class.getSimpleName();
     private final Context mContext;
 
-    public UdinicAuthenticator(Context context) {
+    public TongleAuthenticator(Context context) {
         super(context);
 
         // I hate you! Google - set mContext as protected!
@@ -30,7 +30,7 @@ public class UdinicAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
-        Log.d("udinic", TAG + "> addAccount shit");
+        Log.d(TAG , " addAccount shit");
 
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
         intent.putExtra(AuthenticatorActivity.ARG_ACCOUNT_TYPE, accountType);
@@ -46,7 +46,7 @@ public class UdinicAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
 
-        Log.d("udinic", TAG + "> getAuthToken");
+        Log.d(TAG, " getAuthToken");
 
         // If the caller requested an authToken type we don't support, then
         // return an error
@@ -62,14 +62,14 @@ public class UdinicAuthenticator extends AbstractAccountAuthenticator {
 
         String authToken = am.peekAuthToken(account, authTokenType);
 
-        Log.d("udinic", TAG + "> peekAuthToken returned - " + authToken);
+        Log.d(TAG, " peekAuthToken returned - " + authToken);
 
         // Lets give another try to authenticate the user
         if (TextUtils.isEmpty(authToken)) {
             final String password = am.getPassword(account);
             if (password != null) {
                 try {
-                    Log.d("udinic", TAG + "> re-authenticating with the existing password");
+                    Log.d(TAG, " re-authenticating with the existing password");
                     authToken = sServerAuthenticate.userSignIn(account.name, password, authTokenType);
                 } catch (Exception e) {
                     e.printStackTrace();

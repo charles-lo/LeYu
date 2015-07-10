@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
@@ -23,7 +22,15 @@ public class GatewayImpl implements Gateway{
 	static final  int ERROR_NETWORK = 1;
 	static final  int ERROR_SERVER = 2;
 	static GatewayImpl sInstance;
+	static String sAuthToken;
+	static private MainActivity mMainActivity;
 	final String baseUrl = "http://leibaoserver.azurewebsites.net/api/Leibao/";
+
+	@Override
+	public void initialize(String token, MainActivity mainActivity) {
+		sAuthToken = token;
+		mMainActivity = mainActivity;
+	}
 	
 	@Override
 	public void getMainPageData(final MainPageDataListener listener, String AdminArea) {
@@ -187,46 +194,72 @@ public class GatewayImpl implements Gateway{
 	}
 
 	public String getResponse(String urlString, int timeout) {
-	    HttpURLConnection connection = null;
-	    try {
-	        URL url = new URL(urlString);
-	        connection = (HttpURLConnection) url.openConnection();
-	        connection.setRequestMethod("GET");
-	        connection.setRequestProperty("Content-length", "0");
-	        connection.setUseCaches(false);
-	        connection.setAllowUserInteraction(false);
-	        connection.setConnectTimeout(timeout);
-	        connection.setReadTimeout(timeout);
-	        connection.connect();
-	        int status = connection.getResponseCode();
+		HttpURLConnection connection = null;
+		int retry = 0;
+		while (retry < 5) {
+			try {
+				if (retry > 0) {
+					Thread.sleep(1000);
+				}
+				URL url = new URL(urlString);
+				connection = (HttpURLConnection) url.openConnection();
+				connection.setRequestMethod("GET");
+				connection.setRequestProperty("Content-length", "0");
+				connection.setRequestProperty("Cookie", sAuthToken);
+				connection.setUseCaches(false);
+				connection.setAllowUserInteraction(false);
+				connection.setConnectTimeout(timeout);
+				connection.setReadTimeout(timeout);
+				connection.connect();
+				int status = connection.getResponseCode();
 
-	        switch (status) {
-	            case 200:
-	            case 201:
-	                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	                StringBuilder sb = new StringBuilder();
-	                String line;
-	                while ((line = br.readLine()) != null) {
-	                    sb.append(line+"\n");
-	                }
-	                br.close();
-	                return sb.toString();
-	        }
+				switch (status) {
+				case 200:
+				case 201:
+				default:
+					String ret;
+					BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+					StringBuilder sb = new StringBuilder();
+					String line;
+					while ((line = br.readLine()) != null) {
+						sb.append(line + "\n");
+					}
+					br.close();
+					ret = sb.toString();
+					JSONObject root = new JSONObject(ret);
+					if (root.has("Code")) {
+						String code = root.getString("Code");
+						if (!TextUtils.isEmpty(code) && code.equals("0005")) {
+							if (mMainActivity != null) {
+								mMainActivity.invalidateAuthToken();
+							}
+						}
+					} else {
+						return ret;
+					}
+				}
 
-	    } catch (MalformedURLException ex) {
-	        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-	    } catch (IOException ex) {
-	        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-	    } finally {
-	       if (connection != null) {
-	          try {
-	              connection.disconnect();
-	          } catch (Exception ex) {
-	             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-	          }
-	       }
-	    }
-	    return null;
+			} catch (MalformedURLException ex) {
+				Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+			} catch (IOException ex) {
+				Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} finally {
+				if (connection != null) {
+					try {
+						connection.disconnect();
+					} catch (Exception ex) {
+						Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+					}
+				}
+			}
+			retry++;
+			continue;
+		}
+		return null;
 	}
 	
 	static Gateway getInstance(){

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AccountAuthenticator</string>
+    <string name="label">童樂</string>
+
+    <string name="signup_title">Create new account</string>
+    <string name="login_label">登入帳號</string>
+    <string name="login">登入</string>
+    <string name="backlogin">返回登入</string>
+    <string name="signup_label">註冊帳號</string>
+    <string name="signup">註冊</string>
+    <string name="signupnew">新使用者註冊</string>
+</resources>

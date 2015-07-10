@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tongle.accounts"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="12"
+        android:targetSdkVersion="17" />
+
+    <application
+        android:icon="@drawable/logo"
+        android:label="@string/app_name" >
+
+        <!-- *** Not really needed here, but convenient for copying to other apps that will use this module *** -->
+        <activity
+            android:name="com.tongle.accounts.AuthenticatorActivity"
+            android:label="@string/login_label" />
+        <activity
+            android:name="com.tongle.accounts.SignUpActivity"
+            android:label="@string/signup_title" />
+
+        <service android:name="com.tongle.accounts.TongleAuthenticatorService" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+    </application>
+
+    <!-- *** Not really needed here, but convenient for copying to other apps that will use this module *** -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+
+</manifest>

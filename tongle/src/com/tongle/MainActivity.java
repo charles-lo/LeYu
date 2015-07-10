@@ -1,50 +1,31 @@
 package com.tongle;
 
-import static com.tongle.accounts.AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
-
 import java.io.IOException;
 import java.util.Locale;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.tongle.Gateway.Headline;
-import com.tongle.Gateway.MainPageData;
-import com.tongle.Gateway.Topic;
 import com.tongle.accounts.AccountGeneral;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
+import android.accounts.OnAccountsUpdateListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
-	
-	private static final String STATE_DIALOG = "state_dialog";
-	private static final String STATE_INVALIDATE = "state_invalidate";
 
 	private int m_DeviceWidth;
 	private int m_DeviceHeight;
@@ -56,9 +37,7 @@ public class MainActivity extends Activity {
 	private Location mLocation;
 	private Address mAddress;
 	private AccountManager mAccountManager;
-    private AlertDialog mAlertDialog;
-    private boolean mInvalidate;
-    private Bundle accountInfo; 
+    private Bundle mAccountInfo; 
 	
 	static private final String TAG = MainActivity.class.getSimpleName();
 
@@ -69,7 +48,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		//
 		mAccountManager = AccountManager.get(this);
-		logOn(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+		
+        logOn(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
 
 		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
@@ -85,14 +65,6 @@ public class MainActivity extends Activity {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PageRecommand(), PageRecommand.TAG).commit();
 		}
-		
-		if (savedInstanceState != null) {
-        	boolean showDialog = savedInstanceState.getBoolean(STATE_DIALOG);
-        	boolean invalidate = savedInstanceState.getBoolean(STATE_INVALIDATE);
-        	if (showDialog) {
-        		showAccountPicker(AUTHTOKEN_TYPE_FULL_ACCESS, invalidate);
-        	}
-        }
 	}
 	
 	@Override
@@ -145,15 +117,6 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-    	super.onSaveInstanceState(outState);
-    	if (mAlertDialog != null && mAlertDialog.isShowing()) {
-    		outState.putBoolean(STATE_DIALOG, true);
-    		outState.putBoolean(STATE_INVALIDATE, mInvalidate);
-    	}
-    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -165,25 +128,41 @@ public class MainActivity extends Activity {
 	}
 	
 	public Bundle getAccountInfo(){
-		return accountInfo;
+		return mAccountInfo;
 	}
 	
 	private void logOn(String accountType, final String authTokenType) {
+		// regenerate token
+		invalidateAuthToken();
+		// get token
 		final AccountManagerFuture<Bundle> future = mAccountManager.getAuthTokenByFeatures(accountType, authTokenType, null, this, null, null,
                 new AccountManagerCallback<Bundle>() {
                     @Override
                     public void run(AccountManagerFuture<Bundle> future) {
 
                         try {
-                        	accountInfo = future.getResult();
-                            final String authtoken = accountInfo.getString(AccountManager.KEY_AUTHTOKEN);
-                            Log.d("udinic", "GetTokenForAccount Bundle is " + accountInfo + " authtoken: " + authtoken);
+                        	mAccountInfo = future.getResult();
+                            final String authtoken = mAccountInfo.getString(AccountManager.KEY_AUTHTOKEN);
+                            Log.d(TAG, "GetTokenForAccount Bundle is " + mAccountInfo + " authtoken: " + authtoken);
+                            
+                            GatewayImpl.getInstance().initialize(authtoken, MainActivity.this);
+                            //
                             Fragment frg = null;
 							frg = getFragmentManager().findFragmentByTag(PageRecommand.TAG);
 							final FragmentTransaction ft = getFragmentManager().beginTransaction();
 							ft.detach(frg);
 							ft.attach(frg);
 							ft.commitAllowingStateLoss();
+							//
+							mAccountManager.addOnAccountsUpdatedListener(new OnAccountsUpdateListener() {
+
+								@Override
+								public void onAccountsUpdated(Account[] accounts) {
+									if (mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE).length == 0) {
+										finish();
+									}
+								}
+							}, null, true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -191,32 +170,17 @@ public class MainActivity extends Activity {
                 }
                 , null);
 	}
-	
-	private void showAccountPicker(final String authTokenType, final boolean invalidate) {
-    	mInvalidate = invalidate;
-        final Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
 
-        if (availableAccounts.length == 0) {
-            Toast.makeText(this, "No accounts", Toast.LENGTH_SHORT).show();
-        } else {
-            String name[] = new String[availableAccounts.length];
-            for (int i = 0; i < availableAccounts.length; i++) {
-                name[i] = availableAccounts[i].name;
-            }
+	public void invalidateAuthToken() {
+		// regenerate token
+		final Account availableAccounts[] = mAccountManager.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
 
-            // Account picker
-            mAlertDialog = new AlertDialog.Builder(this).setTitle("Pick Account").setAdapter(new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, name), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if(invalidate)
-                        invalidateAuthToken(availableAccounts[which], authTokenType);
-                    else
-                        getExistingAccountAuthToken(availableAccounts[which], authTokenType);
-                }
-            }).create();
-            mAlertDialog.show();
-        }
-    }
+		if (availableAccounts.length == 0) {
+
+		} else {
+			invalidateAuthToken(availableAccounts[0], AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+		}
+	}
 	
 	   /**
      * Invalidates the auth token for the account
@@ -234,80 +198,17 @@ public class MainActivity extends Activity {
 
                     final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
                     mAccountManager.invalidateAuthToken(account.type, authtoken);
-                    showMessage(account.name + " invalidated");
+                    
+                    GatewayImpl.getInstance().initialize(authtoken, MainActivity.this);
+                    Log.d(TAG, account.name + " invalidated");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    showMessage(e.getMessage());
+                    Log.d(TAG, e.getMessage());
                 }
             }
         }).start();
     }
 
-    /**
-     * Get an auth token for the account.
-     * If not exist - add it and then return its auth token.
-     * If one exist - return its auth token.
-     * If more than one exists - show a picker and return the select account's auth token.
-     * @param accountType
-     * @param authTokenType
-     */
-    private void getTokenForAccountCreateIfNeeded(String accountType, String authTokenType) {
-        final AccountManagerFuture<Bundle> future = mAccountManager.getAuthTokenByFeatures(accountType, authTokenType, null, this, null, null,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        Bundle bnd = null;
-                        try {
-                            bnd = future.getResult();
-                            final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                            showMessage(((authtoken != null) ? "SUCCESS!\ntoken: " + authtoken : "FAIL"));
-                            Log.d("udinic", "GetTokenForAccount Bundle is " + bnd);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            showMessage(e.getMessage());
-                        }
-                    }
-                }
-        , null);
-    }
-    
-    /**
-     * Get the auth token for an existing account on the AccountManager
-     * @param account
-     * @param authTokenType
-     */
-    private void getExistingAccountAuthToken(Account account, String authTokenType) {
-        final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(account, authTokenType, null, this, null, null);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Bundle bnd = future.getResult();
-
-                    final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                    showMessage((authtoken != null) ? "SUCCESS!\ntoken: " + authtoken : "FAIL");
-                    Log.d("udinic", "GetToken Bundle is " + bnd);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    showMessage(e.getMessage());
-                }
-            }
-        }).start();
-    }
-    
-    private void showMessage(final String msg) {
-    	if (TextUtils.isEmpty(msg))
-            return;
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 	
 	private void updateAddress() {
 		try {

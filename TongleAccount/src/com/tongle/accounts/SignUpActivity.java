@@ -1,15 +1,16 @@
 package com.tongle.accounts;
 
 import android.accounts.AccountManager;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.udinic.accounts_authenticator_example.R;
 
 import static com.tongle.accounts.AccountGeneral.sServerAuthenticate;
 import static com.tongle.accounts.AuthenticatorActivity.ARG_ACCOUNT_TYPE;
@@ -21,7 +22,6 @@ import static com.tongle.accounts.AuthenticatorActivity.PARAM_USER_PASS;
  * it returns the result back to the calling activity, which is an AuthenticatorActivity,
  * and it return the result back to the Authenticator
  *
- * User: udinic
  */
 public class SignUpActivity extends Activity {
 
@@ -35,6 +35,25 @@ public class SignUpActivity extends Activity {
         mAccountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
 
         setContentView(R.layout.act_register);
+		// action bar
+		ActionBar mActionBar = getActionBar();
+		mActionBar.setDisplayShowHomeEnabled(false);
+		mActionBar.setDisplayShowTitleEnabled(false);
+
+		mActionBar.setCustomView(R.layout.title_bar);
+		View customView = mActionBar.getCustomView();
+		TextView mTitleTextView = (TextView) customView.findViewById(R.id.title);
+		mTitleTextView.setText(R.string.signup_label);
+		final View back = customView.findViewById(R.id.back);
+		back.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				finish();
+
+			}
+		});
+		mActionBar.setDisplayShowCustomEnabled(true);
 
         findViewById(R.id.alreadyMember).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +83,7 @@ public class SignUpActivity extends Activity {
             @Override
             protected Intent doInBackground(String... params) {
 
-                Log.d("udinic", TAG + "> Started authenticating");
+                Log.d(TAG, "> Started authenticating");
 
                 String authtoken = null;
                 Bundle data = new Bundle();

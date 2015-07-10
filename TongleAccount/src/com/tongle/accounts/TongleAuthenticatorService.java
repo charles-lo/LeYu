@@ -10,11 +10,11 @@ import android.os.IBinder;
  * Date: 19/03/13
  * Time: 19:10
  */
-public class UdinicAuthenticatorService extends Service {
+public class TongleAuthenticatorService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
 
-        UdinicAuthenticator authenticator = new UdinicAuthenticator(this);
+        TongleAuthenticator authenticator = new TongleAuthenticator(this);
         return authenticator.getIBinder();
     }
 }

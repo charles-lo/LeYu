@@ -16,7 +16,6 @@ import com.tongle.Gateway.MainPageDataListener;
 import com.tongle.Gateway.Topic;
 import com.tongle.PageDetail.DetailArgs;
 import com.tongle.PageEvent.EventArgs;
-import com.tongle.accounts.AccountGeneral;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;
@@ -78,8 +77,14 @@ public class PageRecommand extends Fragment {
 
 		final View header = inflater.inflate(R.layout.header_recommand, null);
 		Bundle accountInfo = ((MainActivity) getActivity()).getAccountInfo();
+		Address address = ((MainActivity)getActivity()).getAddress();
+		String adminArea = null;
+		if(address != null){
+			adminArea = address.getAdminArea();
+		}
+		
 		if (accountInfo != null) {
-			((TextView) header.findViewById(R.id.name)).setText(accountInfo.getString("authAccount"));
+			((TextView) header.findViewById(R.id.name)).setText(accountInfo.getString("authAccount") + " 現在在 " + adminArea);
 		} else {
 			((TextView) header.findViewById(R.id.name)).setText(R.string.not_logon);
 		}
@@ -157,11 +162,6 @@ public class PageRecommand extends Fragment {
 		// get server data
 		Gateway gateway = GatewayImpl.getInstance();
 		
-		Address address = ((MainActivity)getActivity()).getAddress();
-		String adminArea = null;
-		if(address != null){
-			adminArea = address.getAdminArea();
-		}
 		
         gateway.getMainPageData(new MainPageDataListener(){
 

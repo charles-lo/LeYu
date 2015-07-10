@@ -32,9 +32,6 @@ import java.util.logging.Logger;
 /**
  * Handles the comminication with Parse.com
  *
- * User: udinic
- * Date: 3/27/13
- * Time: 3:30 AM
  */
 public class TongleServerAuthenticate implements ServerAuthenticate{
 	static final String TAG = TongleServerAuthenticate.class.getSimpleName();
@@ -68,12 +65,12 @@ public class TongleServerAuthenticate implements ServerAuthenticate{
     		throw new Exception("Error signing-in");
 		}else{
 			JSONObject root = new JSONObject(response);
-			Log.d(TAG, "charles Code: " + root.getString("Code") + " Message: " + root.getString("Message"));
+			Log.d(TAG, "Code: " + root.getString("Code") + " Message: " + root.getString("Message"));
 			if (root.getString("Code").equals("0000")) {
-				Log.d(TAG, "charles success: ");
+				Log.d(TAG, "success: ");
 				authtoken = TextUtils.join(",",  msCookieManager.getCookieStore().getCookies());
 			} else {
-				Log.d(TAG, "charles error: ");
+				Log.d(TAG, "error: ");
 				throw new Exception("Error signing-in error code: " + root.getString("Code")
 						+ " Message: " + root.getString("Message"));
 			}
@@ -115,7 +112,7 @@ public class TongleServerAuthenticate implements ServerAuthenticate{
 	        connection.connect();
 	        int status = connection.getResponseCode();
 
-	        Log.d(TAG, "charles " + status);
+	        Log.d(TAG, "" + status);
 	        
 	        switch (status) {
 	            case 200:
@@ -127,7 +124,7 @@ public class TongleServerAuthenticate implements ServerAuthenticate{
 	                    sb.append(line+"\n");
 	                }
 	                br.close();
-	                Log.d(TAG, "charles " + sb.toString());
+	                Log.d(TAG, sb.toString());
 	                Map<String, List<String>> headerFields = connection.getHeaderFields();
 	                List<String> cookiesHeader = headerFields.get(COOKIES_HEADER);
 	                if(cookiesHeader != null)
@@ -149,7 +146,7 @@ public class TongleServerAuthenticate implements ServerAuthenticate{
 	                    sb.append(line+"\n");
 	                }
 	                br.close();
-	                Log.d(TAG, "charles " + sb.toString());
+	                Log.d(TAG, sb.toString());
 	                return sb.toString();
 	        }
 

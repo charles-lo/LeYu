@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- common -->
+	<color name="footer">#6c542f</color>
+	<color name="black">#000</color>
+	<color name="title">#cdb48c</color>
+	<color name="red">#ff3b61</color>
+	<color name="red_01">#ff7872</color>
+	<color name="red_02">#f42c49</color>
+	<color name="brown">#b38c4f</color>
+	<color name="brown01">#c9ae83</color>
+	<color name="grey">#646464</color>
+	<color name="blue">#5b9bd5</color>
+	<color name="orange">#f4c19a</color>
+
+</resources>

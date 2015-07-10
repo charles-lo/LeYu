@@ -3,14 +3,16 @@ package com.tongle.accounts;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.udinic.accounts_authenticator_example.R;
 
 import static com.tongle.accounts.AccountGeneral.sServerAuthenticate;
 
@@ -46,6 +48,27 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_login);
+        // action bar
+		ActionBar mActionBar = getActionBar();
+		mActionBar.setDisplayShowHomeEnabled(false);
+		mActionBar.setDisplayShowTitleEnabled(false);
+
+		mActionBar.setCustomView(R.layout.title_bar);
+		View customView = mActionBar.getCustomView();
+		TextView mTitleTextView = (TextView) customView.findViewById(R.id.title);
+		mTitleTextView.setText(R.string.login_label);
+		final View back = customView.findViewById(R.id.back);
+		back.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				finish();
+
+			}
+		});
+		mActionBar.setDisplayShowCustomEnabled(true);        
+        //
+		
         mAccountManager = AccountManager.get(getBaseContext());
 
         String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
@@ -97,7 +120,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             @Override
             protected Intent doInBackground(String... params) {
 
-                Log.d("udinic", TAG + "> Started authenticating");
+                Log.d(TAG, " Started authenticating");
 
                 String authtoken = null;
                 Bundle data = new Bundle();
@@ -107,6 +130,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                     data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
                     data.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
                     data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
+                    data.putString(AccountManager.KEY_PASSWORD, userPass);
                     data.putString(PARAM_USER_PASS, userPass);
 
                 } catch (Exception e) {
@@ -130,14 +154,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     private void finishLogin(Intent intent) {
-        Log.d("udinic", TAG + "> finishLogin");
+        Log.d(TAG, " finishLogin");
 
         String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
-            Log.d("udinic", TAG + "> finishLogin > addAccountExplicitly");
+            Log.d(TAG, "> finishLogin > addAccountExplicitly");
             String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
             String authtokenType = mAuthTokenType;
 
@@ -146,7 +170,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             mAccountManager.addAccountExplicitly(account, accountPassword, null);
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
         } else {
-            Log.d("udinic", TAG + "> finishLogin > setPassword");
+            Log.d(TAG, "> finishLogin > setPassword");
             mAccountManager.setPassword(account, accountPassword);
         }
 

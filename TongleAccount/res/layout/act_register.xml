@@ -3,7 +3,7 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:background="#000000"
+              android:background="@android:color/white"
               android:paddingLeft="17dp"
               android:paddingRight="17dp"
         >
@@ -15,6 +15,7 @@
             android:layout_marginTop="20dp"
             android:hint="Name"
             android:inputType="text"
+            android:textColor="#000"
             android:padding="10dp"
             />
 
@@ -25,6 +26,7 @@
             android:layout_marginTop="10dp"
             android:hint="Email address"
             android:inputType="textEmailAddress"
+            android:textColor="#000"
             android:padding="10dp"
             />
 
@@ -43,7 +45,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Create Account"
+            android:background="@drawable/rounded_brown"
+            android:text="@string/signup"
             android:padding="10dp"/>
 
     <TextView android:id="@+id/alreadyMember"
@@ -52,6 +55,6 @@
               android:layout_marginTop="10dp"
               android:padding="5dp"
               android:gravity="center"
-              android:text="Already a member?"/>
+              android:text="@string/backlogin"/>
 </LinearLayout>
 

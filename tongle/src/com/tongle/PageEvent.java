@@ -166,33 +166,36 @@ public class PageEvent extends Fragment {
 
 		LeyuAdapter() {
 
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
-			m_Data.add(new Item("?��妙大?��?��", ""));
-			m_Data.add(new Item("??��?�趣?���?", ""));
-			m_Data.add(new Item("?��??��?�天???", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("其妙大自然", ""));
+			m_Data.add(new Item("只有天知道", ""));
+			m_Data.add(new Item("八仙爆炸超酷", ""));
 		}
 
 		@Override

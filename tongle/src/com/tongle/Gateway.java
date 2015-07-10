@@ -3,7 +3,11 @@ package com.tongle;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.accounts.AccountManager;
+
 public interface Gateway {
+	
+	void initialize(String token, MainActivity mainActivity);
 
 	void getMainPageData(MainPageDataListener listener, String AdminArea);
 	

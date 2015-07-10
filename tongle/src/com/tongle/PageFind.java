@@ -329,33 +329,33 @@ public class PageFind extends Fragment {
 
 		LeyuAdapter() {
 
-			m_Data.add(new Item(1, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(1, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(0, "�зN�p�Ѥ~", ""));
-			m_Data.add(new Item(0, "�䧮�j�۵M", ""));
-			m_Data.add(new Item(0, "��@����h", ""));
-			m_Data.add(new Item(1, "�зN�p�Ѥ~", ""));
+			m_Data.add(new Item(1, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(1, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(0, "創意大天才", ""));
+			m_Data.add(new Item(0, "隨便都可以", ""));
+			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
+			m_Data.add(new Item(1, "你說是甚麼就是甚麼", ""));
 			
 		}
 
