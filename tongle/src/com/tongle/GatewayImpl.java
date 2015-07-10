@@ -35,18 +35,18 @@ public class GatewayImpl implements Gateway{
 	@Override
 	public void getMainPageData(final MainPageDataListener listener, String AdminArea) {
 		String urlCmd = baseUrl + "getrecmd?";
-		if(!TextUtils.isEmpty(AdminArea)){
+		if (!TextUtils.isEmpty(AdminArea)) {
 			urlCmd += "area=" + AdminArea;
 		}
 		final String url = urlCmd;
-		
-		new AsyncTask<Void,Void,MainPageData>(){
+
+		new AsyncTask<Void, Void, MainPageData>() {
 
 			@Override
 			protected void onPostExecute(MainPageData result) {
-				if (result == null){
+				if (result == null) {
 					listener.onError();
-				}else{
+				} else {
 					listener.onComplete(result);
 				}
 				super.onPostExecute(result);
@@ -57,35 +57,37 @@ public class GatewayImpl implements Gateway{
 				MainPageData data = null;
 				try {
 					String response = getResponse(url, 10000);
-					
-					if (response == null){
-					}else{
+
+					if (response == null) {
+					} else {
 						JSONObject root = new JSONObject(response);
+						JSONArray tmp;
 						data = new MainPageData();
-						JSONArray tmp = root.getJSONArray("Headline");
-						for (int i = 0, size = tmp.length(); i < size; i++)
-					    {
-					      JSONObject objectInArray = tmp.getJSONObject(i);
-					      data.mHeadlines.add(new Headline(objectInArray.getString("ActivityID"), 
-					    		  objectInArray.getString("Picture") , objectInArray.getString("Title")
-					    		  , objectInArray.getString("Area")));
-					     
-					    }
-						tmp = root.getJSONArray("TopicList");
-						for (int i = 0, size = tmp.length(); i < size; i++)
-					    {
-					      JSONObject objectInArray = tmp.getJSONObject(i);
-					      data.mTopList.add(new Topic(objectInArray.getString("TopicID"), 
-					    		  objectInArray.getString("Picture") , objectInArray.getString("Title")));
-					     
-					    }
+						if (root.has("Headline")) {
+							tmp = root.getJSONArray("Headline");
+							for (int i = 0, size = tmp.length(); i < size; i++) {
+								JSONObject objectInArray = tmp.getJSONObject(i);
+								data.mHeadlines.add(new Headline(objectInArray.getString("ActivityID"), objectInArray.getString("Picture"), objectInArray.getString("Title"), objectInArray
+										.getString("Area")));
+
+							}
+						}
+						if (root.has("TopicList")) {
+							tmp = root.getJSONArray("TopicList");
+							for (int i = 0, size = tmp.length(); i < size; i++) {
+								JSONObject objectInArray = tmp.getJSONObject(i);
+								data.mTopList.add(new Topic(objectInArray.getString("TopicID"), objectInArray.getString("Picture"), objectInArray.getString("Title")));
+
+							}
+						}
 					}
 				} catch (JSONException e) {
 					data = null;
 					e.printStackTrace();
 				}
 				return data;
-			}}.execute();
+			}
+		}.execute();
 	}
 	
 	@Override
@@ -108,29 +110,33 @@ public class GatewayImpl implements Gateway{
 				TopicData data = null;
 				try {
 					String response = getResponse(url, 10000);
-					
-					if (response == null){
-					}else{
+
+					if (response == null) {
+					} else {
 						JSONObject root = new JSONObject(response);
 						data = new TopicData();
-						data.mTitle = root.getString("Title");
-						data.mPicture = root.getString("Picture");
-						JSONArray tmpArray = root.getJSONArray("Contents");
-						for (int i = 0, size = tmpArray.length(); i < size; i++)
-					    {
-					      JSONObject objectInArray = tmpArray.getJSONObject(i);
-					      data.mContents.add(new Content(objectInArray.getInt("Type"), 
-					    		  objectInArray.getString("Text") , objectInArray.getString("Picture")
-					    		  , objectInArray.getString("ActivityID")));
-					     
-					    }
+						if (root.has("Title")) {
+							data.mTitle = root.getString("Title");
+						}
+						if (root.has("Picture")) {
+							data.mPicture = root.getString("Picture");
+						}
+						if (root.has("Contents")) {
+							JSONArray tmpArray = root.getJSONArray("Contents");
+							for (int i = 0, size = tmpArray.length(); i < size; i++) {
+								JSONObject objectInArray = tmpArray.getJSONObject(i);
+								data.mContents
+										.add(new Content(objectInArray.getInt("Type"), objectInArray.getString("Text"), objectInArray.getString("Picture"), objectInArray.getString("ActivityID")));
+							}
+						}
 					}
 				} catch (JSONException e) {
 					data = null;
 					e.printStackTrace();
 				}
 				return data;
-			}}.execute();
+			}
+		}.execute();
 	}
 	
 	@Override
@@ -159,30 +165,56 @@ public class GatewayImpl implements Gateway{
 					}else{
 						JSONObject root = new JSONObject(response);
 						data = new ActivityData();
-						data.mTitle = root.getString("Title");
-						data.mPicture = root.getString("Picture");
-						data.mBeginDate = root.getString("BeginDate");
-						data.mEndDate = root.getString("EndDate");
-						data.mPlace = root.getString("Place");
-						data.mPrice = root.getString("Price");
-						data.mAddress = root.getString("Address");
-						data.mOrganizer = root.getString("Organizer");
-						data.mDescription = root.getString("Description");
-						data.mPhysical = root.getInt("Physical");
-						data.mAesthetic = root.getInt("Aesthetic");
-						data.mScience = root.getInt("Science");
-						data.mSocially = root.getInt("Socially");
-						data.mCulture = root.getInt("Culture");
-
-						JSONObject objectInArray = null;
-						JSONArray tmpArray = root.getJSONArray("ActivityAgeLevels");
-						for (int i = 0, size = tmpArray.length(); i < size; i++)
-					    {
-					      objectInArray = tmpArray.getJSONObject(i).getJSONObject("ActivityAgeLevelSetting");
-					      data.mActivityAgeLevelSettings.add(
-					    		  new ActivityAgeLevelSetting(objectInArray.getString("ID")
-					    				  ,objectInArray.getString("Description")));
-					    }
+						if (root.has("Title")) {
+							data.mTitle = root.getString("Title");
+						}
+						if (root.has("Picture")) {
+							data.mPicture = root.getString("Picture");
+						}
+						if (root.has("BeginDate")) {
+							data.mBeginDate = root.getString("BeginDate");
+						}
+						if (root.has("EndDate")) {
+							data.mEndDate = root.getString("EndDate");
+						}
+						if (root.has("Place")) {
+							data.mPlace = root.getString("Place");
+						}
+						if (root.has("Address")) {
+							data.mAddress = root.getString("Address");
+						}
+						if (root.has("Organizer")) {
+							data.mOrganizer = root.getString("Organizer");
+						}
+						if (root.has("Description")) {
+							data.mDescription = root.getString("Description");
+						}
+						if (root.has("Physical")) {
+							data.mPhysical = root.getInt("Physical");
+						}
+						if (root.has("Aesthetic")) {
+							data.mAesthetic = root.getInt("Aesthetic");
+						}
+						if (root.has("Science")) {
+							data.mScience = root.getInt("Science");
+						}
+						if (root.has("Socially")) {
+							data.mSocially = root.getInt("Socially");
+						}
+						if (root.has("Culture")) {
+							data.mCulture = root.getInt("Culture");
+						}
+						if (root.has("ActivityAgeLevels")) {
+							JSONObject objectInArray = null;
+							JSONArray tmpArray = root.getJSONArray("ActivityAgeLevels");
+							for (int i = 0, size = tmpArray.length(); i < size; i++)
+						    {
+						      objectInArray = tmpArray.getJSONObject(i).getJSONObject("ActivityAgeLevelSetting");
+						      data.mActivityAgeLevelSettings.add(
+						    		  new ActivityAgeLevelSetting(objectInArray.getString("ID")
+						    				  ,objectInArray.getString("Description")));
+						    }
+						}	
 					}
 				} catch (JSONException e) {
 					data = null;
