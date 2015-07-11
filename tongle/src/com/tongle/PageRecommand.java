@@ -107,7 +107,7 @@ public class PageRecommand extends Fragment {
 			public void onClick(View v) {
 				Fragment event = new PageEvent();
 				Bundle bundle = new Bundle();
-				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.weekend)));
+				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.free)));
 				event.setArguments(bundle);
 				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				

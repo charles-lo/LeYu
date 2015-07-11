@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +21,7 @@ import com.tongle.Gateway.ActivityLiteData;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 
 public class GatewayImpl implements Gateway{
 	
@@ -230,34 +233,40 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void getWeekend(ActivitysListener listener, String id) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void getWeekend(final ActivitysListener listener, String id) {
+		String beginDate, endDate;
+		Calendar calendar = Calendar.getInstance();
 
-	@Override
-	public void getFree(ActivitysListener listener, String id) {
-		// TODO Auto-generated method stub
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 		
-	}
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
 
-	@Override
-	public void getHot(ActivitysListener listener, String id) {
-		// TODO Auto-generated method stub
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		if (day == Calendar.SUNDAY) {
+			calendar.add(Calendar.DATE, -7);
+		}
+		beginDate = df.format(calendar.getTime());
+
 		
-	}
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.add(Calendar.DATE, 7);
+		endDate = df.format(calendar.getTime());
 
-	@Override
-	public void getNear(final ActivitysListener listener, String area) {
-		final String url = baseUrl + "FilterActivity?area=" + area;
-		Log.d(TAG, "getNear " + url);
-		new AsyncTask<Void,Void,List<ActivityLiteData>>(){
+		final String url = baseUrl + "FilterActivity?beginDate=" + beginDate + "&endDate=" + endDate;
+		Log.d(TAG, "getWeekend " + url);
+		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
 
 			@Override
 			protected void onPostExecute(List<ActivityLiteData> result) {
-				if (result == null){
+				if (result == null) {
 					listener.onError();
-				}else{
+				} else {
 					listener.onComplete(result);
 				}
 				super.onPostExecute(result);
@@ -265,21 +274,226 @@ public class GatewayImpl implements Gateway{
 
 			@Override
 			protected List<ActivityLiteData> doInBackground(Void... params) {
-				List<ActivityLiteData> data = null;
+				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
 				try {
 					String response = getResponse(url, 10000);
-					
-					if (response == null){
-					}else{
+
+					if (response == null) {
+					} else {
 						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						ActivityLiteData handle = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							handle = new ActivityLiteData();
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Title")) {
+								handle.mTitle = objectInArray.getString("Title");
+							}
+							if (objectInArray.has("Picture")) {
+								handle.mPicture = objectInArray.getString("Picture");
+							}
+							if (objectInArray.has("Area")) {
+								handle.mAddress = objectInArray.getString("Area");
+							}
+							if (objectInArray.has("BeginDate")) {
+								handle.mBeginDate = objectInArray.getString("BeginDate");
+							}
+							if (objectInArray.has("EndDate")) {
+								handle.mEndDate = objectInArray.getString("EndDate");
+							}
+							if (objectInArray.has("IsHot")) {
+								handle.mIsHot = objectInArray.getBoolean("IsHot");
+							}
+							data.add(handle);
+						}
 					}
 				} catch (JSONException e) {
 					data = null;
 					e.printStackTrace();
 				}
 				return data;
-			}}.execute();
-		
+			}
+		}.execute();
+	}
+
+	@Override
+	public void getFree(final ActivitysListener listener) {
+		final String url = baseUrl + "FilterActivity?isFree=true";// + area;
+		Log.d(TAG, "getFree " + url);
+		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
+
+			@Override
+			protected void onPostExecute(List<ActivityLiteData> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<ActivityLiteData> doInBackground(Void... params) {
+				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						ActivityLiteData handle = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							handle = new ActivityLiteData();
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Title")) {
+								handle.mTitle = objectInArray.getString("Title");
+							}
+							if (objectInArray.has("Picture")) {
+								handle.mPicture = objectInArray.getString("Picture");
+							}
+							if (objectInArray.has("Area")) {
+								handle.mAddress = objectInArray.getString("Area");
+							}
+							if (objectInArray.has("BeginDate")) {
+								handle.mBeginDate = objectInArray.getString("BeginDate");
+							}
+							if (objectInArray.has("EndDate")) {
+								handle.mEndDate = objectInArray.getString("EndDate");
+							}
+							if (objectInArray.has("IsHot")) {
+								handle.mIsHot = objectInArray.getBoolean("IsHot");
+							}
+							data.add(handle);
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void getHot(final ActivitysListener listener, String id) {
+		final String url = baseUrl + "FilterActivity?area=";// + area;
+		Log.d(TAG, "getHot " + url);
+		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
+
+			@Override
+			protected void onPostExecute(List<ActivityLiteData> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<ActivityLiteData> doInBackground(Void... params) {
+				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						ActivityLiteData handle = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							handle = new ActivityLiteData();
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Title")) {
+								handle.mTitle = objectInArray.getString("Title");
+							}
+							if (objectInArray.has("Picture")) {
+								handle.mPicture = objectInArray.getString("Picture");
+							}
+							if (objectInArray.has("Area")) {
+								handle.mAddress = objectInArray.getString("Area");
+							}
+							if (objectInArray.has("BeginDate")) {
+								handle.mBeginDate = objectInArray.getString("BeginDate");
+							}
+							if (objectInArray.has("EndDate")) {
+								handle.mEndDate = objectInArray.getString("EndDate");
+							}
+							if (objectInArray.has("IsHot")) {
+								handle.mIsHot = objectInArray.getBoolean("IsHot");
+							}
+							data.add(handle);
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void getNear(final ActivitysListener listener, String area) {
+		final String url = baseUrl + "FilterActivity?area=" + area;
+		Log.d(TAG, "getNear " + url);
+		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
+
+			@Override
+			protected void onPostExecute(List<ActivityLiteData> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<ActivityLiteData> doInBackground(Void... params) {
+				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						ActivityLiteData handle = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							handle = new ActivityLiteData();
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Title")) {
+								handle.mTitle = objectInArray.getString("Title");
+							}
+							if (objectInArray.has("Picture")) {
+								handle.mPicture = objectInArray.getString("Picture");
+							}
+							if (objectInArray.has("Area")) {
+								handle.mAddress = objectInArray.getString("Area");
+							}
+							if (objectInArray.has("BeginDate")) {
+								handle.mBeginDate = objectInArray.getString("BeginDate");
+							}
+							if (objectInArray.has("EndDate")) {
+								handle.mEndDate = objectInArray.getString("EndDate");
+							}
+							if (objectInArray.has("IsHot")) {
+								handle.mIsHot = objectInArray.getBoolean("IsHot");
+							}
+							data.add(handle);
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
 	}
 
 	public String getResponse(String urlString, int timeout) {
@@ -314,9 +528,12 @@ public class GatewayImpl implements Gateway{
 						sb.append(line + "\n");
 					}
 					br.close();
+					JSONObject root = null;
 					ret = sb.toString();
-					JSONObject root = new JSONObject(ret);
-					if (root.has("Code")) {
+					if (isJSONValid(ret)) {
+						root = new JSONObject(ret);
+					}
+					if (root != null && root.has("Code")) {
 						String code = root.getString("Code");
 						if (!TextUtils.isEmpty(code) && code.equals("0005")) {
 							if (mMainActivity != null) {
@@ -349,6 +566,15 @@ public class GatewayImpl implements Gateway{
 			continue;
 		}
 		return null;
+	}
+	
+	private boolean isJSONValid(String test) {
+	    try {
+	        new JSONObject(test);
+	    } catch (JSONException ex) {
+	    	return false;
+	    }
+	    return true;
 	}
 	
 	static Gateway getInstance(){

@@ -17,7 +17,7 @@ public interface Gateway {
 	
 	void getWeekend(ActivitysListener listener, String id);
 	
-	void getFree(ActivitysListener listener, String id);
+	void getFree(ActivitysListener listener);
 	
 	void getHot(ActivitysListener listener, String id);
 	
@@ -110,7 +110,7 @@ public interface Gateway {
 		String mBeginDate;
 		String mEndDate;
 		String mAddress;
-		Boolean isHot;
+		Boolean mIsHot;
 	}
 	
 	class ActivityData {

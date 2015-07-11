@@ -1,6 +1,5 @@
 package com.tongle;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,9 +11,10 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
+import com.tongle.Gateway.ActivityLiteData;
+import com.tongle.Gateway.ActivitysListener;
 import com.tongle.PageDetail.DetailArgs;
 
-import android.R.color;
 import android.app.Fragment;
 import android.app.LocalActivityManager;
 import android.content.res.Resources;
@@ -47,31 +47,115 @@ public class PageEvent extends Fragment {
 	private TabHost tabHost;
 	private ListView list;
 	private LeyuAdapter mAdapter;
+	private View mRootView;
+	private TextView mStatus;
 	// Data
 	private	List<String> tabName = new ArrayList<String>(Arrays.asList("海邊", "牧場", "果園", "展覽", "展覽", "", ""));
 	private List<Integer> tabInt = new ArrayList<Integer>(Arrays.asList(20, 30, 40, 50, 60, 70));
+	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		EventArgs args = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
+		mActivity = (MainActivity) getActivity();
 		mRes = PageEvent.this.getResources();
+		mRootView = inflater.inflate(R.layout.page_event, container, false);
+		mStatus = (TextView)mRootView.findViewById(R.id.status);
 		String title = "";
+		
 		//
 		switch (args.mType) {
 		case weekend: {
 			title = getString(R.string.weekend);
+			// get server data
+			Gateway gateway = GatewayImpl.getInstance();
+			gateway.getWeekend(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					if (data == null || data.size() == 0) {
+						mStatus.setText(R.string.no_weekend);
+					} else {
+						showList(data);
+					}
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mActivity.getAddress().getAdminArea());
 			break;
 		}
 		case free: {
 			title = getString(R.string.free);
+			// get server data
+			Gateway gateway = GatewayImpl.getInstance();
+			gateway.getFree(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					if (data == null || data.size() == 0) {
+						mStatus.setText(R.string.no_free);
+					} else {
+						showList(data);
+					}
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			});
 			break;
 		}
 		case hot: {
 			title = getString(R.string.hot);
+			// get server data
+			Gateway gateway = GatewayImpl.getInstance();
+			gateway.getHot(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					if (data == null || data.size() == 0) {
+						mStatus.setText(R.string.no_hot);
+					} else {
+						showList(data);
+					}
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mActivity.getAddress().getAdminArea());
 			break;
 		}
 		case near: {
 			title = getString(R.string.near);
+			// get server data
+			Gateway gateway = GatewayImpl.getInstance();
+			gateway.getNear(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					if (data == null || data.size() == 0) {
+						mStatus.setText(R.string.no_near);
+					} else {
+						showList(data);
+					}
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mActivity.getAddress().getAdminArea());
+
 			break;
 		}
 		default: {
@@ -79,27 +163,9 @@ public class PageEvent extends Fragment {
 		}
 		}
 		
-		
-		mActivity = (MainActivity) getActivity();
 		mActivity.initActionBar(title);
-		
-		mAdapter = new LeyuAdapter();
-		
-		View rootView = inflater.inflate(R.layout.page_event, container, false);
-		
-		//
-		list = ((ListView) rootView.findViewById(R.id.list));
-		list.setDivider(null);
-		ViewGroup footer = new LinearLayout(PageEvent.this.getActivity());
-		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				(int) (46.67 * mRes.getDisplayMetrics().density));
-		footer.setLayoutParams(lp);
-		list.addFooterView(footer);
-		list.setAdapter(new LeyuAdapter());
-		//
 
-
-		tabHost = (TabHost) rootView.findViewById(R.id.tabhost);
+		tabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
 		tabHost.setup();
 		tabHost.setup(new LocalActivityManager(mActivity, true));
 		for (int i = 0; i < tabName.size(); i++) {
@@ -132,9 +198,11 @@ public class PageEvent extends Fragment {
 									.setVisibility(View.VISIBLE);
 							((TextView) tabHost.getCurrentTabView()
 									.findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
-							list.setAdapter(null);
-							mAdapter.notifyDataSetChanged();
-							list.setAdapter(new LeyuAdapter());
+							if (list != null) {
+								list.setAdapter(null);
+								mAdapter.notifyDataSetChanged();
+								list.setAdapter(new LeyuAdapter());
+							}
 						}
 
 					}
@@ -157,7 +225,20 @@ public class PageEvent extends Fragment {
 		tabs.get(0).findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
 		((TextView)tabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
 
-		return rootView;
+		return mRootView;
+	}
+	
+	private void showList(List<ActivityLiteData> data){
+		mStatus.setVisibility(View.GONE);
+		m_Data = data;
+		mAdapter = new LeyuAdapter();
+		list = ((ListView) mRootView.findViewById(R.id.list));
+		list.setDivider(null);
+		ViewGroup footer = new LinearLayout(PageEvent.this.getActivity());
+		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (46.67 * mRes.getDisplayMetrics().density));
+		footer.setLayoutParams(lp);
+		list.addFooterView(footer);
+		list.setAdapter(new LeyuAdapter());
 	}
 	
 	static public class EventArgs {
@@ -174,7 +255,7 @@ public class PageEvent extends Fragment {
 
 	class LeyuAdapter extends BaseAdapter {
 
-		private List<Item> m_Data = new ArrayList<Item>();
+		
 
 		class Item {
 			String mTitle;
@@ -188,36 +269,6 @@ public class PageEvent extends Fragment {
 
 		LeyuAdapter() {
 
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
-			m_Data.add(new Item("其妙大自然", ""));
-			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("神祕海洋世界", ""));
 		}
 
 		@Override
@@ -253,9 +304,7 @@ public class PageEvent extends Fragment {
 			}
 
 			holder.mTitle.setText(m_Data.get(position).mTitle);
-			String uriBase = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_";
-			DecimalFormat df = new DecimalFormat("'0'.jpg");
-			final Uri uri = Uri.parse(uriBase + df.format(position + tabInt.get(tabHost.getCurrentTab())));
+			final Uri uri = Uri.parse(m_Data.get(position).mPicture);
 			//
 			int width, height;
 			width = height = (int) (mRes.getDisplayMetrics().density * 115);

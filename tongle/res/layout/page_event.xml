@@ -6,6 +6,14 @@
     android:background="@android:color/white"
     android:orientation="vertical" >
 
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/loading"
+        android:textSize="@dimen/font_08" />
+
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="40dp"
