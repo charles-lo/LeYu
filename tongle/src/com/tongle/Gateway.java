@@ -23,7 +23,9 @@ public interface Gateway {
 	
 	void getNear(ActivitysListener listener, String area);
 	
-	void getCategoryList(CategoryListener listener);
+	void getCategoryList(ListListener listener);
+	
+	void getAreaList(ListListener listener);
 	
 	void searchActivity(searchListener listener, String area, String date, String category);
 	
@@ -42,7 +44,7 @@ public interface Gateway {
 		void onError();
 	}
 	
-	public interface CategoryListener {
+	public interface ListListener {
 
 		void onComplete(List<String> data);
 

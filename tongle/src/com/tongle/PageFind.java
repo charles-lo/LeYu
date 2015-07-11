@@ -17,7 +17,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 import com.tongle.Gateway.ActivityLiteData;
-import com.tongle.Gateway.CategoryListener;
+import com.tongle.Gateway.ListListener;
 import com.tongle.Gateway.SearchData;
 import com.tongle.Gateway.searchListener;
 import com.tongle.PageDetail.DetailArgs;
@@ -73,7 +73,7 @@ public class PageFind extends Fragment {
 		mRes = getResources();
 		
 		Gateway gateway = GatewayImpl.getInstance();
-		gateway.getCategoryList(new CategoryListener() {
+		gateway.getCategoryList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
@@ -110,17 +110,20 @@ public class PageFind extends Fragment {
 
 			}
 		});
-		//
-		final View regions = mRootView.findViewById(R.id.region);
-		final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
-		final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity,
-				android.R.layout.simple_spinner_dropdown_item, mRes.getStringArray(R.array.regions));
-		OnClickListener clickRegion = new OnClickListener() {
+		
+		gateway.getAreaList(new ListListener() {
 
 			@Override
-			public void onClick(View v) {
-				new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.region))
-						.setAdapter(regionsAdapter, new DialogInterface.OnClickListener() {
+			public void onComplete(List<String> data) {
+				//
+				final View regions = mRootView.findViewById(R.id.region);
+				final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
+				final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
+				OnClickListener clickRegion = new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.region)).setAdapter(regionsAdapter, new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -131,13 +134,20 @@ public class PageFind extends Fragment {
 								update();
 							}
 						}).create().show();
-				}
-		};
-		regions.setOnClickListener(clickRegion);
-		regionsText.setOnClickListener(clickRegion);
+					}
+				};
+				regions.setOnClickListener(clickRegion);
+				regionsText.setOnClickListener(clickRegion);
 
+			}
 
+			@Override
+			public void onError() {
+				final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
+				regionsText.setText(R.string.network_error);
 
+			}
+		});
 		
 		//
 		((TextView) mRootView.findViewById(R.id.right)).setTextColor(mRes.getColor(R.color.red));

@@ -19,9 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.tongle.Gateway.CategoryListener;
-import com.tongle.Gateway.searchListener;
-
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
@@ -503,7 +500,7 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void getCategoryList(final CategoryListener listener) {
+	public void getCategoryList(final ListListener listener) {
 		final String url = baseUrl + "GetCategoryList";
 		new AsyncTask<Void, Void, List<String>>() {
 
@@ -531,6 +528,48 @@ public class GatewayImpl implements Gateway{
 							objectInArray = root.getJSONObject(i);
 							if (objectInArray.has("Text")) {
 								data.add(objectInArray.getString("Text"));
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+	
+	@Override
+	public void getAreaList(final ListListener listener) {
+		final String url = baseUrl + "GetAreaList";
+		Log.d(TAG, "getAreaList url: " + url);
+		new AsyncTask<Void, Void, List<String>>() {
+
+			@Override
+			protected void onPostExecute(List<String> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<String> doInBackground(Void... params) {
+				List<String> data = new ArrayList<String>();
+				try {
+					String response = getResponse(url, 10000);
+					Log.d(TAG, "getAreaList response: " + response);
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("AreaName")) {
+								data.add(objectInArray.getString("AreaName"));
 							}
 						}
 					}
