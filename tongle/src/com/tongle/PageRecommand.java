@@ -16,6 +16,7 @@ import com.tongle.Gateway.MainPageDataListener;
 import com.tongle.Gateway.Topic;
 import com.tongle.PageDetail.DetailArgs;
 import com.tongle.PageEvent.EventArgs;
+import com.tongle.PageEvent.EventArgs.Type;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;
@@ -95,7 +96,7 @@ public class PageRecommand extends Fragment {
 			public void onClick(View v) {
 				Fragment event = new PageEvent();
 				Bundle bundle = new Bundle();
-				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.weekend))));
+				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.weekend)));
 				event.setArguments(bundle);
 				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 			}});
@@ -106,7 +107,7 @@ public class PageRecommand extends Fragment {
 			public void onClick(View v) {
 				Fragment event = new PageEvent();
 				Bundle bundle = new Bundle();
-				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.free))));
+				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.weekend)));
 				event.setArguments(bundle);
 				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				
@@ -118,7 +119,7 @@ public class PageRecommand extends Fragment {
 			public void onClick(View v) {
 				Fragment event = new PageEvent();
 				Bundle bundle = new Bundle();
-				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.hot))));
+				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.hot)));
 				event.setArguments(bundle);
 				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				
@@ -130,7 +131,7 @@ public class PageRecommand extends Fragment {
 			public void onClick(View v) {
 				Fragment event = new PageEvent();
 				Bundle bundle = new Bundle();
-				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(PageRecommand.this.getActivity().getResources().getString(R.string.near))));
+				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.near)));
 				event.setArguments(bundle);
 				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
 				

@@ -6,12 +6,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.tongle.Gateway.ActivityLiteData;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -215,6 +219,59 @@ public class GatewayImpl implements Gateway{
 						    				  ,objectInArray.getString("Description")));
 						    }
 						}	
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}}.execute();
+		
+	}
+	
+	@Override
+	public void getWeekend(ActivitysListener listener, String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getFree(ActivitysListener listener, String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getHot(ActivitysListener listener, String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getNear(final ActivitysListener listener, String area) {
+		final String url = baseUrl + "FilterActivity?area=" + area;
+		Log.d(TAG, "getNear " + url);
+		new AsyncTask<Void,Void,List<ActivityLiteData>>(){
+
+			@Override
+			protected void onPostExecute(List<ActivityLiteData> result) {
+				if (result == null){
+					listener.onError();
+				}else{
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<ActivityLiteData> doInBackground(Void... params) {
+				List<ActivityLiteData> data = null;
+				try {
+					String response = getResponse(url, 10000);
+					
+					if (response == null){
+					}else{
+						JSONArray root = new JSONArray(response);
 					}
 				} catch (JSONException e) {
 					data = null;

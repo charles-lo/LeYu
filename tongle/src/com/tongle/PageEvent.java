@@ -55,9 +55,33 @@ public class PageEvent extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		EventArgs args = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
 		mRes = PageEvent.this.getResources();
+		String title = "";
 		//
+		switch (args.mType) {
+		case weekend: {
+			title = getString(R.string.weekend);
+			break;
+		}
+		case free: {
+			title = getString(R.string.free);
+			break;
+		}
+		case hot: {
+			title = getString(R.string.hot);
+			break;
+		}
+		case near: {
+			title = getString(R.string.near);
+			break;
+		}
+		default: {
+			break;
+		}
+		}
+		
+		
 		mActivity = (MainActivity) getActivity();
-		mActivity.initActionBar(args.mTitle);
+		mActivity.initActionBar(title);
 		
 		mAdapter = new LeyuAdapter();
 		
@@ -136,10 +160,15 @@ public class PageEvent extends Fragment {
 		return rootView;
 	}
 	
-	static public class EventArgs{
-		private	String	mTitle;
-		EventArgs(String title) {
-			mTitle = title;
+	static public class EventArgs {
+		private Type mType;
+
+		EventArgs(Type type) {
+			mType = type;
+		}
+
+		enum Type {
+			weekend, free, hot, near
 		}
 	}
 
@@ -161,34 +190,34 @@ public class PageEvent extends Fragment {
 
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 			m_Data.add(new Item("其妙大自然", ""));
 			m_Data.add(new Item("只有天知道", ""));
-			m_Data.add(new Item("八仙爆炸超酷", ""));
+			m_Data.add(new Item("神祕海洋世界", ""));
 		}
 
 		@Override

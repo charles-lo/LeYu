@@ -14,7 +14,14 @@ public interface Gateway {
 	void getTopic(TopicListener listener, String id);
 	
 	void getActivity(ActivityListener listener, String id);
-
+	
+	void getWeekend(ActivitysListener listener, String id);
+	
+	void getFree(ActivitysListener listener, String id);
+	
+	void getHot(ActivitysListener listener, String id);
+	
+	void getNear(ActivitysListener listener, String area);
 	
 	//
 	public interface MainPageDataListener {
@@ -34,6 +41,13 @@ public interface Gateway {
 	public interface ActivityListener {
 
 		void onComplete(ActivityData data);
+
+		void onError();
+	}
+	
+	public interface ActivitysListener {
+
+		void onComplete(List<ActivityLiteData> data);
 
 		void onError();
 	}
@@ -90,6 +104,15 @@ public interface Gateway {
 		}
 	}
 	
+	class ActivityLiteData {
+		String mTitle;
+		String mPicture;
+		String mBeginDate;
+		String mEndDate;
+		String mAddress;
+		Boolean isHot;
+	}
+	
 	class ActivityData {
 		String mID;
 		String mPicture;
@@ -106,6 +129,7 @@ public interface Gateway {
 		int mScience;
 		int mSocially;
 		int mCulture;
+		Boolean isHot;
 		List<ActivityAgeLevelSetting> mActivityAgeLevelSettings = new ArrayList<ActivityAgeLevelSetting>();
 	}
 	

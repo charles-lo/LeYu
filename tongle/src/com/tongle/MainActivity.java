@@ -233,7 +233,6 @@ public class MainActivity extends Activity {
                     Log.d(TAG, account.name + " invalidated");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.d(TAG, e.getMessage());
                 }
             }
         }).start();
