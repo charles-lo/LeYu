@@ -3,9 +3,11 @@ package com.tongle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,11 +19,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.tongle.Gateway.ActivityLiteData;
+import com.tongle.Gateway.CategoryListener;
+import com.tongle.Gateway.searchListener;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 
 public class GatewayImpl implements Gateway{
 	
@@ -233,7 +235,7 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void getWeekend(final ActivitysListener listener, String id) {
+	public void getWeekend(final ActivitysListener listener) {
 		String beginDate, endDate;
 		Calendar calendar = Calendar.getInstance();
 
@@ -377,7 +379,7 @@ public class GatewayImpl implements Gateway{
 	}
 
 	@Override
-	public void getHot(final ActivitysListener listener, String id) {
+	public void getHot(final ActivitysListener listener) {
 		final String url = baseUrl + "FilterActivity?area=";// + area;
 		Log.d(TAG, "getHot " + url);
 		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
@@ -456,6 +458,7 @@ public class GatewayImpl implements Gateway{
 			protected List<ActivityLiteData> doInBackground(Void... params) {
 				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
 				try {
+					URLEncoder.encode(url, "UTF-8");
 					String response = getResponse(url, 10000);
 
 					if (response == null) {
@@ -490,6 +493,143 @@ public class GatewayImpl implements Gateway{
 				} catch (JSONException e) {
 					data = null;
 					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+	
+	@Override
+	public void getCategoryList(final CategoryListener listener) {
+		final String url = baseUrl + "GetCategoryList";
+		new AsyncTask<Void, Void, List<String>>() {
+
+			@Override
+			protected void onPostExecute(List<String> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<String> doInBackground(Void... params) {
+				List<String> data = new ArrayList<String>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Text")) {
+								data.add(objectInArray.getString("Text"));
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+	
+	@Override
+	public void searchActivity(final searchListener listener, String area, String date, String category) {
+		String urlTool = baseUrl + "SearchActivity?";
+		final String url;
+		boolean hasParameter = false;
+		if (!TextUtils.isEmpty(area)) {
+			urlTool += "area=" + area;
+			hasParameter = true;
+		}
+		if (!TextUtils.isEmpty(date)) {
+			if (hasParameter) {
+				urlTool += "&";
+			}
+			urlTool += "beginDate=" + date;
+			hasParameter = true;
+		}
+		if (!TextUtils.isEmpty(category)) {
+			if (hasParameter) {
+				urlTool += "&";
+			}
+			urlTool += "category=" + category;
+			hasParameter = true;
+		}
+		url = urlTool;
+		Log.d(TAG, "searchActivity url: " + url);
+		new AsyncTask<Void, Void, SearchData>() {
+
+			@Override
+			protected void onPostExecute(SearchData result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected SearchData doInBackground(Void... params) {
+				SearchData data = null;
+				try {
+					String response = getResponse(url, 10000);
+					Log.d(TAG, "searchActivity response" + response);
+					if (response == null) {
+					} else {
+						JSONObject root = new JSONObject(response);
+						data = new SearchData();
+						if (root.has("TotalCount")) {
+							data.mTotalCount = root.getString("TotalCount");
+						}
+						if (root.has("ActivityDates")) {
+							JSONArray tmpArray = root.getJSONArray("ActivityDates");
+							for (int i = 0, size = tmpArray.length(); i < size; i++) {
+								data.mActivityDates.add(tmpArray.getString(i));
+							}
+						}
+						if (root.has("Activities")) {
+							JSONArray tmpArray = root.getJSONArray("Activities");
+							ActivityLiteData handle = null;
+							for (int i = 0, size = tmpArray.length(); i < size; i++) {
+								JSONObject objectInArray = tmpArray.getJSONObject(i);
+								handle = new ActivityLiteData();
+								if (objectInArray.has("Title")) {
+									handle.mTitle = objectInArray.getString("Title");
+								}
+								if (objectInArray.has("Picture")) {
+									handle.mPicture = objectInArray.getString("Picture");
+								}
+								if (objectInArray.has("Area")) {
+									handle.mAddress = objectInArray.getString("Area");
+								}
+								if (objectInArray.has("BeginDate")) {
+									handle.mBeginDate = objectInArray.getString("BeginDate");
+								}
+								if (objectInArray.has("EndDate")) {
+									handle.mEndDate = objectInArray.getString("EndDate");
+								}
+								if (objectInArray.has("IsHot")) {
+									handle.mIsHot = objectInArray.getBoolean("IsHot");
+								}
+								data.mActivitys.add(handle);
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
 				}
 				return data;
 			}
@@ -508,6 +648,7 @@ public class GatewayImpl implements Gateway{
 				connection = (HttpURLConnection) url.openConnection();
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("Content-length", "0");
+				connection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
 				connection.setRequestProperty("Cookie", sAuthToken);
 				connection.setUseCaches(false);
 				connection.setAllowUserInteraction(false);

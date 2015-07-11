@@ -39,15 +39,14 @@
     <string name="no_hot">都冷門</string>
     <string name="no_near">都很遠</string>
     <string name="network_error">網路發生錯誤</string>
-
     <string name="server_error">server又在那亂動api了\n都不會講一聲的</string>
 
     <string-array name="regions">
-        <item>臺北市</item>
+        <item>台北市</item>
         <item>新北市</item>
         <item>桃園市</item>
-        <item>臺中市</item>
-        <item>臺南市</item>
+        <item>台中市</item>
+        <item>台南市</item>
         <item>高雄市</item>
         <item>宜蘭縣</item>
         <item>新竹縣</item>
@@ -57,7 +56,7 @@
         <item>雲林縣</item>
         <item>嘉義縣</item>
         <item>屏東縣</item>
-        <item>臺東縣</item>
+        <item>台東縣</item>
         <item>花蓮縣</item>
         <item>澎湖縣</item>
         <item>基隆市</item>
@@ -66,7 +65,6 @@
         <item>金門縣</item>
         <item>連江縣</item>
     </string-array>
-    
     <string-array name="category">
         <item>美感</item>
         <item>體能</item>

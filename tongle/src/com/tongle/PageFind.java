@@ -2,9 +2,10 @@ package com.tongle;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -15,6 +16,10 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
+import com.tongle.Gateway.ActivityLiteData;
+import com.tongle.Gateway.CategoryListener;
+import com.tongle.Gateway.SearchData;
+import com.tongle.Gateway.searchListener;
 import com.tongle.PageDetail.DetailArgs;
 
 import android.app.AlertDialog;
@@ -44,8 +49,12 @@ import android.widget.TextView;
 public class PageFind extends Fragment {
 	static final String TAG = PageFind.class.getSimpleName();
 	//
+	private	MainActivity mActivity;
+	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
 	private Resources mRes;
 	View mRootView;
+	// search args
+	private String mArea, mDate, mCategory;
 	// Calendar
 	public GregorianCalendar mMonth, mItemMonth;// calendar instances.
 	public CalendarAdapter mAdapter;// adapter instance
@@ -53,31 +62,73 @@ public class PageFind extends Fragment {
 	public ArrayList<String> mItems; // container to store calendar items which needs showing the event marker
 	private ArrayList<String> mEvent;
 	private LinearLayout mLayout;
-	private ArrayList<String> desc;
-	private TextView calendarText;
+	private ArrayList<String> mDesc;
+	private TextView mCalendarText;
 	// Data
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mActivity = (MainActivity) getActivity();
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
 		mRes = getResources();
+		
+		Gateway gateway = GatewayImpl.getInstance();
+		gateway.getCategoryList(new CategoryListener() {
+
+			@Override
+			public void onComplete(List<String> data) {
+				final View category = mRootView.findViewById(R.id.category);
+				final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
+				final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, data);
+				OnClickListener clickCategory = new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						new AlertDialog.Builder(getActivity()).setTitle(mRes.getString(R.string.category)).setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								String data = categoryAdapter.getItem(which);
+								categoryText.setText(data);
+								mCategory = data;
+								dialog.dismiss();
+								update();
+							}
+						}).create().show();
+
+					}
+				};
+				category.setOnClickListener(clickCategory);
+				categoryText.setOnClickListener(clickCategory);
+
+			}
+
+			@Override
+			public void onError() {
+				final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
+				categoryText.setText(R.string.network_error);
+
+			}
+		});
 		//
 		final View regions = mRootView.findViewById(R.id.region);
 		final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
-		final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(getActivity(),
+		final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity,
 				android.R.layout.simple_spinner_dropdown_item, mRes.getStringArray(R.array.regions));
 		OnClickListener clickRegion = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				new AlertDialog.Builder(getActivity()).setTitle(mRes.getString(R.string.region))
+				new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.region))
 						.setAdapter(regionsAdapter, new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-
-								regionsText.setText(regionsAdapter.getItem(which));
+								String region = regionsAdapter.getItem(which);
+								regionsText.setText(region);
+								mArea = region;
 								dialog.dismiss();
+								update();
 							}
 						}).create().show();
 				}
@@ -87,30 +138,7 @@ public class PageFind extends Fragment {
 
 
 
-		final View category = mRootView.findViewById(R.id.category);
-		final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
-		final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(getActivity(),
-				android.R.layout.simple_spinner_dropdown_item, Arrays.asList("���O01", "���O02",
-						"���O03", "���O04", "���O05", "���O06"));
-		OnClickListener clickCategory = new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				new AlertDialog.Builder(getActivity()).setTitle(mRes.getString(R.string.category))
-						.setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-
-								categoryText.setText(categoryAdapter.getItem(which));
-								dialog.dismiss();
-							}
-						}).create().show();
-
-			}
-		};
-		category.setOnClickListener(clickCategory);
-		categoryText.setOnClickListener(clickCategory);
+		
 		//
 		((TextView) mRootView.findViewById(R.id.right)).setTextColor(mRes.getColor(R.color.red));
 		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
@@ -135,25 +163,26 @@ public class PageFind extends Fragment {
 		//calendar
 		final View calendar = mRootView.findViewById(R.id.calendar);
 		final View calendarView = mRootView.findViewById(R.id.calendar_view);
-		calendarText = (TextView) mRootView.findViewById(R.id.calendar_text);
+		mCalendarText = (TextView) mRootView.findViewById(R.id.calendar_text);
 		
-	    OnClickListener clickCalendar = new OnClickListener() {
+		OnClickListener clickCalendar = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				calendarText.setText(mAdapter.curentDateString);
+				mCalendarText.setText(convertDate(mAdapter.curentDateString));
 				calendarView.setVisibility(View.VISIBLE);
 			}
 		};
 		calendar.setOnClickListener(clickCalendar);
-		calendarText.setOnClickListener(clickCalendar);
+		mCalendarText.setOnClickListener(clickCalendar);
 		View calendarOK = (TextView) mRootView.findViewById(R.id.btn_ok);
 		calendarOK.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
 				calendarView.setVisibility(View.GONE);
-				
+				mDate = mCalendarText.getText().toString();
+				update();
 			}});
 		
 
@@ -203,11 +232,11 @@ public class PageFind extends Fragment {
 				if (((LinearLayout) mLayout).getChildCount() > 0) {
 					((LinearLayout) mLayout).removeAllViews();
 				}
-				desc = new ArrayList<String>();
+				mDesc = new ArrayList<String>();
 				((CalendarAdapter) parent.getAdapter()).setSelected(v);
 				String selectedGridDate = CalendarAdapter.dayString.get(position);
 				
-				calendarText.setText(selectedGridDate);
+				mCalendarText.setText(convertDate(selectedGridDate));
 				String[] separatedTime = selectedGridDate.split("-");
 				String gridvalueString = separatedTime[2].replaceFirst("^0*",
 						"");// taking last part of date. ie; 2 from 2012-12-02.
@@ -224,16 +253,16 @@ public class PageFind extends Fragment {
 
 				for (int i = 0; i < CalendarUtility.startDates.size(); i++) {
 					if (CalendarUtility.startDates.get(i).equals(selectedGridDate)) {
-						desc.add(CalendarUtility.nameOfEvent.get(i));
+						mDesc.add(CalendarUtility.nameOfEvent.get(i));
 					}
 				}
 
-				if (desc.size() > 0) {
-					for (int i = 0; i < desc.size(); i++) {
+				if (mDesc.size() > 0) {
+					for (int i = 0; i < mDesc.size(); i++) {
 						TextView rowTextView = new TextView(getActivity());
 
 						// set some properties of rowTextView or something
-						rowTextView.setText("Event:" + desc.get(i));
+						rowTextView.setText("Event:" + mDesc.get(i));
 						rowTextView.setTextColor(Color.BLACK);
 
 						// add the textview to the linearlayout
@@ -243,13 +272,63 @@ public class PageFind extends Fragment {
 
 				}
 
-				desc = null;
+				mDesc = null;
 
 			}
 
 		});
 
 		return mRootView;
+	}
+	
+	private void update() {
+		// get server data
+		Gateway gateway = GatewayImpl.getInstance();
+		gateway.searchActivity(new searchListener() {
+
+			@Override
+			public void onComplete(SearchData searchData) {
+				List<ActivityLiteData> data = searchData.mActivitys;
+				if (data == null || data.size() == 0) {
+					m_Data.clear();
+					showList(data);
+				} else {
+					showList(data);
+				}
+			}
+
+			@Override
+			public void onError() {
+
+			}
+		},mArea, mDate, mCategory);
+	}
+	
+	private String convertDate(String dateString) {
+		String ret = null;
+		Date date = null;
+		SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MM/dd");
+		try {
+			date = readFormat.parse(dateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return ret;
+		}
+		return writeFormat.format(date);
+	}
+	
+	private void showList(List<ActivityLiteData> data){
+		m_Data = data;
+		
+		ListView list = ((ListView) mRootView.findViewById(R.id.list));
+		list.setDivider(null);
+		ViewGroup footer = new LinearLayout(PageFind.this.getActivity());
+		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				(int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
+		footer.setLayoutParams(lp);
+		list.addFooterView(footer);
+		list.setAdapter(new LeyuAdapter());
 	}
 	
 	protected void setNextMonth() {
@@ -293,7 +372,7 @@ public class PageFind extends Fragment {
 			mItems.clear();
 
 			// Print dates of the current week
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 			String itemvalue;
 			mEvent = CalendarUtility.readCalendarEvent(getActivity());
 			Log.d("=====Event====", mEvent.toString());
@@ -313,7 +392,6 @@ public class PageFind extends Fragment {
 
 	class LeyuAdapter extends BaseAdapter {
 		
-		private List<Item> m_Data = new ArrayList<Item>();
 
 		class Item {
 			int mType;
@@ -328,34 +406,6 @@ public class PageFind extends Fragment {
 		}
 
 		LeyuAdapter() {
-
-			m_Data.add(new Item(1, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(1, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(0, "創意大天才", ""));
-			m_Data.add(new Item(0, "隨便都可以", ""));
-			m_Data.add(new Item(0, "你說是甚麼就是甚麼", ""));
-			m_Data.add(new Item(1, "你說是甚麼就是甚麼", ""));
 			
 		}
 
@@ -379,7 +429,7 @@ public class PageFind extends Fragment {
 
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			if (m_Data.get(position).mType == 1) {
+			if (m_Data.get(position)==null){//m_Data.get(position).mType == 1) {
 				Holder02 holder = new Holder02();
 				if (convertView == null || convertView.getTag() == null
 						|| ((Holder) convertView.getTag()).mType != 1) {
@@ -442,9 +492,7 @@ public class PageFind extends Fragment {
 				}
 
 				holder.mTitle.setText(m_Data.get(position).mTitle);
-				String uriBase = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_";
-				DecimalFormat df = new DecimalFormat("'0'.jpg");
-				final Uri uri = Uri.parse(uriBase + df.format(position + 20));
+				final Uri uri = Uri.parse(m_Data.get(position).mPicture);
 				//
 				int width, height;
 				width = height = (int) (mRes.getDisplayMetrics().density * 115);

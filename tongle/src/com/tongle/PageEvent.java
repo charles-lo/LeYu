@@ -85,7 +85,7 @@ public class PageEvent extends Fragment {
 					mStatus.setText(R.string.network_error);
 
 				}
-			}, mActivity.getAddress().getAdminArea());
+			});
 			break;
 		}
 		case free: {
@@ -131,7 +131,7 @@ public class PageEvent extends Fragment {
 					mStatus.setText(R.string.network_error);
 
 				}
-			}, mActivity.getAddress().getAdminArea());
+			});
 			break;
 		}
 		case near: {

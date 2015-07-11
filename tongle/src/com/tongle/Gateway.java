@@ -15,13 +15,17 @@ public interface Gateway {
 	
 	void getActivity(ActivityListener listener, String id);
 	
-	void getWeekend(ActivitysListener listener, String id);
+	void getWeekend(ActivitysListener listener);
 	
 	void getFree(ActivitysListener listener);
 	
-	void getHot(ActivitysListener listener, String id);
+	void getHot(ActivitysListener listener);
 	
 	void getNear(ActivitysListener listener, String area);
+	
+	void getCategoryList(CategoryListener listener);
+	
+	void searchActivity(searchListener listener, String area, String date, String category);
 	
 	//
 	public interface MainPageDataListener {
@@ -38,6 +42,13 @@ public interface Gateway {
 		void onError();
 	}
 	
+	public interface CategoryListener {
+
+		void onComplete(List<String> data);
+
+		void onError();
+	}
+	
 	public interface ActivityListener {
 
 		void onComplete(ActivityData data);
@@ -48,6 +59,13 @@ public interface Gateway {
 	public interface ActivitysListener {
 
 		void onComplete(List<ActivityLiteData> data);
+
+		void onError();
+	}
+	
+	public interface searchListener {
+
+		void onComplete(SearchData data);
 
 		void onError();
 	}
@@ -102,6 +120,12 @@ public interface Gateway {
 			mPicture = picture;
 			mActivityID = activityID;
 		}
+	}
+	
+	class SearchData {
+		String mTotalCount;
+		List<String> mActivityDates = new ArrayList<String>();
+		List<ActivityLiteData> mActivitys = new ArrayList<ActivityLiteData>();
 	}
 	
 	class ActivityLiteData {

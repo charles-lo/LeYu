@@ -197,8 +197,7 @@ public class PageDetail extends Fragment {
 				((TextView) rootView.findViewById(R.id.address_value)).setText(data.mPlace + " : " + data.mAddress);
 				((TextView) rootView.findViewById(R.id.holder_value)).setText(data.mOrganizer);
 				((TextView) rootView.findViewById(R.id.price_value)).setText(data.mPrice);
-				
-//				final String eventDescriptionOrigin = "讓�?��?��?��?�花??��?察中，�?�解?��?��??��?��?�以??�日常活??��?��?��?��?��?��?�彼此可以�?�良好�?��?��?��?��?��?�中，�?�師??�帶??��?�年級�?��?��?��?��?��?�蝴?��?��?��?�死?��鬥�?��?�中學�?��?��?��?��?��??��，並了解??��?�競?��??��?��?�酷";
+	
 				final String eventDescriptionOrigin = data.mDescription;
 				if (eventDescriptionOrigin.length() > 60) {
 					String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
