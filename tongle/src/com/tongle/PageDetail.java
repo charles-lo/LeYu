@@ -194,8 +194,9 @@ public class PageDetail extends Fragment {
 				}
 				
 				((TextView) rootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
-				((TextView) rootView.findViewById(R.id.address_value)).setText(data.mPlace + " : " + data.mAddress);
-				((TextView) rootView.findViewById(R.id.holder_value)).setText(data.mOrganizer);
+				((TextView) rootView.findViewById(R.id.address_value)).setText(data.mAddress);
+				rootView.findViewById(R.id.holder).setVisibility(View.INVISIBLE);
+				((TextView) rootView.findViewById(R.id.holder_value)).setText("");
 				((TextView) rootView.findViewById(R.id.price_value)).setText(data.mPrice);
 	
 				final String eventDescriptionOrigin = data.mDescription;
