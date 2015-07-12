@@ -17,7 +17,6 @@ import com.tongle.Gateway.TopicListener;
 import com.tongle.PageDetail.DetailArgs;
 
 import android.app.Fragment;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,14 +29,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class PageTopic extends Fragment {
+public class PageTopic extends Page {
 	static final String TAG = PageTopic.class.getSimpleName();
 	public static final String ARG = "topic_arg";
-	//
-	private	MainActivity mActivity;
-	//
-	private Resources mRes;
-	View mRootView;
 	// Data
 	private List<Content> m_Data = new ArrayList<Content>();
 
@@ -205,7 +199,7 @@ public class PageTopic extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mActivityID, data.mPicture, data.mText, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);
+						((MainActivity) getActivity()).replaceFragment(event, TAG);
 					}
 				});
 			} else if (data.mType == 3) {
@@ -250,7 +244,7 @@ public class PageTopic extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mActivityID, data.mPicture, data.mText, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);
+						((MainActivity) getActivity()).replaceFragment(event, TAG);
 					}
 				});
 

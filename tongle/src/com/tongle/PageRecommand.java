@@ -20,7 +20,6 @@ import com.tongle.PageEvent.EventArgs.Type;
 
 import android.animation.ValueAnimator;
 import android.app.Fragment;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.net.Uri;
@@ -44,12 +43,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class PageRecommand extends Fragment {
+public class PageRecommand extends Page {
 	static final String TAG = PageRecommand.class.getSimpleName();
-
+	
 	ValueAnimator mDrawerAnimator = null;
 	//view
-	private Resources mRes;
 	private Button mWeekend, mFree, mHot, mNear;
 	private int mItemHeight, mMax;
 	private ListView mList;
@@ -61,7 +59,6 @@ public class PageRecommand extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.page_recommand, container, false);
-		mRes = getResources();
 		mItemHeight = mRes.getDimensionPixelOffset(R.dimen.list_item_height);
 		mMax = 3 * mItemHeight;
 
@@ -71,14 +68,14 @@ public class PageRecommand extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).replaceFragment(new PageFind(), PageFind.TAG, true);
+				jumpPage(new PageFind(), TAG, true);
 				
 			}});
 
 
 		final View header = inflater.inflate(R.layout.header_recommand, null);
-		Bundle accountInfo = ((MainActivity) getActivity()).getAccountInfo();
-		Address address = ((MainActivity)getActivity()).getAddress();
+		Bundle accountInfo = getAccountInfo();
+		Address address = getAddress();
 		String adminArea = null;
 		if(address != null){
 			adminArea = address.getAdminArea();
@@ -98,7 +95,7 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.weekend)));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
+				jumpPage(event, TAG);
 			}});
 		mFree = (Button) header.findViewById(R.id.free);
 		mFree.setOnClickListener(new OnClickListener(){
@@ -109,7 +106,7 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.free)));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
+				jumpPage(event, TAG);
 				
 			}});
 		mHot = (Button) header.findViewById(R.id.hot);
@@ -121,7 +118,7 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.hot)));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
+				jumpPage(event, TAG);
 				
 			}});
 		mNear = (Button) header.findViewById(R.id.near);
@@ -133,14 +130,14 @@ public class PageRecommand extends Fragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(PageEvent.ARG, new Gson().toJson(new EventArgs(Type.near)));
 				event.setArguments(bundle);
-				((MainActivity) getActivity()).replaceFragment(event, PageEvent.TAG);
+				jumpPage(event, TAG);
 				
 			}});
 
 		
 
 		mList = ((ListView) rootView.findViewById(R.id.list));
-		ViewGroup footer = new LinearLayout(PageRecommand.this.getActivity());
+		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				(int) (PageRecommand.this.getResources().getDisplayMetrics().heightPixels)/2);
 		footer.setLayoutParams(lp);
@@ -171,8 +168,8 @@ public class PageRecommand extends Fragment {
 				status.setVisibility(View.GONE);
 				// headline
 				int width, height;
-				width = PageRecommand.this.getActivity().getResources().getDisplayMetrics().widthPixels;
-				height = (int) (PageRecommand.this.getActivity().getResources().getDisplayMetrics().density * 140);
+				width = getDeviceWidth();
+				height = (int) (mRes.getDisplayMetrics().density * 140);
 				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mHeadlines.get(0).mPicture))
 						.setResizeOptions(new ResizeOptions(width, height))
 						.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
@@ -190,7 +187,7 @@ public class PageRecommand extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
+						jumpPage(event, TAG);;
 						
 					}});
 				// top list
@@ -237,7 +234,7 @@ public class PageRecommand extends Fragment {
 		public View getView(final int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = new ViewHolder();
 			if (convertView == null) {
-				convertView = LayoutInflater.from(getActivity()).inflate(
+				convertView = LayoutInflater.from(mActivity).inflate(
 						R.layout.listitem_recommand, parent, false);
 				holder.mTitle = (TextView) convertView.findViewById(R.id.headline);
 				holder.mImage = (SimpleDraweeView) convertView.findViewById(R.id.headline_value);
@@ -298,8 +295,7 @@ public class PageRecommand extends Fragment {
 			final Uri uri = Uri.parse(m_Data.get(position).mPicture);
 			//
 			int width, height;
-			width = height = (int) (PageRecommand.this.getActivity().getResources()
-					.getDisplayMetrics().density * 115);
+			width = height = (int) (mRes.getDisplayMetrics().density * 115);
 			ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
 					.setResizeOptions(new ResizeOptions(width, height))
 					.setPostprocessor(holder.mProcessor)
@@ -318,7 +314,7 @@ public class PageRecommand extends Fragment {
 					Bundle bundle = new Bundle();
 					bundle.putString(PageTopic.ARG, new Gson().toJson(m_Data.get(position)));
 					event.setArguments(bundle);
-					((MainActivity) getActivity()).replaceFragment(event, PageTopic.TAG);
+					jumpPage(event, PageTopic.TAG);
 					
 				}});
 
@@ -334,7 +330,7 @@ public class PageRecommand extends Fragment {
 
 			MeshPostprocessor() {
 				super();
-				mRs = RenderScript.create(getActivity());
+				mRs = RenderScript.create(mActivity);
 				mScript = ScriptIntrinsicBlur.create(mRs, Element.U8_4(mRs));
 			}
 

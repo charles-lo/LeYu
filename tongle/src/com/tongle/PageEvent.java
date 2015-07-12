@@ -17,7 +17,6 @@ import com.tongle.PageDetail.DetailArgs;
 
 import android.app.Fragment;
 import android.app.LocalActivityManager;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,20 +33,16 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
-public class PageEvent extends Fragment {
-	static final String TAG = PageEvent.class.getSimpleName();
+public class PageEvent extends Page {
 	public static final String ARG = "event_arg";
-	//
-	private	MainActivity mActivity;
+
 	// view
 	private LinearLayout mTabBar;
 	private int mPreious;
-	private Resources mRes;
 	private	List<View> tabs = new ArrayList<View>();
 	private TabHost tabHost;
 	private ListView list;
 	private LeyuAdapter mAdapter;
-	private View mRootView;
 	private TextView mStatus;
 	// Data
 	private	List<String> tabName = new ArrayList<String>(Arrays.asList("海邊", "牧場", "果園", "展覽", "展覽", "", ""));
@@ -56,9 +51,8 @@ public class PageEvent extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		
 		EventArgs args = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
-		mActivity = (MainActivity) getActivity();
-		mRes = PageEvent.this.getResources();
 		mRootView = inflater.inflate(R.layout.page_event, container, false);
 		mStatus = (TextView)mRootView.findViewById(R.id.status);
 		String title = "";
@@ -234,7 +228,7 @@ public class PageEvent extends Fragment {
 		mAdapter = new LeyuAdapter();
 		list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
-		ViewGroup footer = new LinearLayout(PageEvent.this.getActivity());
+		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (46.67 * mRes.getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
 		list.addFooterView(footer);
@@ -293,7 +287,7 @@ public class PageEvent extends Fragment {
 		public View getView(final int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = new ViewHolder();
 			if (convertView == null) {
-				convertView = LayoutInflater.from(getActivity()).inflate(R.layout.listitem_event,
+				convertView = LayoutInflater.from(mActivity).inflate(R.layout.listitem_event,
 						parent, false);
 				holder.mTitle = (TextView) convertView.findViewById(R.id.event_title);
 				holder.image = (SimpleDraweeView) convertView.findViewById(R.id.event_image);
@@ -325,7 +319,7 @@ public class PageEvent extends Fragment {
 					Bundle bundle = new Bundle();
 					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 					event.setArguments(bundle);
-					((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
+					jumpPage(event, TAG);;
 					
 				}});
 

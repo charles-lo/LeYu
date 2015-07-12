@@ -33,9 +33,7 @@ import com.tongle.Gateway.ActivityAgeLevelSetting;
 import com.tongle.Gateway.ActivityData;
 import com.tongle.Gateway.ActivityListener;
 
-import android.app.Fragment;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,86 +50,86 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PageDetail extends Fragment {
+public class PageDetail extends Page {
 
-	static final String TAG = PageDetail.class.getSimpleName();
 	public static final String ARG = "detail_arg";
-	//
-	private	MainActivity mActivity;
 	// view
-	private Resources mRes;
 	private BarChart mChart;
 	private TextView mLeft, mRight;
 	private View mShare;
 	private IWXAPI api;
 	public static final String APP_ID = "wx6dbf5e76d03452da";
 	// Data
-	private	List<String> category;
-	
+	private List<String> category;
+
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
 		final DetailArgs args = new Gson().fromJson((String) getArguments().getString(ARG), DetailArgs.class);
-		mRes = PageDetail.this.getResources();
+
 		category = Arrays.asList(mRes.getStringArray(R.array.category));
 		//
-		mActivity = (MainActivity) getActivity();
 		mActivity.initActionBar(args.mTitle);
-		
+
 		api = WXAPIFactory.createWXAPI(mActivity, APP_ID, false);
 		api.registerApp(APP_ID);
 		//
-		final View rootView = inflater.inflate(R.layout.page_detail, container, false);
+		mRootView = inflater.inflate(R.layout.page_detail, container, false);
 
-		
-		mShare = rootView.findViewById(R.id.share);
-		mShare.setOnTouchListener(new OnTouchListener(){
+		mShare = mRootView.findViewById(R.id.share);
+		mShare.setOnTouchListener(new OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				return true;
-			}});
-		mLeft = (TextView) rootView.findViewById(R.id.left);
+			}
+		});
+		mLeft = (TextView) mRootView.findViewById(R.id.left);
 		mLeft.setText(R.string.collection);
-		mLeft.setOnClickListener(new OnClickListener(){
+		mLeft.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				View layout = inflater.inflate(R.layout.toast, (ViewGroup) rootView, false);
+				View layout = inflater.inflate(R.layout.toast, (ViewGroup) mRootView, false);
 
 				TextView text = (TextView) layout.findViewById(R.id.text);
 				text.setText(R.string.add);
 
-				Toast toast = new Toast(getActivity());
+				Toast toast = new Toast(mActivity);
 				toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
 				toast.setDuration(Toast.LENGTH_SHORT);
 				toast.setView(layout);
 				toast.show();
-				
-			}});
-		mRight = (TextView) rootView.findViewById(R.id.right);//
+
+			}
+		});
+		mRight = (TextView) mRootView.findViewById(R.id.right);//
 		mRight.setText(R.string.share);
-		mRight.setOnClickListener(new OnClickListener(){
+		mRight.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				
+
 				mShare.setVisibility(View.VISIBLE);
-				
-			}});
-		rootView.findViewById(R.id.close).setOnClickListener(new OnClickListener(){
+
+			}
+		});
+		mRootView.findViewById(R.id.close).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				mShare.setVisibility(View.GONE);
-				
-			}});
-		
-		rootView.findViewById(R.id.wechat).setOnClickListener(new OnClickListener(){
+
+			}
+		});
+
+		mRootView.findViewById(R.id.wechat).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				WXTextObject textObj = new WXTextObject();
-				textObj.text = "樂育 ";//\n title: " + args.mTitle + "\n  " + args.mUrl;
+				textObj.text = "樂育 ";// \n title: " + args.mTitle + "\n " +
+										// args.mUrl;
 
 				WXMediaMessage msg = new WXMediaMessage();
 				msg.mediaObject = textObj;
@@ -141,40 +139,42 @@ public class PageDetail extends Fragment {
 				req.transaction = "text" + System.currentTimeMillis();
 				req.message = msg;
 				req.scene = SendMessageToWX.Req.WXSceneSession;
-				
-				
+
 				api.sendReq(req);
-	    
-			}});
-		
-		rootView.findViewById(R.id.mail).setOnClickListener(new OnClickListener(){
+
+			}
+		});
+
+		mRootView.findViewById(R.id.mail).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("message/rfc822");
-				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture  );
+				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture);
 
 				startActivity(Intent.createChooser(intent, getString(R.string.mail)));
-			}});
-		
-		rootView.findViewById(R.id.message).setOnClickListener(new OnClickListener(){
+			}
+		});
+
+		mRootView.findViewById(R.id.message).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(Intent.ACTION_VIEW);         
+				Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.setData(Uri.parse("sms:"));
-				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture  );
+				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture);
 
 				startActivity(Intent.createChooser(intent, getString(R.string.message)));
-			}});
+			}
+		});
 
 		//
-		((TextView) rootView.findViewById(R.id.description)).setText(args.mTitle);
+		((TextView) mRootView.findViewById(R.id.description)).setText(args.mTitle);
 		//
-		final TextView status = (TextView)rootView.findViewById(R.id.status);
+		final TextView status = (TextView) mRootView.findViewById(R.id.status);
 		Gateway gateway = GatewayImpl.getInstance();
-		gateway.getActivity(new ActivityListener(){
+		gateway.getActivity(new ActivityListener() {
 
 			@Override
 			public void onComplete(ActivityData data) {
@@ -183,50 +183,48 @@ public class PageDetail extends Fragment {
 				Date beginDate = null, endDate = null;
 				SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ");
 				SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MMdd-HH:mm");
-				try {  
+				try {
 					beginDate = readFormat.parse(data.mBeginDate);
 					endDate = readFormat.parse(data.mEndDate);
 				} catch (ParseException e) {
-				    e.printStackTrace();
-				    status.setVisibility(View.VISIBLE);
-				    status.setText(R.string.server_error);
-				    return;
+					e.printStackTrace();
+					status.setVisibility(View.VISIBLE);
+					status.setText(R.string.server_error);
+					return;
 				}
-				
-				((TextView) rootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
-				((TextView) rootView.findViewById(R.id.address_value)).setText(data.mAddress);
-				rootView.findViewById(R.id.holder).setVisibility(View.INVISIBLE);
-				((TextView) rootView.findViewById(R.id.holder_value)).setText("");
-				((TextView) rootView.findViewById(R.id.price_value)).setText(data.mPrice);
-	
+
+				((TextView) mRootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
+				((TextView) mRootView.findViewById(R.id.address_value)).setText(data.mAddress);
+				mRootView.findViewById(R.id.holder).setVisibility(View.INVISIBLE);
+				((TextView) mRootView.findViewById(R.id.holder_value)).setText("");
+				((TextView) mRootView.findViewById(R.id.price_value)).setText(data.mPrice);
+
 				final String eventDescriptionOrigin = data.mDescription;
 				if (eventDescriptionOrigin.length() > 60) {
 					String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
-					final TextView eventDescription = (TextView) rootView.findViewById(R.id.event_description);
+					final TextView eventDescription = (TextView) mRootView.findViewById(R.id.event_description);
 					eventDescription.setText(eventDescriptionTxt + "...");
 
-					TextView extend = (TextView) rootView.findViewById(R.id.extend);
+					TextView extend = (TextView) mRootView.findViewById(R.id.extend);
 					extend.setOnClickListener(new OnClickListener() {
 
 						@Override
 						public void onClick(View v) {
 							eventDescription.setText(eventDescriptionOrigin);
-							eventDescription.setLayoutParams(new TableLayout.LayoutParams(
-									LinearLayout.LayoutParams.WRAP_CONTENT,
-									LinearLayout.LayoutParams.WRAP_CONTENT));
+							eventDescription.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 						}
 					});
-				}else{
-					final TextView eventDescription = (TextView) rootView.findViewById(R.id.event_description);
+				} else {
+					final TextView eventDescription = (TextView) mRootView.findViewById(R.id.event_description);
 					eventDescription.setText(eventDescriptionOrigin);
-					rootView.findViewById(R.id.extend).setVisibility(View.INVISIBLE);
+					mRootView.findViewById(R.id.extend).setVisibility(View.INVISIBLE);
 				}
 				//
 				String age = "";
-				for(ActivityAgeLevelSetting item : data.mActivityAgeLevelSettings){
+				for (ActivityAgeLevelSetting item : data.mActivityAgeLevelSettings) {
 					age += item.mDescription + "  ";
 				}
-				((TextView) rootView.findViewById(R.id.fitage)).setText(age);
+				((TextView) mRootView.findViewById(R.id.fitage)).setText(age);
 				//
 				setData(5, 5, data);
 			}
@@ -234,71 +232,67 @@ public class PageDetail extends Fragment {
 			@Override
 			public void onError() {
 				status.setText(R.string.server_error);
-				
-			}}, args.mID);
+
+			}
+		}, args.mID);
 		//
-		SimpleDraweeView image = (SimpleDraweeView) rootView.findViewById(R.id.cover);
+		SimpleDraweeView image = (SimpleDraweeView) mRootView.findViewById(R.id.cover);
 		int width, height;
 		width = height = (int) (mRes.getDisplayMetrics().density * 115);
-		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(args.mPicture))
-				.setResizeOptions(new ResizeOptions(width, height))
-				.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
-				.build();
-		DraweeController controller = Fresco.newDraweeControllerBuilder()
-				.setImageRequest(request).setOldController(image.getController())
-				.build();
+		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(args.mPicture)).setResizeOptions(new ResizeOptions(width, height)).setLocalThumbnailPreviewsEnabled(true)
+				.setProgressiveRenderingEnabled(true).build();
+		DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(image.getController()).build();
 		image.setController(controller);
-		//data
-		
-		
-		((TextView) rootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);//.setText("?��??�價?�數1�?29???");
-			
-		mChart = (BarChart) rootView.findViewById(R.id.chart1);
+		// data
+
+		((TextView) mRootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);// .setText("?��??�價?�數1�?29???");
+
+		mChart = (BarChart) mRootView.findViewById(R.id.chart1);
 		mChart.setDrawBarShadow(false);
-        mChart.setDrawValueAboveBar(true);
-        mChart.setDrawValuesForWholeStack(false);
-        mChart.setClickable(false);
-        mChart.setLongClickable(false);
-        mChart.setDoubleTapToZoomEnabled(false);
-        mChart.setTouchEnabled(false);
-        
-        mChart.setDescription("");
-        mChart.setMaxVisibleValueCount(5);
-        mChart.setPinchZoom(false);
-        mChart.setDrawGridBackground(false);
-        
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.setPosition(XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setSpaceBetweenLabels(2);
-        xAxis.setTextSize(mRes.getDimensionPixelSize(R.dimen.font_06)/mRes.getDisplayMetrics().density);
-        xAxis.setTextColor(mRes.getColor(R.color.grey));
-        
-        YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setLabelCount(4);
-        leftAxis.setPosition(YAxisLabelPosition.INSIDE_CHART);
-        leftAxis.setSpaceTop(15f);
-        leftAxis.setTextColor(Color.TRANSPARENT);
-        
-        YAxis rightAxis = mChart.getAxisRight();
-        rightAxis.setEnabled(false);
-        
-        Legend l = mChart.getLegend();
-        l.setEnabled(false);
+		mChart.setDrawValueAboveBar(true);
+		mChart.setDrawValuesForWholeStack(false);
+		mChart.setClickable(false);
+		mChart.setLongClickable(false);
+		mChart.setDoubleTapToZoomEnabled(false);
+		mChart.setTouchEnabled(false);
+
+		mChart.setDescription("");
+		mChart.setMaxVisibleValueCount(5);
+		mChart.setPinchZoom(false);
+		mChart.setDrawGridBackground(false);
+
+		XAxis xAxis = mChart.getXAxis();
+		xAxis.setPosition(XAxisPosition.BOTTOM);
+		xAxis.setDrawGridLines(false);
+		xAxis.setSpaceBetweenLabels(2);
+		xAxis.setTextSize(mRes.getDimensionPixelSize(R.dimen.font_06) / mRes.getDisplayMetrics().density);
+		xAxis.setTextColor(mRes.getColor(R.color.grey));
+
+		YAxis leftAxis = mChart.getAxisLeft();
+		leftAxis.setLabelCount(4);
+		leftAxis.setPosition(YAxisLabelPosition.INSIDE_CHART);
+		leftAxis.setSpaceTop(15f);
+		leftAxis.setTextColor(Color.TRANSPARENT);
+
+		YAxis rightAxis = mChart.getAxisRight();
+		rightAxis.setEnabled(false);
+
+		Legend l = mChart.getLegend();
+		l.setEnabled(false);
 		// footer
-		ViewGroup footer = new LinearLayout(PageDetail.this.getActivity());
-		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				(int) (46.67 * mRes.getDisplayMetrics().density));
+		ViewGroup footer = new LinearLayout(mActivity);
+		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (46.67 * mRes.getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
-		
-		return rootView;
+
+		return mRootView;
 	}
-	
-	static public class DetailArgs{
-		private	String	mID;
-		private	String	mPicture;
-		private	String	mTitle;
-		private	String	mArea;
+
+	static public class DetailArgs {
+		private String mID;
+		private String mPicture;
+		private String mTitle;
+		private String mArea;
+
 		DetailArgs(String id, String picture, String title, String area) {
 			mID = id;
 			mTitle = title;
@@ -306,58 +300,58 @@ public class PageDetail extends Fragment {
 			mArea = area;
 		}
 	}
-	
+
 	private void setData(int count, float range, ActivityData serverData) {
 
-        ArrayList<String> xVals = new ArrayList<String>();
-        for (int i = 0; i < count; i++) {
-            xVals.add(category.get(i));
-        }
+		ArrayList<String> xVals = new ArrayList<String>();
+		for (int i = 0; i < count; i++) {
+			xVals.add(category.get(i));
+		}
 
-        ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
-        BarEntry  bar;
-        float val = (float) serverData.mAesthetic;
-        bar = new BarEntry(val, 0);
-        bar.setXIndex(1);
-        yVals1.add(new BarEntry(val, 0));
-        
-        val = (float) serverData.mPhysical;
-        bar = new BarEntry(val, 1);
-        bar.setXIndex(1);
-        yVals1.add(new BarEntry(val, 1));
-        
-        val = (float) serverData.mSocially;
+		ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+		BarEntry bar;
+		float val = (float) serverData.mAesthetic;
+		bar = new BarEntry(val, 0);
+		bar.setXIndex(1);
+		yVals1.add(new BarEntry(val, 0));
+
+		val = (float) serverData.mPhysical;
+		bar = new BarEntry(val, 1);
+		bar.setXIndex(1);
+		yVals1.add(new BarEntry(val, 1));
+
+		val = (float) serverData.mSocially;
 		bar = new BarEntry(val, 2);
 		bar.setXIndex(1);
 		yVals1.add(new BarEntry(val, 2));
-		
-        val = (float) serverData.mScience;
+
+		val = (float) serverData.mScience;
 		bar = new BarEntry(val, 3);
 		bar.setXIndex(1);
 		yVals1.add(new BarEntry(val, 3));
-		
-        val = (float) serverData.mCulture;
+
+		val = (float) serverData.mCulture;
 		bar = new BarEntry(val, 4);
 		bar.setXIndex(1);
 		yVals1.add(new BarEntry(val, 4));
-        
-        
-        BarDataSet set1 = new BarDataSet(yVals1, "");
-        set1.setBarSpacePercent(50);
-        set1.setValueFormatter(new ValueFormatter(){
+
+		BarDataSet set1 = new BarDataSet(yVals1, "");
+		set1.setBarSpacePercent(50);
+		set1.setValueFormatter(new ValueFormatter() {
 
 			@Override
 			public String getFormattedValue(float value) {
 				return "" + ((int) value);
-			}});
-        set1.setColor(mRes.getColor(R.color.blue));
-        ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
-        dataSets.add(set1);
+			}
+		});
+		set1.setColor(mRes.getColor(R.color.blue));
+		ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
+		dataSets.add(set1);
 
-        BarData data = new BarData(xVals, dataSets);
-        data.setValueTextSize(10f);
+		BarData data = new BarData(xVals, dataSets);
+		data.setValueTextSize(10f);
 
-        mChart.setData(data);
-        mChart.requestLayout();
-    }
+		mChart.setData(data);
+		mChart.requestLayout();
+	}
 }

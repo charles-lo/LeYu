@@ -26,7 +26,6 @@ import android.app.AlertDialog;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,13 +45,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class PageFind extends Fragment {
-	static final String TAG = PageFind.class.getSimpleName();
+public class PageFind extends Page {
 	//
-	private	MainActivity mActivity;
 	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
-	private Resources mRes;
-	View mRootView;
 	// search args
 	private String mArea, mDate, mCategory;
 	// Calendar
@@ -68,9 +63,7 @@ public class PageFind extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		mActivity = (MainActivity) getActivity();
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
-		mRes = getResources();
 		
 		Gateway gateway = GatewayImpl.getInstance();
 		gateway.getCategoryList(new ListListener() {
@@ -79,12 +72,12 @@ public class PageFind extends Fragment {
 			public void onComplete(List<String> data) {
 				final View category = mRootView.findViewById(R.id.category);
 				final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
-				final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, data);
+				final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
 				OnClickListener clickCategory = new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						new AlertDialog.Builder(getActivity()).setTitle(mRes.getString(R.string.category)).setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
+						new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.category)).setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -155,7 +148,7 @@ public class PageFind extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				((MainActivity) getActivity()).replaceFragment(new PageRecommand(), PageRecommand.TAG, true);
+				jumpPage(new PageRecommand(), TAG, true);
 
 			}
 		});
@@ -163,7 +156,7 @@ public class PageFind extends Fragment {
 		//
 		ListView list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
-		ViewGroup footer = new LinearLayout(PageFind.this.getActivity());
+		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				(int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
@@ -202,7 +195,7 @@ public class PageFind extends Fragment {
 
 		mItems = new ArrayList<String>();
 
-		mAdapter = new CalendarAdapter(getActivity(), mMonth);
+		mAdapter = new CalendarAdapter(mActivity, mMonth);
 
 		GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
 		gridview.setAdapter(mAdapter);
@@ -269,7 +262,7 @@ public class PageFind extends Fragment {
 
 				if (mDesc.size() > 0) {
 					for (int i = 0; i < mDesc.size(); i++) {
-						TextView rowTextView = new TextView(getActivity());
+						TextView rowTextView = new TextView(mActivity);
 
 						// set some properties of rowTextView or something
 						rowTextView.setText("Event:" + mDesc.get(i));
@@ -333,7 +326,7 @@ public class PageFind extends Fragment {
 		
 		ListView list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
-		ViewGroup footer = new LinearLayout(PageFind.this.getActivity());
+		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				(int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
@@ -384,7 +377,7 @@ public class PageFind extends Fragment {
 			// Print dates of the current week
 			DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 			String itemvalue;
-			mEvent = CalendarUtility.readCalendarEvent(getActivity());
+			mEvent = CalendarUtility.readCalendarEvent(mActivity);
 			Log.d("=====Event====", mEvent.toString());
 			Log.d("=====Date ARRAY====", CalendarUtility.startDates.toString());
 
@@ -443,7 +436,7 @@ public class PageFind extends Fragment {
 				Holder02 holder = new Holder02();
 				if (convertView == null || convertView.getTag() == null
 						|| ((Holder) convertView.getTag()).mType != 1) {
-					convertView = LayoutInflater.from(getActivity()).inflate(
+					convertView = LayoutInflater.from(mActivity).inflate(
 							R.layout.listitem_event_02, parent, false);
 					holder.mTitles.add((TextView) convertView.findViewById(R.id.event_title_01));
 					holder.mTitles.add((TextView) convertView.findViewById(R.id.event_title_02));
@@ -481,7 +474,7 @@ public class PageFind extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
+						jumpPage(event, TAG);;
 						
 					}});
 			}
@@ -490,7 +483,7 @@ public class PageFind extends Fragment {
 				if (convertView == null 
 						|| convertView.getTag() == null 
 						|| ((Holder) convertView.getTag()).mType !=0) {
-					convertView = LayoutInflater.from(getActivity()).inflate(R.layout.listitem_event,
+					convertView = LayoutInflater.from(mActivity).inflate(R.layout.listitem_event,
 							parent, false);
 					holder.mTitle = (TextView) convertView.findViewById(R.id.event_title);
 					holder.image = (SimpleDraweeView) convertView.findViewById(R.id.event_image);
@@ -523,7 +516,7 @@ public class PageFind extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, PageDetail.TAG);;
+						jumpPage(event, TAG);;
 						
 					}});
 			}
