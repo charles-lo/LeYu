@@ -23,7 +23,7 @@ public interface Gateway {
 	
 	void getNear(ActivitysListener listener, String area);
 	
-	void getCategoryList(ListListener listener);
+	void getTypeList(ListListener listener);
 	
 	void getAreaList(ListListener listener);
 	
@@ -131,6 +131,7 @@ public interface Gateway {
 	}
 	
 	class ActivityLiteData {
+		String mID;
 		String mTitle;
 		String mPicture;
 		String mBeginDate;

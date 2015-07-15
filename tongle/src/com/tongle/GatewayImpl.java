@@ -500,8 +500,8 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void getCategoryList(final ListListener listener) {
-		final String url = baseUrl + "GetCategoryList";
+	public void getTypeList(final ListListener listener) {
+		final String url = baseUrl + "GetTypeList";
 		new AsyncTask<Void, Void, List<String>>() {
 
 			@Override
@@ -644,6 +644,9 @@ public class GatewayImpl implements Gateway{
 							for (int i = 0, size = tmpArray.length(); i < size; i++) {
 								JSONObject objectInArray = tmpArray.getJSONObject(i);
 								handle = new ActivityLiteData();
+								if (objectInArray.has("ID")) {
+									handle.mID = objectInArray.getString("ID");
+								}
 								if (objectInArray.has("Title")) {
 									handle.mTitle = objectInArray.getString("Title");
 								}

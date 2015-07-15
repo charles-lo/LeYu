@@ -66,7 +66,7 @@ public class PageFind extends Page {
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
 		
 		Gateway gateway = GatewayImpl.getInstance();
-		gateway.getCategoryList(new ListListener() {
+		gateway.getTypeList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
@@ -472,7 +472,7 @@ public class PageFind extends Page {
 					public void onClick(View v) {
 						Fragment event = new PageDetail();
 						Bundle bundle = new Bundle();
-						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mID, uri.toString(), m_Data.get(position).mTitle, null)));
 						event.setArguments(bundle);
 						jumpPage(event, TAG);;
 						
@@ -514,7 +514,7 @@ public class PageFind extends Page {
 					public void onClick(View v) {
 						Fragment event = new PageDetail();
 						Bundle bundle = new Bundle();
-						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mID, uri.toString(), m_Data.get(position).mTitle, null)));
 						event.setArguments(bundle);
 						jumpPage(event, TAG);;
 						
