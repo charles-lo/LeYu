@@ -583,13 +583,20 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void searchActivity(final searchListener listener, String area, String date, String category) {
+	public void searchActivity(final searchListener listener, String area, String date, String type) {
 		String urlTool = baseUrl + "SearchActivity?";
 		final String url;
 		boolean hasParameter = false;
 		if (!TextUtils.isEmpty(area)) {
-			urlTool += "area=" + area;
-			hasParameter = true;
+			try {
+				String areaNew = URLEncoder.encode(area, "utf-8");
+				if (hasParameter) {
+					urlTool += "&";
+				}
+				urlTool += "area=" + areaNew;
+				hasParameter = true;
+			} catch (UnsupportedEncodingException e) {
+			}
 		}
 		if (!TextUtils.isEmpty(date)) {
 			if (hasParameter) {
@@ -598,12 +605,16 @@ public class GatewayImpl implements Gateway{
 			urlTool += "beginDate=" + date;
 			hasParameter = true;
 		}
-		if (!TextUtils.isEmpty(category)) {
-			if (hasParameter) {
-				urlTool += "&";
+		if (!TextUtils.isEmpty(type)) {
+			try {
+				String typeNew = URLEncoder.encode(type, "utf-8");
+				if (hasParameter) {
+					urlTool += "&";
+				}
+				urlTool += "type=" + typeNew;
+				hasParameter = true;
+			} catch (UnsupportedEncodingException e) {
 			}
-			urlTool += "category=" + category;
-			hasParameter = true;
 		}
 		url = urlTool;
 		Log.d(TAG, "searchActivity url: " + url);

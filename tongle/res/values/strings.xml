@@ -39,7 +39,7 @@
     <string name="no_hot">都冷門</string>
     <string name="no_near">都很遠</string>
     <string name="network_error">網路發生錯誤</string>
-    <string name="server_error">server又在那亂動api了\n都不會講一聲的</string>
+    <string name="server_error">server他不行了</string>
 
     <string-array name="regions">
         <item>台北市</item>
