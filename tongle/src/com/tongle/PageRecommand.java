@@ -166,35 +166,35 @@ public class PageRecommand extends Page {
 			@Override
 			public void onComplete(final MainPageData data) {
 
-				if (data.mHeadlines.size() == 0) {
-					status.setText(R.string.server_error);
-					return;
-				}
 				// headline
 				status.setVisibility(View.GONE);
-				int width, height;
-				width = getDeviceWidth();
-				height = (int) (mRes.getDisplayMetrics().density * 140);
-				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mHeadlines.get(0).mPicture)).setResizeOptions(new ResizeOptions(width, height))
-						.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true).build();
-				SimpleDraweeView image = ((SimpleDraweeView) header.findViewById(R.id.headline));
-				DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(image.getController()).build();
-				image.setController(controller);
+				if (data.mHeadlines.size() > 0) {
+					int width, height;
+					width = getDeviceWidth();
+					height = (int) (mRes.getDisplayMetrics().density * 140);
+					ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mHeadlines.get(0).mPicture)).setResizeOptions(new ResizeOptions(width, height))
+							.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true).build();
+					SimpleDraweeView image = ((SimpleDraweeView) header.findViewById(R.id.headline));
+					DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(image.getController()).build();
+					image.setController(controller);
 
-				image.setOnClickListener(new OnClickListener() {
+					image.setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-						Fragment event = new PageDetail();
-						Bundle bundle = new Bundle();
-						bundle.putString(PageDetail.ARG,
-								new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
-						event.setArguments(bundle);
-						jumpPage(event, TAG);
-						;
+						@Override
+						public void onClick(View v) {
+							Fragment event = new PageDetail();
+							Bundle bundle = new Bundle();
+							bundle.putString(PageDetail.ARG,
+									new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
+							event.setArguments(bundle);
+							jumpPage(event, TAG);
+							;
 
-					}
-				});
+						}
+					});
+					return;
+				}
+
 				// top list
 				m_Data = data.mTopList;
 				mList.setAdapter(new LeyuAdapter());
@@ -204,8 +204,9 @@ public class PageRecommand extends Page {
 			@Override
 			public void onError() {
 				status.setText(R.string.network_error);
-				
-			}}, adminArea);
+
+			}
+		}, adminArea);
 		return rootView;
 	}
 	

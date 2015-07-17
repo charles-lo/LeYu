@@ -148,7 +148,7 @@ public class PageEvent extends Page {
 					mStatus.setText(R.string.network_error);
 
 				}
-			}, mActivity.getAddress().getAdminArea());
+			}, mActivity.getLocation());
 
 			break;
 		}

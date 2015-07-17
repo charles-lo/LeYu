@@ -254,6 +254,10 @@ public class MainActivity extends Activity {
 	public Address getAddress() {
 		return mAddress;
 	}
+	
+	public Location getLocation() {
+		return mLocation;
+	}
 
 	@Override
 	public void onBackPressed() {

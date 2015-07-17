@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.location.Location;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
@@ -436,8 +437,8 @@ public class GatewayImpl implements Gateway{
 	}
 
 	@Override
-	public void getNear(final ActivitysListener listener, String area) {
-		final String url = baseUrl + "FilterActivity?area=" + area;
+	public void getNear(final ActivitysListener listener, Location location) {
+		final String url = baseUrl + "FilterActivity?lon=" + location.getLongitude() + "&lat=" + location.getLatitude();
 		Log.d(TAG, "getNear " + url);
 		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
 

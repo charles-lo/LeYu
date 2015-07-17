@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.accounts.AccountManager;
+import android.location.Location;
 
 public interface Gateway {
 	
@@ -21,7 +22,7 @@ public interface Gateway {
 	
 	void getHot(ActivitysListener listener);
 	
-	void getNear(ActivitysListener listener, String area);
+	void getNear(ActivitysListener listener, Location location);
 	
 	void getTypeList(ListListener listener);
 	
