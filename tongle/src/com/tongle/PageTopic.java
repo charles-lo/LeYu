@@ -63,7 +63,6 @@ public class PageTopic extends Page {
 			@Override
 			public void onComplete(TopicData data) {
 				status.setVisibility(View.GONE);
-				//
 				// headline
 				int width, height;
 				width = getActivity().getResources().getDisplayMetrics().widthPixels;

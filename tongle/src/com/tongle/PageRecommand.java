@@ -58,13 +58,13 @@ public class PageRecommand extends Page {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.page_recommand, container, false);
+		mRootView = inflater.inflate(R.layout.page_recommand, container, false);
 		mItemHeight = mRes.getDimensionPixelOffset(R.dimen.list_item_height);
 		mMax = 3 * mItemHeight;
 
 		//
-		((TextView) rootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
-		rootView.findViewById(R.id.right).setOnClickListener(new OnClickListener(){
+		((TextView) mRootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
+		mRootView.findViewById(R.id.right).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
@@ -83,8 +83,21 @@ public class PageRecommand extends Page {
 		
 		if (accountInfo != null) {
 			((TextView) header.findViewById(R.id.name)).setText(accountInfo.getString("authAccount") + " 現在在 " + adminArea);
+			header.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					Fragment event = new PageMine();
+					jumpPage(event, TAG);					
+				}});
 		} else {
 			((TextView) header.findViewById(R.id.name)).setText(R.string.not_logon);
+			header.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					mActivity.logOn();				
+				}});
 		}
 		mWeekend = (Button) header.findViewById(R.id.weekend);
 		mWeekend.setOnClickListener(new OnClickListener(){
@@ -136,7 +149,7 @@ public class PageRecommand extends Page {
 
 		
 
-		mList = ((ListView) rootView.findViewById(R.id.list));
+		mList = ((ListView) mRootView.findViewById(R.id.list));
 		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				(int) (PageRecommand.this.getResources().getDisplayMetrics().heightPixels)/2);
@@ -156,7 +169,7 @@ public class PageRecommand extends Page {
 		mList.addHeaderView(header);
 		mList.addFooterView(footer);
 
-		final TextView status = (TextView)rootView.findViewById(R.id.status);
+		final TextView status = (TextView)mRootView.findViewById(R.id.status);
 		// get server data
 		Gateway gateway = GatewayImpl.getInstance();
 		
@@ -207,7 +220,7 @@ public class PageRecommand extends Page {
 
 			}
 		}, adminArea);
-		return rootView;
+		return mRootView;
 	}
 	
 

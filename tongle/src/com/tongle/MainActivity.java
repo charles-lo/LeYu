@@ -161,6 +161,10 @@ public class MainActivity extends Activity {
 		mTitleTextView.setText(title);
 	}
 	
+	public void logOn() {
+		logOn(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
+	}
+	
 	private void logOn(String accountType, final String authTokenType) {
 		// regenerate token
 		invalidateAuthToken();

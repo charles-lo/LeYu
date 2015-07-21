@@ -40,6 +40,10 @@
     <string name="no_near">都很遠</string>
     <string name="network_error">網路發生錯誤</string>
     <string name="server_error">server他不行了</string>
+    <string name="my_baby">我的寶貝</string>
+    <string name="friend">朋友</string>
+    <string name="footprint">足跡</string>
+    <string name="collent">收藏</string>
 
     <string-array name="regions">
         <item>台北市</item>
