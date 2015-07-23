@@ -132,6 +132,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onPause() {
 		mLocationMgr.removeUpdates(mLocationListener);
+		GatewayImpl.getInstance().userActionLeave();
 		super.onPause();
 	}
 
@@ -161,6 +162,10 @@ public class MainActivity extends Activity {
 		mTitleTextView.setText(title);
 	}
 	
+	public void hideActionBar() {
+		mActionBar.hide();
+	}
+	
 	public void logOn() {
 		logOn(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
 	}
@@ -187,6 +192,7 @@ public class MainActivity extends Activity {
 							ft.detach(frg);
 							ft.attach(frg);
 							ft.commitAllowingStateLoss();
+//							replaceFragment(PageRecommand.TAG, new PageRecommand());
 							//
 							mAccountManager.addOnAccountsUpdatedListener(new OnAccountsUpdateListener() {
 
@@ -269,19 +275,25 @@ public class MainActivity extends Activity {
 		if (mFinishOnBack || !getFragmentManager().popBackStackImmediate()) {
 			finish();
 		}
+	}
+	
+	public void replaceFragment(String newTag, Fragment newFrg) {
+		getFragmentManager().popBackStackImmediate();
+		jumpFragment(newFrg, newTag);
 
+		mFinishOnBack = false;
 	}
 
-	public void replaceFragment(Fragment newFragment, String tag) {
+	public void jumpFragment(Fragment newFragment, String tag) {
 		getFragmentManager().beginTransaction()
-				.replace(R.id.container, newFragment, tag).addToBackStack(null)
+				.replace(R.id.container, newFragment, tag).addToBackStack(tag)
 				.commit();
 		mFinishOnBack = false;
 	}
 	
-	public void replaceFragment(Fragment newFragment, String tag, boolean finishOnBack) {
+	public void jumpFragment(Fragment newFragment, String tag, boolean finishOnBack) {
 		getFragmentManager().beginTransaction()
-				.replace(R.id.container, newFragment, tag).addToBackStack(null)
+				.replace(R.id.container, newFragment, tag).addToBackStack(tag)
 				.commit();
 		mFinishOnBack = finishOnBack;
 	}

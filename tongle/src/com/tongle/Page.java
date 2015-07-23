@@ -37,11 +37,15 @@ public class Page extends Fragment {
 		return mActivity.getDeviceHeight();
 	}
 	
-	protected void jumpPage(Fragment newFragment, String tag){
-		mActivity.replaceFragment(newFragment, TAG);;
+	protected void replaceFragment(String newTag, Fragment newFrg) {
+		mActivity.replaceFragment(newTag, newFrg);
 	}
-	
-	protected void jumpPage(Fragment newFragment, String tag,  boolean finishOnBack){
-		mActivity.replaceFragment(newFragment, TAG, finishOnBack);;
+
+	protected void jumpPage(Fragment newFragment, String tag) {
+		mActivity.jumpFragment(newFragment, TAG);
+	}
+
+	protected void jumpPage(Fragment newFragment, String tag, boolean finishOnBack) {
+		mActivity.jumpFragment(newFragment, TAG, finishOnBack);
 	}
 }

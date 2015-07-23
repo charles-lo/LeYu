@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -20,8 +21,9 @@ import android.widget.TextView;
 
 public class PageMine extends Page {
 	static final String TAG = PageMine.class.getSimpleName();
+
 	//
-	
+
 	// Data
 
 	@Override
@@ -39,7 +41,22 @@ public class PageMine extends Page {
 		tabHost.setup();
 
 		final Context context = mActivity;
+		((TextView) mRootView.findViewById(R.id.right)).setTextColor(mRes.getColor(R.color.red));
+		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				replaceFragment(TAG, new PageRecommand());
+			}
+		});
+		mRootView.findViewById(R.id.center).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				replaceFragment(TAG, new PageFind());
+			}
+		});
+		//
 		final ViewPager pager = (ViewPager) mRootView.findViewById(R.id.viewpager);// ViewPager
 
 		List<View> listViews = new ArrayList<View>();
@@ -58,18 +75,9 @@ public class PageMine extends Page {
 
 		RelativeLayout tabIndicator3 = (RelativeLayout) LayoutInflater.from(context).inflate(R.layout.tab_widget, null);
 		TextView tvTab3 = (TextView) tabIndicator3.findViewById(R.id.tv_title);
-		tvTab3.setText(R.string.collent);
+		tvTab3.setText(R.string.collection);
 
-		tabHost.addTab(tabHost.newTabSpec("A").setIndicator(tabIndicator1).setContent(new TabContentFactory(){
-
-			@Override
-			public View createTabContent(String tag) {
-				TextView tv = new TextView(context);
-				tv.setText("The Text of " + tag);
-				return tv;
-			}
-		}));
-		tabHost.addTab(tabHost.newTabSpec("B").setIndicator(tabIndicator2).setContent(new TabContentFactory(){
+		tabHost.addTab(tabHost.newTabSpec("A").setIndicator(tabIndicator1).setContent(new TabContentFactory() {
 
 			@Override
 			public View createTabContent(String tag) {
@@ -78,7 +86,16 @@ public class PageMine extends Page {
 				return tv;
 			}
 		}));
-		tabHost.addTab(tabHost.newTabSpec("C").setIndicator(tabIndicator3).setContent(new TabContentFactory(){
+		tabHost.addTab(tabHost.newTabSpec("B").setIndicator(tabIndicator2).setContent(new TabContentFactory() {
+
+			@Override
+			public View createTabContent(String tag) {
+				TextView tv = new TextView(context);
+				tv.setText("The Text of " + tag);
+				return tv;
+			}
+		}));
+		tabHost.addTab(tabHost.newTabSpec("C").setIndicator(tabIndicator3).setContent(new TabContentFactory() {
 
 			@Override
 			public View createTabContent(String tag) {

@@ -584,6 +584,90 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
+	public void userActionLeave() {
+		final String url = baseUrl + "UserActionLeave";
+		Log.d(TAG, "userActionLeave url: " + url);
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				getResponse(url, 10000);
+				return null;
+			}
+		}.execute();		
+	}
+
+	@Override
+	public void userActionActivity(String id) {
+		final String url = baseUrl + "userActionActivity?id=" + id;
+		Log.d(TAG, "userActionActivity url: " + url);
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				getResponse(url, 10000);
+				return null;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void userActionTopic(String id) {
+		final String url = baseUrl + "UserActionTopic?id=" + id;
+		Log.d(TAG, "userActionTopic url: " + url);
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				getResponse(url, 10000);
+				return null;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void userActionHot() {
+		final String url = baseUrl + "UserActionHot";
+		Log.d(TAG, "userActionHot url: " + url);
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				getResponse(url, 10000);
+				return null;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void userActionWeekend() {
+		final String url = baseUrl + "UserActionWeekend";
+		Log.d(TAG, "userActionWeekend url: " + url);
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				getResponse(url, 10000);
+				return null;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void userActionNeighborhood() {
+		final String url = baseUrl + "UserActionNeighborhood";
+		Log.d(TAG, "userActionNeighborhood url: " + url);
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				getResponse(url, 10000);
+				return null;
+			}
+		}.execute();
+	}
+	
+	@Override
 	public void searchActivity(final searchListener listener, String area, String date, String type) {
 		String urlTool = baseUrl + "SearchActivity?";
 		final String url;

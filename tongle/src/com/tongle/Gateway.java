@@ -28,6 +28,18 @@ public interface Gateway {
 	
 	void getAreaList(ListListener listener);
 	
+	void userActionLeave();
+	
+	void userActionActivity(String id);
+	
+	void userActionTopic(String id);
+	
+	void userActionHot();
+	
+	void userActionWeekend();
+	
+	void userActionNeighborhood();
+	
 	void searchActivity(searchListener listener, String area, String date, String category);
 	
 	//

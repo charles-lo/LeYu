@@ -16,7 +16,6 @@ import com.tongle.Gateway.ActivitysListener;
 import com.tongle.PageDetail.DetailArgs;
 
 import android.app.Fragment;
-import android.app.LocalActivityManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -80,6 +79,7 @@ public class PageEvent extends Page {
 
 				}
 			});
+			gateway.userActionWeekend();
 			break;
 		}
 		case free: {
@@ -126,6 +126,7 @@ public class PageEvent extends Page {
 
 				}
 			});
+			gateway.userActionHot();
 			break;
 		}
 		case near: {
@@ -149,7 +150,7 @@ public class PageEvent extends Page {
 
 				}
 			}, mActivity.getLocation());
-
+			gateway.userActionNeighborhood();
 			break;
 		}
 		default: {
@@ -161,7 +162,6 @@ public class PageEvent extends Page {
 
 		tabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
 		tabHost.setup();
-		tabHost.setup(new LocalActivityManager(mActivity, true));
 		for (int i = 0; i < tabName.size(); i++) {
 			View tabIndicator = inflater.inflate(R.layout.tabwidget, null);
 			tabs.add(tabIndicator);

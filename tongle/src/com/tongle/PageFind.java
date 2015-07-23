@@ -64,12 +64,16 @@ public class PageFind extends Page {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
-		
+		mActivity.hideActionBar();
 		Gateway gateway = GatewayImpl.getInstance();
 		gateway.getTypeList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
+				if(!isAdded()){
+					return;
+				}
+				data.add(0, getString(R.string.all_category));
 				final View category = mRootView.findViewById(R.id.category);
 				final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
 				final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
@@ -83,7 +87,12 @@ public class PageFind extends Page {
 							public void onClick(DialogInterface dialog, int which) {
 								String data = categoryAdapter.getItem(which);
 								categoryText.setText(data);
-								mCategory = data;
+								if (which == 0) {
+									mCategory = null;
+								} else {
+									mCategory = data;
+								}
+								
 								dialog.dismiss();
 								update();
 							}
@@ -93,7 +102,9 @@ public class PageFind extends Page {
 				};
 				category.setOnClickListener(clickCategory);
 				categoryText.setOnClickListener(clickCategory);
-
+				String text = categoryAdapter.getItem(0);
+				categoryText.setText(text);
+				mCategory = null;
 			}
 
 			@Override
@@ -111,6 +122,10 @@ public class PageFind extends Page {
 				//
 				final View regions = mRootView.findViewById(R.id.region);
 				final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
+				if(!isAdded()){
+					return;
+				}				
+				data.add(0, getString(R.string.allplace));
 				final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
 				OnClickListener clickRegion = new OnClickListener() {
 
@@ -122,7 +137,12 @@ public class PageFind extends Page {
 							public void onClick(DialogInterface dialog, int which) {
 								String region = regionsAdapter.getItem(which);
 								regionsText.setText(region);
-								mArea = region;
+								if (which == 0) {
+									mArea = null;
+								} else {
+									mArea = region;
+								}
+								
 								dialog.dismiss();
 								update();
 							}
@@ -131,7 +151,9 @@ public class PageFind extends Page {
 				};
 				regions.setOnClickListener(clickRegion);
 				regionsText.setOnClickListener(clickRegion);
-
+				String region = regionsAdapter.getItem(0);
+				regionsText.setText(region);
+				mArea = null;
 			}
 
 			@Override
@@ -143,16 +165,21 @@ public class PageFind extends Page {
 		});
 		
 		//
-		((TextView) mRootView.findViewById(R.id.right)).setTextColor(mRes.getColor(R.color.red));
+		((TextView) mRootView.findViewById(R.id.center)).setTextColor(mRes.getColor(R.color.red));
 		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				jumpPage(new PageRecommand(), TAG, true);
-
+				replaceFragment(TAG, new PageRecommand());
 			}
 		});
+		mRootView.findViewById(R.id.right).setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				replaceFragment(TAG, new PageMine());
+			}
+		});
 		//
 		ListView list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
@@ -187,7 +214,17 @@ public class PageFind extends Page {
 				mDate = mCalendarText.getText().toString();
 				update();
 			}});
-		
+		View calendarCancel = (TextView) mRootView.findViewById(R.id.btn_cancel);
+		calendarCancel.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				calendarView.setVisibility(View.GONE);
+				mCalendarText.setText(R.string.all);
+				mDate = null;
+				update();
+			}});
+
 
 		mLayout = (LinearLayout) mRootView.findViewById(R.id.text);
 		mMonth = (GregorianCalendar) GregorianCalendar.getInstance();
@@ -199,7 +236,11 @@ public class PageFind extends Page {
 
 		GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
 		gridview.setAdapter(mAdapter);
-
+		
+		mCalendarText.setText(convertDate(mAdapter.curentDateString));
+		mDate = mCalendarText.getText().toString();
+		update();
+		
 		mHandler = new Handler();
 		mHandler.post(calendarUpdater);
 
@@ -237,6 +278,7 @@ public class PageFind extends Page {
 				}
 				mDesc = new ArrayList<String>();
 				((CalendarAdapter) parent.getAdapter()).setSelected(v);
+				((CalendarAdapter) parent.getAdapter()).setToday();
 				String selectedGridDate = CalendarAdapter.dayString.get(position);
 				
 				mCalendarText.setText(convertDate(selectedGridDate));
@@ -291,6 +333,9 @@ public class PageFind extends Page {
 
 			@Override
 			public void onComplete(SearchData searchData) {
+				if(!isAdded()){
+					return;
+				}
 				List<ActivityLiteData> data = searchData.mActivitys;
 				if (data == null || data.size() == 0) {
 					m_Data.clear();

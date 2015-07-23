@@ -61,17 +61,23 @@ public class PageRecommand extends Page {
 		mRootView = inflater.inflate(R.layout.page_recommand, container, false);
 		mItemHeight = mRes.getDimensionPixelOffset(R.dimen.list_item_height);
 		mMax = 3 * mItemHeight;
-
+		mActivity.hideActionBar();
 		//
 		((TextView) mRootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
-		mRootView.findViewById(R.id.right).setOnClickListener(new OnClickListener(){
+		mRootView.findViewById(R.id.center).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				jumpPage(new PageFind(), TAG, true);
+				replaceFragment(TAG, new PageFind());
 				
 			}});
+		mRootView.findViewById(R.id.right).setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				replaceFragment(TAG, new PageMine());
+			}
+		});
 
 		final View header = inflater.inflate(R.layout.header_recommand, null);
 		Bundle accountInfo = getAccountInfo();
@@ -83,13 +89,6 @@ public class PageRecommand extends Page {
 		
 		if (accountInfo != null) {
 			((TextView) header.findViewById(R.id.name)).setText(accountInfo.getString("authAccount") + " 現在在 " + adminArea);
-			header.setOnClickListener(new OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					Fragment event = new PageMine();
-					jumpPage(event, TAG);					
-				}});
 		} else {
 			((TextView) header.findViewById(R.id.name)).setText(R.string.not_logon);
 			header.setOnClickListener(new OnClickListener(){
@@ -205,7 +204,6 @@ public class PageRecommand extends Page {
 
 						}
 					});
-					return;
 				}
 
 				// top list

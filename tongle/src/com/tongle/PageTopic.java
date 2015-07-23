@@ -88,6 +88,7 @@ public class PageTopic extends Page {
 
 			}
 		}, args.mID);
+		gateway.userActionTopic(args.mID);
 
 		return mRootView;
 	}
@@ -198,7 +199,7 @@ public class PageTopic extends Page {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mActivityID, data.mPicture, data.mText, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, TAG);
+						((MainActivity) getActivity()).jumpFragment(event, TAG);
 					}
 				});
 			} else if (data.mType == 3) {
@@ -243,7 +244,7 @@ public class PageTopic extends Page {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(data.mActivityID, data.mPicture, data.mText, null)));
 						event.setArguments(bundle);
-						((MainActivity) getActivity()).replaceFragment(event, TAG);
+						((MainActivity) getActivity()).jumpFragment(event, TAG);
 					}
 				});
 

@@ -304,7 +304,7 @@
         android:layout_width="match_parent"
         android:layout_height="46.67dp"
         android:layout_alignParentBottom="true"
-        layout="@layout/footer" />
+        layout="@layout/footer01" />
 
     <include layout="@layout/share" />
 

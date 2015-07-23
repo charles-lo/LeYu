@@ -5,7 +5,7 @@
     android:background="@android:color/white" >
 
     <Button
-        android:id="@+id/left"
+        android:id="@+id/btn01"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -14,9 +14,9 @@
         android:text="@string/recommand"
         android:textColor="@color/footer"
         android:textSize="@dimen/font_01" />
-    
+
     <Button
-        android:id="@+id/center"
+        android:id="@+id/btn02"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -27,7 +27,18 @@
         android:textSize="@dimen/font_01" />
 
     <Button
-        android:id="@+id/right"
+        android:id="@+id/btn03"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:text="@string/mine"
+        android:textColor="@color/footer"
+        android:textSize="@dimen/font_01" />
+
+    <Button
+        android:id="@+id/btn04"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

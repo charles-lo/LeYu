@@ -55,7 +55,7 @@ public class PageDetail extends Page {
 	public static final String ARG = "detail_arg";
 	// view
 	private BarChart mChart;
-	private TextView mLeft, mRight;
+	private TextView mBtn01, mBtn02, mBtn03, mBtn04;
 	private View mShare;
 	private IWXAPI api;
 	public static final String APP_ID = "wx6dbf5e76d03452da";
@@ -84,9 +84,9 @@ public class PageDetail extends Page {
 				return true;
 			}
 		});
-		mLeft = (TextView) mRootView.findViewById(R.id.left);
-		mLeft.setText(R.string.collection);
-		mLeft.setOnClickListener(new OnClickListener() {
+		mBtn01 = (TextView) mRootView.findViewById(R.id.btn01);
+		mBtn01.setText(R.string.collection);
+		mBtn01.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -103,9 +103,12 @@ public class PageDetail extends Page {
 
 			}
 		});
-		mRight = (TextView) mRootView.findViewById(R.id.right);//
-		mRight.setText(R.string.share);
-		mRight.setOnClickListener(new OnClickListener() {
+		mBtn02 = (TextView) mRootView.findViewById(R.id.btn02);
+		mBtn02.setText(R.string.recommand);
+		
+		mBtn03 = (TextView) mRootView.findViewById(R.id.btn03);//
+		mBtn03.setText(R.string.share);
+		mBtn03.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -114,6 +117,9 @@ public class PageDetail extends Page {
 
 			}
 		});
+		
+		mBtn04 = (TextView) mRootView.findViewById(R.id.btn04);
+		mBtn04.setText(R.string.footprint);
 		mRootView.findViewById(R.id.close).setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -235,6 +241,7 @@ public class PageDetail extends Page {
 
 			}
 		}, args.mID);
+		gateway.userActionActivity(args.mID);
 		//
 		SimpleDraweeView image = (SimpleDraweeView) mRootView.findViewById(R.id.cover);
 		int width, height;

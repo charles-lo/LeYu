@@ -56,7 +56,7 @@ public class CalendarAdapter extends BaseAdapter {
 
 	private ArrayList<String> items;
 	public static List<String> dayString;
-	private View previousView;
+	private View previousView, today;
 
 	public CalendarAdapter(Context c, GregorianCalendar monthCalendar) {
 		CalendarAdapter.dayString = new ArrayList<String>();
@@ -119,14 +119,15 @@ public class CalendarAdapter extends BaseAdapter {
 			dayView.setFocusable(false);
 		} else {
 			// setting curent month's days in blue color.
-			dayView.setTextColor(Color.BLUE);
+			dayView.setTextColor(Color.BLACK);
 		}
 
 		if (dayString.get(position).equals(curentDateString)) {
 			setSelected(v);
+			today = v;
 			previousView = v;
 		} else {
-			v.setBackgroundResource(R.drawable.list_item_background);
+			v.setBackgroundResource(android.R.color.white);
 		}
 		dayView.setText(gridvalue);
 
@@ -156,8 +157,15 @@ public class CalendarAdapter extends BaseAdapter {
 			previousView.setBackgroundResource(R.drawable.list_item_background);
 		}
 		previousView = view;
-		view.setBackgroundResource(R.drawable.calendar_cel_selectl);
+		view.setBackgroundResource(R.drawable.calendar_month_circle_selected);
 		return view;
+	}
+	
+	public void setToday() {
+		if (today != null) {
+			today.setBackgroundResource(R.drawable.calendar_month_circle_today);
+		}
+		return;
 	}
 
 	public void refreshDays() {
