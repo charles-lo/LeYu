@@ -233,7 +233,7 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void getWeekend(final ActivitysListener listener) {
+	public void getWeekend(final ActivitysListener listener, String category) {
 		String beginDate, endDate;
 		Calendar calendar = Calendar.getInstance();
 
@@ -258,7 +258,11 @@ public class GatewayImpl implements Gateway{
 		calendar.add(Calendar.DATE, 7);
 		endDate = df.format(calendar.getTime());
 
-		final String url = baseUrl + "FilterActivity?beginDate=" + beginDate + "&endDate=" + endDate;
+		String url = baseUrl + "FilterActivity?beginDate=" + beginDate + "&endDate=" + endDate;
+		if(!TextUtils.isEmpty(category)){
+			url += url + "&category=" + category;
+		}
+		final String urlSend = url;
 		Log.d(TAG, "getWeekend " + url);
 		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
 
@@ -276,7 +280,7 @@ public class GatewayImpl implements Gateway{
 			protected List<ActivityLiteData> doInBackground(Void... params) {
 				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
 				try {
-					String response = getResponse(url, 10000);
+					String response = getResponse(urlSend, 10000);
 
 					if (response == null) {
 					} else {
@@ -317,8 +321,12 @@ public class GatewayImpl implements Gateway{
 	}
 
 	@Override
-	public void getFree(final ActivitysListener listener) {
-		final String url = baseUrl + "FilterActivity?isFree=true";// + area;
+	public void getFree(final ActivitysListener listener, String category) {
+		String url = baseUrl + "FilterActivity?isFree=true";// + area;
+		if(!TextUtils.isEmpty(category)){
+			url += url + "&category=" + category;
+		}
+		final String urlSend = url;
 		Log.d(TAG, "getFree " + url);
 		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
 
@@ -336,7 +344,7 @@ public class GatewayImpl implements Gateway{
 			protected List<ActivityLiteData> doInBackground(Void... params) {
 				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
 				try {
-					String response = getResponse(url, 10000);
+					String response = getResponse(urlSend, 10000);
 
 					if (response == null) {
 					} else {
@@ -377,8 +385,12 @@ public class GatewayImpl implements Gateway{
 	}
 
 	@Override
-	public void getHot(final ActivitysListener listener) {
-		final String url = baseUrl + "FilterActivity?area=";// + area;
+	public void getHot(final ActivitysListener listener, String category) {
+		String url = baseUrl + "FilterActivity";// + area;
+		if(!TextUtils.isEmpty(category)){
+			url += url + "&category=" + category;
+		}
+		final String urlSend = url;
 		Log.d(TAG, "getHot " + url);
 		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
 
@@ -396,7 +408,7 @@ public class GatewayImpl implements Gateway{
 			protected List<ActivityLiteData> doInBackground(Void... params) {
 				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
 				try {
-					String response = getResponse(url, 10000);
+					String response = getResponse(urlSend, 10000);
 
 					if (response == null) {
 					} else {
@@ -437,8 +449,12 @@ public class GatewayImpl implements Gateway{
 	}
 
 	@Override
-	public void getNear(final ActivitysListener listener, Location location) {
-		final String url = baseUrl + "FilterActivity?lon=" + location.getLongitude() + "&lat=" + location.getLatitude();
+	public void getNear(final ActivitysListener listener, Location location, String category) {
+		String url = baseUrl + "FilterActivity?lon=" + location.getLongitude() + "&lat=" + location.getLatitude();
+		if(!TextUtils.isEmpty(category)){
+			url += url + "&category=" + category;
+		}
+		final String urlSend = url;
 		Log.d(TAG, "getNear " + url);
 		new AsyncTask<Void, Void, List<ActivityLiteData>>() {
 
@@ -456,8 +472,7 @@ public class GatewayImpl implements Gateway{
 			protected List<ActivityLiteData> doInBackground(Void... params) {
 				List<ActivityLiteData> data = new ArrayList<ActivityLiteData>();
 				try {
-					URLEncoder.encode(url, "UTF-8");
-					String response = getResponse(url, 10000);
+					String response = getResponse(urlSend, 10000);
 
 					if (response == null) {
 					} else {
@@ -491,9 +506,6 @@ public class GatewayImpl implements Gateway{
 				} catch (JSONException e) {
 					data = null;
 					e.printStackTrace();
-				} catch (UnsupportedEncodingException e) {
-					data = null;
-					e.printStackTrace();
 				}
 				return data;
 			}
@@ -503,6 +515,48 @@ public class GatewayImpl implements Gateway{
 	@Override
 	public void getTypeList(final ListListener listener) {
 		final String url = baseUrl + "GetTypeList";
+		new AsyncTask<Void, Void, List<String>>() {
+
+			@Override
+			protected void onPostExecute(List<String> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<String> doInBackground(Void... params) {
+				List<String> data = new ArrayList<String>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Text")) {
+								data.add(objectInArray.getString("Text"));
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+	
+	@Override
+	public void getCategoryList(final ListListener listener) {
+		final String url = baseUrl + "GetCategoryList";
+		Log.d(TAG, "getCategoryList " + url);
 		new AsyncTask<Void, Void, List<String>>() {
 
 			@Override

@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.location.Address;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 public class Page extends Fragment {
 	//
@@ -13,12 +14,17 @@ public class Page extends Fragment {
 	protected MainActivity mActivity;
 	protected Resources mRes;
 	protected View mRootView;
+	protected Gateway mGateway;
+	protected CacheManager mCacheManager;
+	protected TextView mStatus;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mActivity = (MainActivity) getActivity();
 		mRes = getResources();
+		mCacheManager = CacheManager.getInstance();
+		mGateway = GatewayImpl.getInstance();
 	}
 	
 	protected Bundle getAccountInfo(){

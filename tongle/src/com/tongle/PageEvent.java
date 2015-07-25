@@ -1,7 +1,6 @@
 package com.tongle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -13,7 +12,9 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 import com.tongle.Gateway.ActivityLiteData;
 import com.tongle.Gateway.ActivitysListener;
+import com.tongle.Gateway.ListListener;
 import com.tongle.PageDetail.DetailArgs;
+import com.tongle.PageEvent.EventArgs.Type;
 
 import android.app.Fragment;
 import android.graphics.Color;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TabHost.TabContentFactory;
 import android.widget.TextView;
 
 public class PageEvent extends Page {
@@ -44,139 +46,98 @@ public class PageEvent extends Page {
 	private LeyuAdapter mAdapter;
 	private TextView mStatus;
 	// Data
-	private	List<String> tabName = new ArrayList<String>(Arrays.asList("海邊", "牧場", "果園", "展覽", "展覽", "", ""));
-	private List<Integer> tabInt = new ArrayList<Integer>(Arrays.asList(20, 30, 40, 50, 60, 70));
+	EventArgs mArgs;
+	private	List<String> mCategorys = new ArrayList<String>();
+	private String mCategory;
 	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		EventArgs args = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
+		mArgs = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
 		mRootView = inflater.inflate(R.layout.page_event, container, false);
 		mStatus = (TextView)mRootView.findViewById(R.id.status);
-		String title = "";
-		
+		mCategorys = mCacheManager.getCategoryList();
+		mGateway.getCategoryList(new ListListener() {
+
+			@Override
+			public void onComplete(List<String> data) {
+				if (!isAdded()) {
+					return;
+				}
+				mCacheManager.setCategoryList(data);
+				mCategorys = data;
+				updateTabs(inflater);
+			}
+
+			@Override
+			public void onError() {
+			}
+		});
 		//
-		switch (args.mType) {
-		case weekend: {
-			title = getString(R.string.weekend);
-			// get server data
-			Gateway gateway = GatewayImpl.getInstance();
-			gateway.getWeekend(new ActivitysListener() {
+		mActivity.initActionBar(getEvent(mArgs.mType));
 
-				@Override
-				public void onComplete(List<ActivityLiteData> data) {
-					if (data == null || data.size() == 0) {
-						mStatus.setText(R.string.no_weekend);
-					} else {
-						showList(data);
-					}
-				}
+		updateTabs(inflater);
 
-				@Override
-				public void onError() {
-					mStatus.setText(R.string.network_error);
-
-				}
-			});
-			gateway.userActionWeekend();
-			break;
-		}
-		case free: {
-			title = getString(R.string.free);
-			// get server data
-			Gateway gateway = GatewayImpl.getInstance();
-			gateway.getFree(new ActivitysListener() {
-
-				@Override
-				public void onComplete(List<ActivityLiteData> data) {
-					if (data == null || data.size() == 0) {
-						mStatus.setText(R.string.no_free);
-					} else {
-						showList(data);
-					}
-				}
-
-				@Override
-				public void onError() {
-					mStatus.setText(R.string.network_error);
-
-				}
-			});
-			break;
-		}
-		case hot: {
-			title = getString(R.string.hot);
-			// get server data
-			Gateway gateway = GatewayImpl.getInstance();
-			gateway.getHot(new ActivitysListener() {
-
-				@Override
-				public void onComplete(List<ActivityLiteData> data) {
-					if (data == null || data.size() == 0) {
-						mStatus.setText(R.string.no_hot);
-					} else {
-						showList(data);
-					}
-				}
-
-				@Override
-				public void onError() {
-					mStatus.setText(R.string.network_error);
-
-				}
-			});
-			gateway.userActionHot();
-			break;
-		}
-		case near: {
-			title = getString(R.string.near);
-			// get server data
-			Gateway gateway = GatewayImpl.getInstance();
-			gateway.getNear(new ActivitysListener() {
-
-				@Override
-				public void onComplete(List<ActivityLiteData> data) {
-					if (data == null || data.size() == 0) {
-						mStatus.setText(R.string.no_near);
-					} else {
-						showList(data);
-					}
-				}
-
-				@Override
-				public void onError() {
-					mStatus.setText(R.string.network_error);
-
-				}
-			}, mActivity.getLocation());
-			gateway.userActionNeighborhood();
-			break;
-		}
-		default: {
-			break;
-		}
+		return mRootView;
+	}
+	
+	private void updateTabs(LayoutInflater inflater){
+		if (mCategorys == null || mCategorys.size() == 0){
+			return;
 		}
 		
-		mActivity.initActionBar(title);
-
 		tabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
 		tabHost.setup();
-		for (int i = 0; i < tabName.size(); i++) {
-			View tabIndicator = inflater.inflate(R.layout.tabwidget, null);
+		int len = mCategorys.size();
+		View tabIndicator = inflater.inflate(R.layout.tabwidget, null);
+		tabs.add(tabIndicator);
+		final TextView tvTab = (TextView) tabIndicator.findViewById(R.id.tab_title);
+		tvTab.setText(getString(R.string.all));
+		tabIndicator.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				mCategory = (String) tvTab.getText();
+				getEvent(mArgs.mType);
+			}});
+		tabHost.addTab(tabHost.newTabSpec("").setIndicator(tabIndicator)
+				.setContent(new TabContentFactory() {
+
+					@Override
+					public View createTabContent(String tag) {
+						TextView tv = new TextView(mActivity);
+						tv.setText("The Text of " + tag);
+						return tv;
+					}
+				}));
+		for (int i = 0; i < len; i++) {
+			tabIndicator = inflater.inflate(R.layout.tabwidget, null);
 			tabs.add(tabIndicator);
 			TextView tvTab1 = (TextView) tabIndicator.findViewById(R.id.tab_title);
-			tvTab1.setText(tabName.get(i));
-			tabHost.addTab(tabHost.newTabSpec("" + i).setIndicator(tabIndicator)
-					.setContent(R.id.temp));
-		}
+			tvTab1.setText(mCategorys.get(i));
+			tabHost.addTab(tabHost.newTabSpec(mCategorys.get(i)).setIndicator(tabIndicator)
+					.setContent(new TabContentFactory() {
 
+						@Override
+						public View createTabContent(String tag) {
+							TextView tv = new TextView(mActivity);
+							tv.setText("The Text of " + tag);
+							return tv;
+						}
+					}));
+		}
+		
 		tabHost.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tabId) {
 				tabHost.setOnTabChangedListener(new OnTabChangeListener() {
 					@Override
 					public void onTabChanged(String tabId) {
+
+						mCategory = tabId;
+						Log.d(TAG, "mCategory: " + mCategory);
+
 						if(tabHost.getCurrentTabView().findViewById(R.id.tab_title) !=null && TextUtils.isEmpty(((TextView) tabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())){
 							return;
 						}
@@ -218,12 +179,137 @@ public class PageEvent extends Page {
 		tabHost.setCurrentTab(0);
 		tabs.get(0).findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
 		((TextView)tabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
-
-		return mRootView;
 	}
 	
-	private void showList(List<ActivityLiteData> data){
-		mStatus.setVisibility(View.GONE);
+	private String getEvent(Type type){
+		String title = "";
+		switch (type) {
+		case weekend: {
+			title = getString(R.string.weekend);
+			updateWeekend(mCacheManager.getWeekend(), true);
+			// get server data
+			mGateway.getWeekend(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					mCacheManager.setWeekend(data);
+					updateWeekend(data, true);
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mCategory);
+			mGateway.userActionWeekend();
+			break;
+		}
+		case free: {
+			title = getString(R.string.free);
+			updateFree(mCacheManager.getFree(), true);
+			// get server data
+			mGateway.getFree(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					mCacheManager.setFree(data);
+					updateFree(data, true);
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mCategory);
+			break;
+		}
+		case hot: {
+			title = getString(R.string.hot);
+			updateHot(mCacheManager.getHot(), true);
+			// get server data
+			mGateway.getHot(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					mCacheManager.setHot(data);
+					updateHot(data, true);
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mCategory);
+			mGateway.userActionHot();
+			break;
+		}
+		case near: {
+			title = getString(R.string.near);
+			updateNear(mCacheManager.getNear(), true);
+			// get server data
+			mGateway.getNear(new ActivitysListener() {
+
+				@Override
+				public void onComplete(List<ActivityLiteData> data) {
+					mCacheManager.setNear(data);
+					updateNear(data, true);
+				}
+
+				@Override
+				public void onError() {
+					mStatus.setText(R.string.network_error);
+
+				}
+			}, mActivity.getLocation(), mCategory);
+			mGateway.userActionNeighborhood();
+			break;
+		}
+		default: {
+			break;
+		}
+		}
+		return title;
+	}
+	
+	private void updateWeekend(List<ActivityLiteData> data, boolean showStatus){
+		if (data == null || data.size() == 0) {
+			mStatus.setText(R.string.no_weekend);
+		} else {
+			showList(data, showStatus);
+		}
+	}
+	
+	private void updateFree(List<ActivityLiteData> data, boolean showStatus){
+		if (data == null || data.size() == 0) {
+			mStatus.setText(R.string.no_free);
+		} else {
+			showList(data, showStatus);
+		}
+	}
+	
+	private void updateHot(List<ActivityLiteData> data, boolean hideStatus){
+		if (data == null || data.size() == 0) {
+			mStatus.setText(R.string.no_hot);
+		} else {
+			showList(data, hideStatus);
+		}
+	}
+	
+	private void updateNear(List<ActivityLiteData> data, boolean hideStatus){
+		if (data == null || data.size() == 0) {
+			mStatus.setText(R.string.no_near);
+		} else {
+			showList(data, hideStatus);
+		}
+	}
+	
+	private void showList(List<ActivityLiteData> data, boolean hideStatus){
+		if (hideStatus) {
+			mStatus.setVisibility(View.GONE);
+		}
 		m_Data = data;
 		mAdapter = new LeyuAdapter();
 		list = ((ListView) mRootView.findViewById(R.id.list));
@@ -267,19 +353,16 @@ public class PageEvent extends Page {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return m_Data.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 

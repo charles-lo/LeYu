@@ -53,6 +53,7 @@ public class PageRecommand extends Page {
 	private ListView mList;
 	private int mScrollState;
 	private boolean mScroll;
+	private View mHeader;
 	// Data
 	private List<Topic> m_Data = new ArrayList<Topic>();
 	
@@ -79,7 +80,7 @@ public class PageRecommand extends Page {
 			}
 		});
 
-		final View header = inflater.inflate(R.layout.header_recommand, null);
+		mHeader = inflater.inflate(R.layout.header_recommand, null);
 		Bundle accountInfo = getAccountInfo();
 		Address address = getAddress();
 		String adminArea = null;
@@ -88,17 +89,17 @@ public class PageRecommand extends Page {
 		}
 		
 		if (accountInfo != null) {
-			((TextView) header.findViewById(R.id.name)).setText(accountInfo.getString("authAccount") + " 現在在 " + adminArea);
+			((TextView) mHeader.findViewById(R.id.name)).setText(accountInfo.getString("authAccount") + " 現在在 " + adminArea);
 		} else {
-			((TextView) header.findViewById(R.id.name)).setText(R.string.not_logon);
-			header.setOnClickListener(new OnClickListener(){
+			((TextView) mHeader.findViewById(R.id.name)).setText(R.string.not_logon);
+			mHeader.setOnClickListener(new OnClickListener(){
 
 				@Override
 				public void onClick(View v) {
 					mActivity.logOn();				
 				}});
 		}
-		mWeekend = (Button) header.findViewById(R.id.weekend);
+		mWeekend = (Button) mHeader.findViewById(R.id.weekend);
 		mWeekend.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -109,7 +110,7 @@ public class PageRecommand extends Page {
 				event.setArguments(bundle);
 				jumpPage(event, TAG);
 			}});
-		mFree = (Button) header.findViewById(R.id.free);
+		mFree = (Button) mHeader.findViewById(R.id.free);
 		mFree.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -121,7 +122,7 @@ public class PageRecommand extends Page {
 				jumpPage(event, TAG);
 				
 			}});
-		mHot = (Button) header.findViewById(R.id.hot);
+		mHot = (Button) mHeader.findViewById(R.id.hot);
 		mHot.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -133,7 +134,7 @@ public class PageRecommand extends Page {
 				jumpPage(event, TAG);
 				
 			}});
-		mNear = (Button) header.findViewById(R.id.near);
+		mNear = (Button) mHeader.findViewById(R.id.near);
 		mNear.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -165,63 +166,67 @@ public class PageRecommand extends Page {
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				
 			}});
-		mList.addHeaderView(header);
+		mList.addHeaderView(mHeader);
 		mList.addFooterView(footer);
 
-		final TextView status = (TextView)mRootView.findViewById(R.id.status);
+		mStatus = (TextView)mRootView.findViewById(R.id.status);
+		// get cache data
+		updateMainPage(mCacheManager.getMainPageData(), true);
 		// get server data
-		Gateway gateway = GatewayImpl.getInstance();
-		
-		
-		gateway.getMainPageData(new MainPageDataListener() {
+		mGateway.getMainPageData(new MainPageDataListener() {
 
 			@Override
 			public void onComplete(final MainPageData data) {
-
+				mCacheManager.setMainPageData(data);
 				// headline
-				status.setVisibility(View.GONE);
-				if (data.mHeadlines.size() > 0) {
-					int width, height;
-					width = getDeviceWidth();
-					height = (int) (mRes.getDisplayMetrics().density * 140);
-					ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mHeadlines.get(0).mPicture)).setResizeOptions(new ResizeOptions(width, height))
-							.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true).build();
-					SimpleDraweeView image = ((SimpleDraweeView) header.findViewById(R.id.headline));
-					DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(image.getController()).build();
-					image.setController(controller);
-
-					image.setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							Fragment event = new PageDetail();
-							Bundle bundle = new Bundle();
-							bundle.putString(PageDetail.ARG,
-									new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
-							event.setArguments(bundle);
-							jumpPage(event, TAG);
-							;
-
-						}
-					});
-				}
-
-				// top list
-				m_Data = data.mTopList;
-				mList.setAdapter(new LeyuAdapter());
-
+				updateMainPage(data, true);
 			}
 
 			@Override
 			public void onError() {
-				status.setText(R.string.network_error);
+				mStatus.setText(R.string.network_error);
 
 			}
 		}, adminArea);
 		return mRootView;
 	}
 	
+	private void updateMainPage(final MainPageData data, boolean hideStatus) {
+		// headline
+		if (data == null) {
+			return;
+		}
+		if (hideStatus) {
+			mStatus.setVisibility(View.GONE);
+		}
+		if (data.mHeadlines.size() > 0) {
+			int width, height;
+			width = getDeviceWidth();
+			height = (int) (mRes.getDisplayMetrics().density * 140);
+			ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mHeadlines.get(0).mPicture)).setResizeOptions(new ResizeOptions(width, height))
+					.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true).build();
+			SimpleDraweeView image = ((SimpleDraweeView) mHeader.findViewById(R.id.headline));
+			DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(image.getController()).build();
+			image.setController(controller);
 
+			image.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Fragment event = new PageDetail();
+					Bundle bundle = new Bundle();
+					bundle.putString(PageDetail.ARG,
+							new Gson().toJson(new DetailArgs(data.mHeadlines.get(0).mActivityID, data.mHeadlines.get(0).mPicture, data.mHeadlines.get(0).mTitle, data.mHeadlines.get(0).mArea)));
+					event.setArguments(bundle);
+					jumpPage(event, TAG);
+				}
+			});
+		}
+
+		// top list
+		m_Data = data.mTopList;
+		mList.setAdapter(new LeyuAdapter());
+	}
 
 	class LeyuAdapter extends BaseAdapter {
 
@@ -231,19 +236,16 @@ public class PageRecommand extends Page {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return m_Data.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 

@@ -178,70 +178,23 @@ public class PageDetail extends Page {
 		//
 		((TextView) mRootView.findViewById(R.id.description)).setText(args.mTitle);
 		//
-		final TextView status = (TextView) mRootView.findViewById(R.id.status);
-		Gateway gateway = GatewayImpl.getInstance();
-		gateway.getActivity(new ActivityListener() {
+		mStatus = (TextView) mRootView.findViewById(R.id.status);
+		
+		mGateway.getActivity(new ActivityListener() {
 
 			@Override
 			public void onComplete(ActivityData data) {
-				status.setVisibility(View.GONE);
-				// time
-				Date beginDate = null, endDate = null;
-				SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ");
-				SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MMdd-HH:mm");
-				try {
-					beginDate = readFormat.parse(data.mBeginDate);
-					endDate = readFormat.parse(data.mEndDate);
-				} catch (ParseException e) {
-					e.printStackTrace();
-					status.setVisibility(View.VISIBLE);
-					status.setText(R.string.server_error);
-					return;
-				}
-
-				((TextView) mRootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
-				((TextView) mRootView.findViewById(R.id.address_value)).setText(data.mAddress);
-				mRootView.findViewById(R.id.holder).setVisibility(View.INVISIBLE);
-				((TextView) mRootView.findViewById(R.id.holder_value)).setText("");
-				((TextView) mRootView.findViewById(R.id.price_value)).setText(data.mPrice);
-
-				final String eventDescriptionOrigin = data.mDescription;
-				if (eventDescriptionOrigin.length() > 60) {
-					String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
-					final TextView eventDescription = (TextView) mRootView.findViewById(R.id.event_description);
-					eventDescription.setText(eventDescriptionTxt + "...");
-
-					TextView extend = (TextView) mRootView.findViewById(R.id.extend);
-					extend.setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							eventDescription.setText(eventDescriptionOrigin);
-							eventDescription.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-						}
-					});
-				} else {
-					final TextView eventDescription = (TextView) mRootView.findViewById(R.id.event_description);
-					eventDescription.setText(eventDescriptionOrigin);
-					mRootView.findViewById(R.id.extend).setVisibility(View.INVISIBLE);
-				}
-				//
-				String age = "";
-				for (ActivityAgeLevelSetting item : data.mActivityAgeLevelSettings) {
-					age += item.mDescription + "  ";
-				}
-				((TextView) mRootView.findViewById(R.id.fitage)).setText(age);
-				//
-				setData(5, 5, data);
+				mCacheManager.setActivity(args.mID, data);
+				updateActivity(data, true);
 			}
 
 			@Override
 			public void onError() {
-				status.setText(R.string.server_error);
+				mStatus.setText(R.string.server_error);
 
 			}
 		}, args.mID);
-		gateway.userActionActivity(args.mID);
+		mGateway.userActionActivity(args.mID);
 		//
 		SimpleDraweeView image = (SimpleDraweeView) mRootView.findViewById(R.id.cover);
 		int width, height;
@@ -252,7 +205,7 @@ public class PageDetail extends Page {
 		image.setController(controller);
 		// data
 
-		((TextView) mRootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);// .setText("?��??�價?�數1�?29???");
+		((TextView) mRootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);
 
 		mChart = (BarChart) mRootView.findViewById(R.id.chart1);
 		mChart.setDrawBarShadow(false);
@@ -290,8 +243,69 @@ public class PageDetail extends Page {
 		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (46.67 * mRes.getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
+		
+
+		updateActivity(mCacheManager.getActivity(args.mID), true);
 
 		return mRootView;
+	}
+	
+	private void updateActivity(ActivityData data, boolean hideStatus) {
+		if (data == null) {
+			return;
+		}
+		
+		if (hideStatus) {
+			mStatus.setVisibility(View.GONE);
+		}
+		// time
+		Date beginDate = null, endDate = null;
+		SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ");
+		SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MMdd-HH:mm");
+		try {
+			beginDate = readFormat.parse(data.mBeginDate);
+			endDate = readFormat.parse(data.mEndDate);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			mStatus.setVisibility(View.VISIBLE);
+			mStatus.setText(R.string.server_error);
+			return;
+		}
+
+		((TextView) mRootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
+		((TextView) mRootView.findViewById(R.id.address_value)).setText(data.mAddress);
+		mRootView.findViewById(R.id.holder).setVisibility(View.INVISIBLE);
+		((TextView) mRootView.findViewById(R.id.holder_value)).setText("");
+		((TextView) mRootView.findViewById(R.id.price_value)).setText(data.mPrice);
+
+		final String eventDescriptionOrigin = data.mDescription;
+		if (eventDescriptionOrigin.length() > 60) {
+			String eventDescriptionTxt = eventDescriptionOrigin.substring(0, 60);
+			final TextView eventDescription = (TextView) mRootView.findViewById(R.id.event_description);
+			eventDescription.setText(eventDescriptionTxt + "...");
+
+			TextView extend = (TextView) mRootView.findViewById(R.id.extend);
+			extend.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					eventDescription.setText(eventDescriptionOrigin);
+					eventDescription.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+				}
+			});
+		} else {
+			final TextView eventDescription = (TextView) mRootView.findViewById(R.id.event_description);
+			eventDescription.setText(eventDescriptionOrigin);
+			mRootView.findViewById(R.id.extend).setVisibility(View.INVISIBLE);
+		}
+		//
+		String age = "";
+		for (ActivityAgeLevelSetting item : data.mActivityAgeLevelSettings) {
+			age += item.mDescription + "  ";
+		}
+		((TextView) mRootView.findViewById(R.id.fitage)).setText(age);
+		//
+		setData(5, 5, data);
 	}
 
 	static public class DetailArgs {

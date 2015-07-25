@@ -65,46 +65,17 @@ public class PageFind extends Page {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
 		mActivity.hideActionBar();
-		Gateway gateway = GatewayImpl.getInstance();
-		gateway.getTypeList(new ListListener() {
+		
+		updateTypeList(mCacheManager.getTypeList());
+		mGateway.getTypeList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
 				if(!isAdded()){
 					return;
 				}
-				data.add(0, getString(R.string.all_category));
-				final View category = mRootView.findViewById(R.id.category);
-				final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
-				final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
-				OnClickListener clickCategory = new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.category)).setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								String data = categoryAdapter.getItem(which);
-								categoryText.setText(data);
-								if (which == 0) {
-									mCategory = null;
-								} else {
-									mCategory = data;
-								}
-								
-								dialog.dismiss();
-								update();
-							}
-						}).create().show();
-
-					}
-				};
-				category.setOnClickListener(clickCategory);
-				categoryText.setOnClickListener(clickCategory);
-				String text = categoryAdapter.getItem(0);
-				categoryText.setText(text);
-				mCategory = null;
+				mCacheManager.setTypeList(data);
+				updateTypeList(data);
 			}
 
 			@Override
@@ -114,46 +85,17 @@ public class PageFind extends Page {
 
 			}
 		});
-		
-		gateway.getAreaList(new ListListener() {
+		updateTypeList(mCacheManager.getAreaList());
+		mGateway.getAreaList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
 				//
-				final View regions = mRootView.findViewById(R.id.region);
-				final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
 				if(!isAdded()){
 					return;
-				}				
-				data.add(0, getString(R.string.allplace));
-				final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
-				OnClickListener clickRegion = new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.region)).setAdapter(regionsAdapter, new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								String region = regionsAdapter.getItem(which);
-								regionsText.setText(region);
-								if (which == 0) {
-									mArea = null;
-								} else {
-									mArea = region;
-								}
-								
-								dialog.dismiss();
-								update();
-							}
-						}).create().show();
-					}
-				};
-				regions.setOnClickListener(clickRegion);
-				regionsText.setOnClickListener(clickRegion);
-				String region = regionsAdapter.getItem(0);
-				regionsText.setText(region);
-				mArea = null;
+				}
+				mCacheManager.setAreaList(data);
+				updateAreaList(data);
 			}
 
 			@Override
@@ -220,7 +162,7 @@ public class PageFind extends Page {
 			@Override
 			public void onClick(View v) {
 				calendarView.setVisibility(View.GONE);
-				mCalendarText.setText(R.string.all);
+				mCalendarText.setText(R.string.alltime);
 				mDate = null;
 				update();
 			}});
@@ -312,18 +254,83 @@ public class PageFind extends Page {
 
 						// add the textview to the linearlayout
 						mLayout.addView(rowTextView);
-
 					}
-
 				}
-
 				mDesc = null;
-
 			}
-
 		});
 
 		return mRootView;
+	}
+	
+	private void updateTypeList(List<String> data) {
+		data.add(0, getString(R.string.all_category));
+		final View category = mRootView.findViewById(R.id.category);
+		final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
+		final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
+		OnClickListener clickCategory = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.category)).setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String data = categoryAdapter.getItem(which);
+						categoryText.setText(data);
+						if (which == 0) {
+							mCategory = null;
+						} else {
+							mCategory = data;
+						}
+
+						dialog.dismiss();
+						update();
+					}
+				}).create().show();
+
+			}
+		};
+		category.setOnClickListener(clickCategory);
+		categoryText.setOnClickListener(clickCategory);
+		String text = categoryAdapter.getItem(0);
+		categoryText.setText(text);
+		mCategory = null;
+	}
+	
+	private void updateAreaList(List<String> data) {
+		final View regions = mRootView.findViewById(R.id.region);
+		final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
+
+		data.add(0, getString(R.string.allplace));
+		final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
+		OnClickListener clickRegion = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.region)).setAdapter(regionsAdapter, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String region = regionsAdapter.getItem(which);
+						regionsText.setText(region);
+						if (which == 0) {
+							mArea = null;
+						} else {
+							mArea = region;
+						}
+
+						dialog.dismiss();
+						update();
+					}
+				}).create().show();
+			}
+		};
+		regions.setOnClickListener(clickRegion);
+		regionsText.setOnClickListener(clickRegion);
+		String region = regionsAdapter.getItem(0);
+		regionsText.setText(region);
+		mArea = null;
 	}
 	
 	private void update() {

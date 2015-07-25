@@ -16,15 +16,17 @@ public interface Gateway {
 	
 	void getActivity(ActivityListener listener, String id);
 	
-	void getWeekend(ActivitysListener listener);
+	void getWeekend(ActivitysListener listener, String category);
 	
-	void getFree(ActivitysListener listener);
+	void getFree(ActivitysListener listener, String category);
 	
-	void getHot(ActivitysListener listener);
+	void getHot(ActivitysListener listener, String category);
 	
-	void getNear(ActivitysListener listener, Location location);
+	void getNear(ActivitysListener listener, Location location, String category);
 	
 	void getTypeList(ListListener listener);
+	
+	void getCategoryList(ListListener listener);
 	
 	void getAreaList(ListListener listener);
 	

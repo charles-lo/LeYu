@@ -26,25 +26,23 @@
             android:paddingLeft="16.67dp"
             android:paddingRight="60dp" >
 
-            <TabWidget
-                android:id="@android:id/tabs"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
 
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+                </TabWidget>
                 <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="gone" >
-
-                    <LinearLayout
-                        android:id="@+id/temp"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical" >
-                    </LinearLayout>
                 </FrameLayout>
-            </TabWidget>
+            </LinearLayout>
         </TabHost>
     </HorizontalScrollView>
 
