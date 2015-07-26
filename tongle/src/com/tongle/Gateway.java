@@ -8,7 +8,7 @@ import android.location.Location;
 
 public interface Gateway {
 	
-	void initialize(String token, MainActivity mainActivity);
+	void initialize(MainActivity mainActivity, String token, String imei);
 
 	void getMainPageData(MainPageDataListener listener, String AdminArea);
 	
@@ -27,6 +27,10 @@ public interface Gateway {
 	void getTypeList(ListListener listener);
 	
 	void getCategoryList(ListListener listener);
+	
+	void getWeekendCategoryList(ListListener listener);
+	
+	void getFreeCategoryList(ListListener listener);
 	
 	void getAreaList(ListListener listener);
 	

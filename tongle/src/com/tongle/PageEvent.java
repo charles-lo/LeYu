@@ -38,94 +38,76 @@ public class PageEvent extends Page {
 	public static final String ARG = "event_arg";
 
 	// view
-	private LinearLayout mTabBar;
-	private int mPreious;
 	private	List<View> tabs = new ArrayList<View>();
 	private TabHost tabHost;
 	private ListView list;
 	private LeyuAdapter mAdapter;
 	private TextView mStatus;
+	private LayoutInflater mInflater;
 	// Data
 	EventArgs mArgs;
+	private boolean mTabInitilized;
 	private	List<String> mCategorys = new ArrayList<String>();
 	private String mCategory;
 	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
 	
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+		mInflater = inflater;
+		mTabInitilized = false;
 		mArgs = new Gson().fromJson((String) getArguments().getString(ARG), EventArgs.class);
 		mRootView = inflater.inflate(R.layout.page_event, container, false);
 		mStatus = (TextView)mRootView.findViewById(R.id.status);
-		mCategorys = mCacheManager.getCategoryList();
-		mGateway.getCategoryList(new ListListener() {
-
-			@Override
-			public void onComplete(List<String> data) {
-				if (!isAdded()) {
-					return;
-				}
-				mCacheManager.setCategoryList(data);
-				mCategorys = data;
-				updateTabs(inflater);
-			}
-
-			@Override
-			public void onError() {
-			}
-		});
+		getCategoryList(mArgs.mType);
 		//
 		mActivity.initActionBar(getEvent(mArgs.mType));
 
-		updateTabs(inflater);
+		updateTabs();
 
 		return mRootView;
 	}
 	
-	private void updateTabs(LayoutInflater inflater){
-		if (mCategorys == null || mCategorys.size() == 0){
+	@Override
+	public void onResume() {
+		mTabInitilized = false;
+		super.onResume();
+	}
+
+	private void updateTabs() {
+		if (mCategorys == null || mCategorys.size() == 0) {
 			return;
 		}
-		
+
 		tabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
 		tabHost.setup();
 		int len = mCategorys.size();
-		View tabIndicator = inflater.inflate(R.layout.tabwidget, null);
+		View tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
 		tabs.add(tabIndicator);
 		final TextView tvTab = (TextView) tabIndicator.findViewById(R.id.tab_title);
 		tvTab.setText(getString(R.string.all));
-		tabIndicator.setOnClickListener(new OnClickListener(){
+		tabHost.addTab(tabHost.newTabSpec("").setIndicator(tabIndicator).setContent(new TabContentFactory() {
 
 			@Override
-			public void onClick(View v) {
-				mCategory = (String) tvTab.getText();
-				getEvent(mArgs.mType);
-			}});
-		tabHost.addTab(tabHost.newTabSpec("").setIndicator(tabIndicator)
-				.setContent(new TabContentFactory() {
-
-					@Override
-					public View createTabContent(String tag) {
-						TextView tv = new TextView(mActivity);
-						tv.setText("The Text of " + tag);
-						return tv;
-					}
-				}));
+			public View createTabContent(String tag) {
+				TextView tv = new TextView(mActivity);
+				tv.setText("The Text of " + tag);
+				return tv;
+			}
+		}));
 		for (int i = 0; i < len; i++) {
-			tabIndicator = inflater.inflate(R.layout.tabwidget, null);
+			tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
 			tabs.add(tabIndicator);
 			TextView tvTab1 = (TextView) tabIndicator.findViewById(R.id.tab_title);
 			tvTab1.setText(mCategorys.get(i));
-			tabHost.addTab(tabHost.newTabSpec(mCategorys.get(i)).setIndicator(tabIndicator)
-					.setContent(new TabContentFactory() {
+			tabHost.addTab(tabHost.newTabSpec(mCategorys.get(i)).setIndicator(tabIndicator).setContent(new TabContentFactory() {
 
-						@Override
-						public View createTabContent(String tag) {
-							TextView tv = new TextView(mActivity);
-							tv.setText("The Text of " + tag);
-							return tv;
-						}
-					}));
+				@Override
+				public View createTabContent(String tag) {
+					TextView tv = new TextView(mActivity);
+					tv.setText("The Text of " + tag);
+					return tv;
+				}
+			}));
 		}
 		
 		tabHost.setOnTabChangedListener(new OnTabChangeListener() {
@@ -135,50 +117,134 @@ public class PageEvent extends Page {
 					@Override
 					public void onTabChanged(String tabId) {
 
-						mCategory = tabId;
-						Log.d(TAG, "mCategory: " + mCategory);
-
-						if(tabHost.getCurrentTabView().findViewById(R.id.tab_title) !=null && TextUtils.isEmpty(((TextView) tabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())){
+						if (mTabInitilized) {
+							mCategory = tabId;
+							getEvent(mArgs.mType);
+							Log.d(TAG, "charles mCategory: " + mCategory);
+						}
+						if (tabHost.getCurrentTabView().findViewById(R.id.tab_title) != null && TextUtils.isEmpty(((TextView) tabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())) {
 							return;
 						}
 						for (View tab : tabs) {
 							if (tabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
 								tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
-								((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes
-										.getColor(R.color.footer));
+								((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes.getColor(R.color.footer));
 							}
 						}
 						if (tabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
-							tabHost.getCurrentTabView().findViewById(R.id.tab_image)
-									.setVisibility(View.VISIBLE);
-							((TextView) tabHost.getCurrentTabView()
-									.findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
+							tabHost.getCurrentTabView().findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
+							((TextView) tabHost.getCurrentTabView().findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
 							if (list != null) {
 								list.setAdapter(null);
 								mAdapter.notifyDataSetChanged();
 								list.setAdapter(new LeyuAdapter());
 							}
 						}
-
 					}
 				});
 
 			}
 		});
-		for(View tab : tabs){
+		
+		for (View tab : tabs) {
 			tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
 			tab.performClick();
 		}
 		for (View tab : tabs) {
 			if (tabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
 				tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
-				((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes
-						.getColor(R.color.footer));
+				((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes.getColor(R.color.footer));
 			}
 		}
 		tabHost.setCurrentTab(0);
 		tabs.get(0).findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
-		((TextView)tabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
+		((TextView) tabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
+		mTabInitilized = true;
+	}
+	
+	private void getCategoryList(Type type){
+		mCategorys = mCacheManager.getCategoryList();
+		switch (type) {
+		case weekend: {
+			mGateway.getWeekendCategoryList(new ListListener() {
+
+				@Override
+				public void onComplete(List<String> data) {
+					if (!isAdded()) {
+						return;
+					}
+					mCacheManager.setCategoryList(data);
+					mCategorys = data;
+					updateTabs();
+				}
+
+				@Override
+				public void onError() {
+				}
+			});
+			break;
+		}
+		case free: {
+			mGateway.getFreeCategoryList(new ListListener() {
+
+				@Override
+				public void onComplete(List<String> data) {
+					if (!isAdded()) {
+						return;
+					}
+					mCacheManager.setCategoryList(data);
+					mCategorys = data;
+					updateTabs();
+				}
+
+				@Override
+				public void onError() {
+				}
+			});
+			break;
+		}
+		case hot: {
+			mGateway.getCategoryList(new ListListener() {
+
+				@Override
+				public void onComplete(List<String> data) {
+					if (!isAdded()) {
+						return;
+					}
+					mCacheManager.setCategoryList(data);
+					mCategorys = data;
+					updateTabs();
+				}
+
+				@Override
+				public void onError() {
+				}
+			});
+			break;
+		}
+		case near: {
+			mGateway.getCategoryList(new ListListener() {
+
+				@Override
+				public void onComplete(List<String> data) {
+					if (!isAdded()) {
+						return;
+					}
+					mCacheManager.setCategoryList(data);
+					mCategorys = data;
+					updateTabs();
+				}
+
+				@Override
+				public void onError() {
+				}
+			});
+			break;
+		}
+		default: {
+			break;
+		}
+		}
 	}
 	
 	private String getEvent(Type type){
@@ -400,7 +466,7 @@ public class PageEvent extends Page {
 				public void onClick(View v) {
 					Fragment event = new PageDetail();
 					Bundle bundle = new Bundle();
-					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(null, uri.toString(), m_Data.get(position).mTitle, null)));
+					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mID, uri.toString(), m_Data.get(position).mTitle, null)));
 					event.setArguments(bundle);
 					jumpPage(event, TAG);;
 					

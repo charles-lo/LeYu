@@ -30,13 +30,21 @@ public class GatewayImpl implements Gateway{
 	static final  int ERROR_SERVER = 2;
 	static GatewayImpl sInstance;
 	static String sAuthToken;
+	static String sIMEI;
+	static List<String> sCookie = new ArrayList<String>();
 	static private MainActivity mMainActivity;
 	final String baseUrl = "http://leibaoserver.azurewebsites.net/api/Leibao/";
 
 	@Override
-	public void initialize(String token, MainActivity mainActivity) {
-		sAuthToken = token;
+	public void initialize(MainActivity mainActivity, String token, String imei) {
 		mMainActivity = mainActivity;
+		sAuthToken = token;
+		sIMEI = imei;
+		sCookie.clear();
+		sCookie.add(token);
+		if (!TextUtils.isEmpty(imei)) {
+			sCookie.add("IMEI=" + sIMEI);
+		}
 	}
 	
 	@Override
@@ -260,7 +268,11 @@ public class GatewayImpl implements Gateway{
 
 		String url = baseUrl + "FilterActivity?beginDate=" + beginDate + "&endDate=" + endDate;
 		if(!TextUtils.isEmpty(category)){
-			url += url + "&category=" + category;
+			try {
+				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		final String urlSend = url;
 		Log.d(TAG, "getWeekend " + url);
@@ -322,9 +334,13 @@ public class GatewayImpl implements Gateway{
 
 	@Override
 	public void getFree(final ActivitysListener listener, String category) {
-		String url = baseUrl + "FilterActivity?isFree=true";// + area;
+		String url = baseUrl + "FilterActivity?isFree=true";
 		if(!TextUtils.isEmpty(category)){
-			url += url + "&category=" + category;
+			try {
+				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		final String urlSend = url;
 		Log.d(TAG, "getFree " + url);
@@ -388,7 +404,11 @@ public class GatewayImpl implements Gateway{
 	public void getHot(final ActivitysListener listener, String category) {
 		String url = baseUrl + "FilterActivity";// + area;
 		if(!TextUtils.isEmpty(category)){
-			url += url + "&category=" + category;
+			try {
+				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		final String urlSend = url;
 		Log.d(TAG, "getHot " + url);
@@ -418,6 +438,9 @@ public class GatewayImpl implements Gateway{
 						for (int i = 0, size = root.length(); i < size; i++) {
 							handle = new ActivityLiteData();
 							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("ID")) {
+								handle.mID = objectInArray.getString("ID");
+							}
 							if (objectInArray.has("Title")) {
 								handle.mTitle = objectInArray.getString("Title");
 							}
@@ -452,7 +475,11 @@ public class GatewayImpl implements Gateway{
 	public void getNear(final ActivitysListener listener, Location location, String category) {
 		String url = baseUrl + "FilterActivity?lon=" + location.getLongitude() + "&lat=" + location.getLatitude();
 		if(!TextUtils.isEmpty(category)){
-			url += url + "&category=" + category;
+			try {
+				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		final String urlSend = url;
 		Log.d(TAG, "getNear " + url);
@@ -557,6 +584,115 @@ public class GatewayImpl implements Gateway{
 	public void getCategoryList(final ListListener listener) {
 		final String url = baseUrl + "GetCategoryList";
 		Log.d(TAG, "getCategoryList " + url);
+		new AsyncTask<Void, Void, List<String>>() {
+
+			@Override
+			protected void onPostExecute(List<String> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<String> doInBackground(Void... params) {
+				List<String> data = new ArrayList<String>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Text")) {
+								data.add(objectInArray.getString("Text"));
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+	
+
+	@Override
+	public void getWeekendCategoryList(final ListListener listener) {
+		String beginDate, endDate;
+		Calendar calendar = Calendar.getInstance();
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+		
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		if (day == Calendar.SUNDAY) {
+			calendar.add(Calendar.DATE, -7);
+		}
+		beginDate = df.format(calendar.getTime());
+
+		
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.add(Calendar.DATE, 7);
+		endDate = df.format(calendar.getTime());		
+		
+		final String url = baseUrl + "GetCategoryList?beginDate=" + beginDate + "&endDate=" + endDate;
+		Log.d(TAG, "getWeekendCategoryList " + url);
+		new AsyncTask<Void, Void, List<String>>() {
+
+			@Override
+			protected void onPostExecute(List<String> result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected List<String> doInBackground(Void... params) {
+				List<String> data = new ArrayList<String>();
+				try {
+					String response = getResponse(url, 10000);
+
+					if (response == null) {
+					} else {
+						JSONArray root = new JSONArray(response);
+						JSONObject objectInArray = null;
+						for (int i = 0, size = root.length(); i < size; i++) {
+							objectInArray = root.getJSONObject(i);
+							if (objectInArray.has("Text")) {
+								data.add(objectInArray.getString("Text"));
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
+
+	@Override
+	public void getFreeCategoryList(final ListListener listener) {
+		final String url = baseUrl + "GetCategoryList?isFree=true";
+		Log.d(TAG, "getFreeCategoryList " + url);
 		new AsyncTask<Void, Void, List<String>>() {
 
 			@Override
@@ -841,7 +977,9 @@ public class GatewayImpl implements Gateway{
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("Content-length", "0");
 				connection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
-				connection.setRequestProperty("Cookie", sAuthToken);
+				String tmp = TextUtils.join(",", sCookie);
+				Log.d(TAG, "charles " + tmp);
+				connection.setRequestProperty("Cookie", TextUtils.join(",", sCookie));
 				connection.setUseCaches(false);
 				connection.setAllowUserInteraction(false);
 				connection.setConnectTimeout(timeout);

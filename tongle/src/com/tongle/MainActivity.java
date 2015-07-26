@@ -22,6 +22,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,7 @@ public class MainActivity extends Activity {
 	private Geocoder mGeocoder;
 	private Location mLocation;
 	private Address mAddress;
+	private String mIMEI;
 	private AccountManager mAccountManager;
     private Bundle mAccountInfo; 
     // Action Bar
@@ -74,14 +76,18 @@ public class MainActivity extends Activity {
 		//
 		mAccountManager = AccountManager.get(this);
 		
+		mIMEI = ((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
+		
         logOn(AccountGeneral.ACCOUNT_TYPE, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS);
 
 		m_DeviceWidth = getResources().getDisplayMetrics().widthPixels;
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
 		mHandler = new Handler();
 		
+		
+
 		// location manager
-		mLocationMgr = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+		mLocationMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
 		mGeocoder = new Geocoder(this, Locale.TAIWAN);
 		mLocation = mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		updateAddress();
@@ -184,7 +190,7 @@ public class MainActivity extends Activity {
                             final String authtoken = mAccountInfo.getString(AccountManager.KEY_AUTHTOKEN);
                             Log.d(TAG, "GetTokenForAccount Bundle is " + mAccountInfo + " authtoken: " + authtoken);
                             
-                            GatewayImpl.getInstance().initialize(authtoken, MainActivity.this);
+                            GatewayImpl.getInstance().initialize(MainActivity.this, authtoken, mIMEI);
                             //
                             Fragment frg = null;
 							frg = getFragmentManager().findFragmentByTag(PageRecommand.TAG);
@@ -239,7 +245,7 @@ public class MainActivity extends Activity {
                     final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
                     mAccountManager.invalidateAuthToken(account.type, authtoken);
                     
-                    GatewayImpl.getInstance().initialize(authtoken, MainActivity.this);
+                    GatewayImpl.getInstance().initialize(MainActivity.this, authtoken, mIMEI);
                     Log.d(TAG, account.name + " invalidated");
                 } catch (Exception e) {
                     e.printStackTrace();
