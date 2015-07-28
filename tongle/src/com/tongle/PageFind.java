@@ -260,6 +260,8 @@ public class PageFind extends Page {
 			}
 		});
 
+		initActionBar("");
+		updateTitlebarLeftImg(R.drawable.logo_s);
 		return mRootView;
 	}
 	
@@ -298,11 +300,12 @@ public class PageFind extends Page {
 		mCategory = null;
 	}
 	
-	private void updateAreaList(List<String> data) {
+	private void updateAreaList(final List<String> data) {
 		final View regions = mRootView.findViewById(R.id.region);
 		final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
 
-		data.add(0, getString(R.string.allplace));
+		data.add(0, getString(R.string.near));
+		data.add(getString(R.string.allplace));
 		final ArrayAdapter<String> regionsAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_dropdown_item, data);
 		OnClickListener clickRegion = new OnClickListener() {
 
@@ -315,6 +318,8 @@ public class PageFind extends Page {
 						String region = regionsAdapter.getItem(which);
 						regionsText.setText(region);
 						if (which == 0) {
+							mArea = null;
+						} else if (which == data.size() - 1) {
 							mArea = null;
 						} else {
 							mArea = region;
@@ -336,7 +341,7 @@ public class PageFind extends Page {
 	private void update() {
 		// get server data
 		Gateway gateway = GatewayImpl.getInstance();
-		gateway.searchActivity(new searchListener() {
+		gateway.searchActivityMoreData(new searchListener() {
 
 			@Override
 			public void onComplete(SearchData searchData) {
@@ -356,7 +361,7 @@ public class PageFind extends Page {
 			public void onError() {
 
 			}
-		},mArea, mDate, mCategory);
+		},mArea, getLocation(), mDate, mCategory);
 	}
 	
 	private String convertDate(String dateString) {

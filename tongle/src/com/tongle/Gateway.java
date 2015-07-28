@@ -48,6 +48,8 @@ public interface Gateway {
 	
 	void searchActivity(searchListener listener, String area, String date, String category);
 	
+	void searchActivityMoreData(searchListener listener, String area, Location location, String date, String category);
+	
 	//
 	public interface MainPageDataListener {
 

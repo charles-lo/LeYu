@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -46,6 +47,9 @@ public class MainActivity extends Activity {
     // Action Bar
     private ActionBar mActionBar;
     private TextView mTitleTextView;
+    private View mTitleBar;
+    private View mTitleBarLeft;
+    private ImageView mTitleBarLeftImg;
 	
 	static private final String TAG = MainActivity.class.getSimpleName();
 
@@ -60,17 +64,8 @@ public class MainActivity extends Activity {
 		mActionBar.setDisplayShowTitleEnabled(false);
 
 		mActionBar.setCustomView(R.layout.title_bar);
-		View customView = mActionBar.getCustomView();
-		mTitleTextView = (TextView) customView.findViewById(R.id.title);
-		final View back = customView.findViewById(R.id.back);
-		back.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-
-			}
-		});
+		mTitleBar = mActionBar.getCustomView();
+		
 		mActionBar.setDisplayShowCustomEnabled(true);
 		mActionBar.hide();
 		//
@@ -164,12 +159,29 @@ public class MainActivity extends Activity {
 	}
 	
 	public void initActionBar(String title){
+		mTitleTextView = (TextView) mTitleBar.findViewById(R.id.title);
+		mTitleBarLeftImg =  (ImageView) mTitleBar.findViewById(R.id.left_img);
+		mTitleBarLeftImg.setImageResource(R.drawable.back);
+		mTitleBarLeft = mTitleBar.findViewById(R.id.back);
+		mTitleBarLeft.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+
+			}
+		});
+		
 		mActionBar.show();
 		mTitleTextView.setText(title);
 	}
 	
 	public void hideActionBar() {
 		mActionBar.hide();
+	}
+	
+	public void updateTitlebarLeftImg(int id) {
+		mTitleBarLeftImg.setImageResource(id);
 	}
 	
 	public void logOn() {

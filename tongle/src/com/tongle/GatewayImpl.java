@@ -963,6 +963,120 @@ public class GatewayImpl implements Gateway{
 			}
 		}.execute();
 	}
+	
+	@Override
+	public void searchActivityMoreData(final searchListener listener, String area, Location location, String date, String type) {
+		String urlTool = baseUrl + "searchActivityMoreData?";
+		final String url;
+		boolean hasParameter = false;
+		if (!TextUtils.isEmpty(area)) {
+			try {
+				String areaNew = URLEncoder.encode(area, "utf-8");
+				if (hasParameter) {
+					urlTool += "&";
+				}
+				urlTool += "area=" + areaNew;
+				hasParameter = true;
+			} catch (UnsupportedEncodingException e) {
+			}
+		}
+		if (location != null) {
+			if (hasParameter) {
+				urlTool += "&";
+			}
+			urlTool += "lon=" + location.getLongitude() + "&lat=" + location.getLatitude();
+			hasParameter = true;
+		}
+		if (!TextUtils.isEmpty(date)) {
+			if (hasParameter) {
+				urlTool += "&";
+			}
+			urlTool += "beginDate=" + date;
+			hasParameter = true;
+		}
+		if (!TextUtils.isEmpty(type)) {
+			try {
+				String typeNew = URLEncoder.encode(type, "utf-8");
+				if (hasParameter) {
+					urlTool += "&";
+				}
+				urlTool += "type=" + typeNew;
+				hasParameter = true;
+			} catch (UnsupportedEncodingException e) {
+			}
+		}
+		url = urlTool;
+		Log.d(TAG, "searchActivity url: " + url);
+		new AsyncTask<Void, Void, SearchData>() {
+
+			@Override
+			protected void onPostExecute(SearchData result) {
+				if (result == null) {
+					listener.onError();
+				} else {
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected SearchData doInBackground(Void... params) {
+				SearchData data = null;
+				try {
+					String response = getResponse(url, 10000);
+					Log.d(TAG, "searchActivity response" + response);
+					if (response == null) {
+					} else {
+						JSONObject root = new JSONObject(response);
+						data = new SearchData();
+						if (root.has("TotalCount")) {
+							data.mTotalCount = root.getString("TotalCount");
+						}
+						if (root.has("ActivityDates")) {
+							JSONArray tmpArray = root.getJSONArray("ActivityDates");
+							for (int i = 0, size = tmpArray.length(); i < size; i++) {
+								data.mActivityDates.add(tmpArray.getString(i));
+							}
+						}
+						if (root.has("Activities")) {
+							JSONArray tmpArray = root.getJSONArray("Activities");
+							ActivityLiteData handle = null;
+							for (int i = 0, size = tmpArray.length(); i < size; i++) {
+								JSONObject objectInArray = tmpArray.getJSONObject(i);
+								handle = new ActivityLiteData();
+								if (objectInArray.has("ID")) {
+									handle.mID = objectInArray.getString("ID");
+								}
+								if (objectInArray.has("Title")) {
+									handle.mTitle = objectInArray.getString("Title");
+								}
+								if (objectInArray.has("Picture")) {
+									handle.mPicture = objectInArray.getString("Picture");
+								}
+								if (objectInArray.has("Area")) {
+									handle.mAddress = objectInArray.getString("Area");
+								}
+								if (objectInArray.has("BeginDate")) {
+									handle.mBeginDate = objectInArray.getString("BeginDate");
+								}
+								if (objectInArray.has("EndDate")) {
+									handle.mEndDate = objectInArray.getString("EndDate");
+								}
+								if (objectInArray.has("IsHot")) {
+									handle.mIsHot = objectInArray.getBoolean("IsHot");
+								}
+								data.mActivitys.add(handle);
+							}
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}
+		}.execute();
+	}
 
 	public String getResponse(String urlString, int timeout) {
 		HttpURLConnection connection = null;
@@ -978,7 +1092,6 @@ public class GatewayImpl implements Gateway{
 				connection.setRequestProperty("Content-length", "0");
 				connection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
 				String tmp = TextUtils.join(",", sCookie);
-				Log.d(TAG, "charles " + tmp);
 				connection.setRequestProperty("Cookie", TextUtils.join(",", sCookie));
 				connection.setUseCaches(false);
 				connection.setAllowUserInteraction(false);

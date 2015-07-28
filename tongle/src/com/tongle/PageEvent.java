@@ -120,7 +120,6 @@ public class PageEvent extends Page {
 						if (mTabInitilized) {
 							mCategory = tabId;
 							getEvent(mArgs.mType);
-							Log.d(TAG, "charles mCategory: " + mCategory);
 						}
 						if (tabHost.getCurrentTabView().findViewById(R.id.tab_title) != null && TextUtils.isEmpty(((TextView) tabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())) {
 							return;

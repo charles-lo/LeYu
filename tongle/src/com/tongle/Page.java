@@ -3,6 +3,7 @@ package com.tongle;
 import android.app.Fragment;
 import android.content.res.Resources;
 import android.location.Address;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -38,9 +39,25 @@ public class Page extends Fragment {
 	public int getDeviceWidth() {
 		return mActivity.getDeviceWidth();
 	}
+	
+	public Location getLocation() {
+		return mActivity.getLocation();
+	}
 
 	public int getDeviceHeight() {
 		return mActivity.getDeviceHeight();
+	}
+	
+	public void initActionBar(String title){
+		mActivity.initActionBar(title);
+	}
+	
+	public void hideActionBar() {
+		mActivity.hideActionBar();
+	}
+	
+	public void updateTitlebarLeftImg(int id) {
+		mActivity.updateTitlebarLeftImg(id);
 	}
 	
 	protected void replaceFragment(String newTag, Fragment newFrg) {
