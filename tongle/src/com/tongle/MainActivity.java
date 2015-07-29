@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -50,6 +51,7 @@ public class MainActivity extends Activity {
     private View mTitleBar;
     private View mTitleBarLeft;
     private ImageView mTitleBarLeftImg;
+    private EditText mTitleBarRightEdit;
 	
 	static private final String TAG = MainActivity.class.getSimpleName();
 
@@ -171,13 +173,17 @@ public class MainActivity extends Activity {
 
 			}
 		});
-		
+		mTitleBarRightEdit = (EditText) mTitleBar.findViewById(R.id.right_txt);
 		mActionBar.show();
 		mTitleTextView.setText(title);
 	}
 	
 	public void hideActionBar() {
 		mActionBar.hide();
+	}
+	
+	public EditText getTitleBarRightEdit(){
+		return mTitleBarRightEdit;
 	}
 	
 	public void updateTitlebarLeftImg(int id) {

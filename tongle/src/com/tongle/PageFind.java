@@ -22,6 +22,8 @@ import com.tongle.Gateway.SearchData;
 import com.tongle.Gateway.searchListener;
 import com.tongle.PageDetail.DetailArgs;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 
 import android.app.Fragment;
@@ -39,6 +41,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -59,6 +62,7 @@ public class PageFind extends Page {
 	private LinearLayout mLayout;
 	private ArrayList<String> mDesc;
 	private TextView mCalendarText;
+	private String mDateSelected, mToday;
 	// Data
 
 	@Override
@@ -141,31 +145,31 @@ public class PageFind extends Page {
 
 			@Override
 			public void onClick(View v) {
-				mCalendarText.setText(convertDate(mAdapter.curentDateString));
-				calendarView.setVisibility(View.VISIBLE);
+				int offset = -getDeviceHeight() / 3;
+				int duration = 300;
+				if (calendarView.getVisibility() == View.VISIBLE) {
+					calendarView.animate().translationY(offset).alpha(0.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							calendarView.setTranslationY(0);
+							calendarView.setVisibility(View.GONE);
+						}
+					});
+				} else {
+					calendarView.setVisibility(View.VISIBLE);
+					calendarView.setAlpha(0.0f);
+					calendarView.setTranslationY(offset);
+					calendarView.animate().translationY(0).alpha(1.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							calendarView.setVisibility(View.VISIBLE);
+						}
+					});
+				}
 			}
 		};
 		calendar.setOnClickListener(clickCalendar);
 		mCalendarText.setOnClickListener(clickCalendar);
-		View calendarOK = (TextView) mRootView.findViewById(R.id.btn_ok);
-		calendarOK.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				calendarView.setVisibility(View.GONE);
-				mDate = mCalendarText.getText().toString();
-				update();
-			}});
-		View calendarCancel = (TextView) mRootView.findViewById(R.id.btn_cancel);
-		calendarCancel.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				calendarView.setVisibility(View.GONE);
-				mCalendarText.setText(R.string.alltime);
-				mDate = null;
-				update();
-			}});
 
 
 		mLayout = (LinearLayout) mRootView.findViewById(R.id.text);
@@ -179,8 +183,8 @@ public class PageFind extends Page {
 		GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
 		gridview.setAdapter(mAdapter);
 		
-		mCalendarText.setText(convertDate(mAdapter.curentDateString));
-		mDate = mCalendarText.getText().toString();
+		mCalendarText.setText(getString(R.string.today));
+		mDateSelected = mToday = mDate = mAdapter.curentDateString;
 		update();
 		
 		mHandler = new Handler();
@@ -222,9 +226,14 @@ public class PageFind extends Page {
 				((CalendarAdapter) parent.getAdapter()).setSelected(v);
 				((CalendarAdapter) parent.getAdapter()).setToday();
 				String selectedGridDate = CalendarAdapter.dayString.get(position);
-				
-				mCalendarText.setText(convertDate(selectedGridDate));
-				String[] separatedTime = selectedGridDate.split("-");
+				mDateSelected = selectedGridDate;
+				Log.d("charles", "mToday: " + mToday + " mDateSelected: " + mDateSelected);
+				if (mDateSelected.equals(mToday)) {
+					mCalendarText.setText(getString(R.string.today));
+				} else {
+					mCalendarText.setText(selectedGridDate);
+				}
+				String[] separatedTime = selectedGridDate.split("/");
 				String gridvalueString = separatedTime[2].replaceFirst("^0*",
 						"");// taking last part of date. ie; 2 from 2012-12-02.
 				int gridvalue = Integer.parseInt(gridvalueString);
@@ -257,11 +266,17 @@ public class PageFind extends Page {
 					}
 				}
 				mDesc = null;
+				
+				mDate = mDateSelected;
+				update();
 			}
 		});
 
 		initActionBar("");
 		updateTitlebarLeftImg(R.drawable.logo_s);
+		EditText rightEdit = getTitleBarRightEdit();
+		rightEdit.setVisibility(View.VISIBLE);
+		rightEdit.setHint(R.string.keyword_find);
 		return mRootView;
 	}
 	
@@ -362,20 +377,6 @@ public class PageFind extends Page {
 
 			}
 		},mArea, getLocation(), mDate, mCategory);
-	}
-	
-	private String convertDate(String dateString) {
-		String ret = null;
-		Date date = null;
-		SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MM/dd");
-		try {
-			date = readFormat.parse(dateString);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return ret;
-		}
-		return writeFormat.format(date);
 	}
 	
 	private void showList(List<ActivityLiteData> data){

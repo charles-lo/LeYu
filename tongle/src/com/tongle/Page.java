@@ -6,6 +6,7 @@ import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class Page extends Fragment {
@@ -58,6 +59,10 @@ public class Page extends Fragment {
 	
 	public void updateTitlebarLeftImg(int id) {
 		mActivity.updateTitlebarLeftImg(id);
+	}
+	
+	public EditText getTitleBarRightEdit(){
+		return mActivity.getTitleBarRightEdit();
 	}
 	
 	protected void replaceFragment(String newTag, Fragment newFrg) {

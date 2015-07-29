@@ -65,7 +65,7 @@ public class CalendarAdapter extends BaseAdapter {
 		mContext = c;
 		month.set(GregorianCalendar.DAY_OF_MONTH, 1);
 		this.items = new ArrayList<String>();
-		df = new SimpleDateFormat("yyyy-MM-dd");
+		df = new SimpleDateFormat("yyyy/MM/dd");
 		curentDateString = df.format(selectedDate.getTime());
 		refreshDays();
 	}
@@ -104,7 +104,7 @@ public class CalendarAdapter extends BaseAdapter {
 		}
 		dayView = (TextView) v.findViewById(R.id.date);
 		// separates daystring into parts.
-		String[] separatedTime = dayString.get(position).split("-");
+		String[] separatedTime = dayString.get(position).split("/");
 		// taking last part of date. ie; 2 from 2012-12-02
 		String gridvalue = separatedTime[2].replaceFirst("^0*", "");
 		// checking whether the day is in current month or not.

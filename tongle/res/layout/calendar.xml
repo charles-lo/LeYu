@@ -156,14 +156,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@android:string/ok" />
+            android:text="@android:string/ok"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/all" />
+            android:text="@string/all"
+            android:visibility="gone" />
     </LinearLayout>
 
 </RelativeLayout>

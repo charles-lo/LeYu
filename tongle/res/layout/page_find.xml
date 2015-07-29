@@ -104,6 +104,13 @@
         android:background="@android:color/white"
         android:orientation="vertical" >
 
+        <include
+            android:id="@+id/calendar_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/calendar"
+            android:visibility="gone" />
+
         <ListView
             android:id="@+id/list"
             android:layout_width="match_parent"
@@ -116,13 +123,5 @@
         android:layout_height="46.67dp"
         android:layout_alignParentBottom="true"
         layout="@layout/footer" />
-
-    <include
-        android:id="@+id/calendar_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/top_menu"
-        layout="@layout/calendar"
-        android:visibility="gone" />
 
 </RelativeLayout>
