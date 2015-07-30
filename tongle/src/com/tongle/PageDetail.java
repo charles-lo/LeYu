@@ -1,6 +1,5 @@
 package com.tongle;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -40,7 +39,6 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -67,19 +65,21 @@ public class PageDetail extends Page {
 	private View mShare;
 	SimpleDraweeView mImage;
 	// Data
+	private DetailArgs mArgs;
 	private List<String> category;
 	private List<ResolveInfo> mShareApps;
+	private Intent mFriendsIntent;
 	// share
 	private ResolveInfo mWechat, mWeibo, mFacebook;
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		final DetailArgs args = new Gson().fromJson((String) getArguments().getString(ARG), DetailArgs.class);
+		mArgs = new Gson().fromJson((String) getArguments().getString(ARG), DetailArgs.class);
 
 		category = Arrays.asList(mRes.getStringArray(R.array.category));
 		//
-		mActivity.initActionBar(args.mTitle);
+		mActivity.initActionBar(mArgs.mTitle);
 		mShareApps = mActivity.getShareList();
 		
 		for (ResolveInfo info : mShareApps) {
@@ -161,7 +161,7 @@ public class PageDetail extends Page {
 					intent.setComponent(new ComponentName(mWechat.activityInfo.packageName, mWechat.activityInfo.name));
 					intent.setAction(Intent.ACTION_SEND);
 					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + args.mTitle + "\n  " + args.mPicture);
+					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
 					intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 					intent.setPackage(mWechat.activityInfo.packageName);
 					startActivity(intent);
@@ -181,7 +181,7 @@ public class PageDetail extends Page {
 					intent.setComponent(new ComponentName(mWeibo.activityInfo.packageName, mWeibo.activityInfo.name));
 					intent.setAction(Intent.ACTION_SEND);
 					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + args.mTitle + "\n  " + args.mPicture);
+					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
 					intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 					intent.setPackage(mWeibo.activityInfo.packageName);
 					startActivity(intent);
@@ -201,7 +201,7 @@ public class PageDetail extends Page {
 					intent.setComponent(new ComponentName(mFacebook.activityInfo.packageName, mFacebook.activityInfo.name));
 					intent.setAction(Intent.ACTION_SEND);
 					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + args.mTitle + "\n  " + args.mPicture);
+					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
 					intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 					intent.setPackage(mFacebook.activityInfo.packageName);
 					startActivity(intent);
@@ -213,48 +213,23 @@ public class PageDetail extends Page {
 
 			@Override
 			public void onClick(View v) {
-				new AsyncTask<Void, Void, Intent>() {
+				if (mFriendsIntent != null) {
+					startActivity(mFriendsIntent);
+				} else {
+					new AsyncTask<Void, Void, Intent>() {
 
-					@Override
-					protected void onPostExecute(Intent result) {
-						startActivity(result);
-					}
-
-					@Override
-					protected Intent doInBackground(Void... params) {
-						try {
-							URL url = new URL(args.mPicture);
-							HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-							connection.setDoInput(true);
-							connection.connect();
-							InputStream input = connection.getInputStream();
-							Bitmap immutableBpm = BitmapFactory.decodeStream(input, null, null);
-							Bitmap mutableBitmap = immutableBpm.copy(Bitmap.Config.RGB_565, true);
-
-							String path = Images.Media.insertImage(mActivity.getContentResolver(), mutableBitmap, "", null);
-							Log.d(TAG, "charles " + path);
-							Uri uri = Uri.parse(path);
-							if (mWechat == null) {
-								Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.wechat.com"));
-								startActivity(browserIntent);
-							} else {
-								Intent intent = new Intent();
-								intent.setComponent(new ComponentName(mWechat.activityInfo.packageName, "com.tencent.mm.ui.tools.ShareToTimeLineUI"));
-								intent.setAction(Intent.ACTION_SEND);
-								intent.setType("image/*");
-								intent.putExtra(Intent.EXTRA_STREAM, uri);
-								intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + args.mTitle + "\n  " + args.mPicture);
-								intent.setPackage(mWechat.activityInfo.packageName);
-								return intent;
-							}
-						} catch (MalformedURLException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
+						@Override
+						protected void onPostExecute(Intent result) {
+							startActivity(result);
 						}
-						return null;
-					}
-				}.execute();
+
+						@Override
+						protected Intent doInBackground(Void... params) {
+							mFriendsIntent = getFriendsIntent();
+							return mFriendsIntent;
+						}
+					}.execute();
+				}
 			}
 		});
 		
@@ -264,7 +239,7 @@ public class PageDetail extends Page {
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("message/rfc822");
-				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + args.mTitle + "\n  " + args.mPicture);
+				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
 
 				startActivity(Intent.createChooser(intent, getString(R.string.mail)));
 			}
@@ -276,14 +251,14 @@ public class PageDetail extends Page {
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.setData(Uri.parse("sms:"));
-				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + args.mTitle + "\n  " + args.mPicture);
+				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
 
 				startActivity(Intent.createChooser(intent, getString(R.string.message)));
 			}
 		});
 
 		//
-		((TextView) mRootView.findViewById(R.id.description)).setText(args.mTitle);
+		((TextView) mRootView.findViewById(R.id.description)).setText(mArgs.mTitle);
 		//
 		mStatus = (TextView) mRootView.findViewById(R.id.status);
 		
@@ -291,7 +266,7 @@ public class PageDetail extends Page {
 
 			@Override
 			public void onComplete(ActivityData data) {
-				mCacheManager.setActivity(args.mID, data);
+				mCacheManager.setActivity(mArgs.mID, data);
 				updateActivity(data, true);
 			}
 
@@ -300,16 +275,24 @@ public class PageDetail extends Page {
 				mStatus.setText(R.string.server_error);
 
 			}
-		}, args.mID);
-		mGateway.userActionActivity(args.mID);
+		}, mArgs.mID);
+		mGateway.userActionActivity(mArgs.mID);
 		//
 		mImage = (SimpleDraweeView) mRootView.findViewById(R.id.cover);
 		int width, height;
 		width = height = (int) (mRes.getDisplayMetrics().density * 115);
-		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(args.mPicture)).setResizeOptions(new ResizeOptions(width, height)).setLocalThumbnailPreviewsEnabled(true)
+		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(mArgs.mPicture)).setResizeOptions(new ResizeOptions(width, height)).setLocalThumbnailPreviewsEnabled(true)
 				.setProgressiveRenderingEnabled(true).build();
 		DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(mImage.getController()).build();
 		mImage.setController(controller);
+		//
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				mFriendsIntent = getFriendsIntent();
+				return null;
+			}
+		}.execute();
 		// data
 
 		((TextView) mRootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);
@@ -352,10 +335,72 @@ public class PageDetail extends Page {
 		footer.setLayoutParams(lp);
 		
 
-		updateActivity(mCacheManager.getActivity(args.mID), true);
+		updateActivity(mCacheManager.getActivity(mArgs.mID), true);
 
 		return mRootView;
 	}
+	
+	private Intent getFriendsIntent(){
+		Intent ret = null;
+		try {
+			URL url = new URL(mArgs.mPicture);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setDoInput(true);
+			connection.connect();
+			InputStream input = connection.getInputStream();
+			final BitmapFactory.Options options = new BitmapFactory.Options();
+			int width = (int) (mRes.getDisplayMetrics().density * 115);
+			options.inSampleSize = calculateInSampleSize(options, width, width);
+			options.inPreferredConfig = Bitmap.Config.RGB_565;
+			
+			Bitmap immutableBpm = BitmapFactory.decodeStream(input, null, options);
+			Bitmap mutableBitmap = immutableBpm.copy(Bitmap.Config.RGB_565, true);
+
+			String path = Images.Media.insertImage(mActivity.getContentResolver(), mutableBitmap, "", null);
+			Uri uri = Uri.parse(path);
+			if (mWechat == null) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.wechat.com"));
+				ret = browserIntent;
+			} else {
+				Intent intent = new Intent();
+				intent.setComponent(new ComponentName(mWechat.activityInfo.packageName, "com.tencent.mm.ui.tools.ShareToTimeLineUI"));
+				intent.setAction(Intent.ACTION_SEND);
+				intent.setType("image/*");
+				intent.putExtra(Intent.EXTRA_STREAM, uri);
+				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
+				intent.setPackage(mWechat.activityInfo.packageName);
+				ret = intent;
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    // Raw height and width of image
+    final int height = options.outHeight;
+    final int width = options.outWidth;
+    int inSampleSize = 1;
+
+    if (height > reqHeight || width > reqWidth) {
+
+        final int halfHeight = height / 2;
+        final int halfWidth = width / 2;
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while ((halfHeight / inSampleSize) > reqHeight
+                && (halfWidth / inSampleSize) > reqWidth) {
+            inSampleSize *= 2;
+        }
+    }
+
+    return inSampleSize;
+}
 	
 	private void updateActivity(ActivityData data, boolean hideStatus) {
 		if (data == null) {
