@@ -1,6 +1,7 @@
 package com.tongle;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -15,11 +16,15 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
@@ -39,12 +44,14 @@ public class MainActivity extends Activity {
 	private Handler mHandler;
 	private LocationManager mLocationMgr;
 	private LocationListener mLocationListener;
+	// Data
 	private Geocoder mGeocoder;
 	private Location mLocation;
 	private Address mAddress;
 	private String mIMEI;
 	private AccountManager mAccountManager;
     private Bundle mAccountInfo; 
+    private List<ResolveInfo> mShareApps;
     // Action Bar
     private ActionBar mActionBar;
     private TextView mTitleTextView;
@@ -81,7 +88,16 @@ public class MainActivity extends Activity {
 		m_DeviceHeight = getResources().getDisplayMetrics().heightPixels;
 		mHandler = new Handler();
 		
-		
+		new AsyncTask<Void, Void, Void>(){
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				PackageManager pm = getPackageManager();
+			    Intent sendIntent = new Intent(Intent.ACTION_SEND);     
+			    sendIntent.setType("text/plain");
+			    mShareApps = pm.queryIntentActivities(sendIntent, 0);
+				return null;
+			}}.execute();
 
 		// location manager
 		mLocationMgr = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -160,6 +176,10 @@ public class MainActivity extends Activity {
 		return mAccountInfo;
 	}
 	
+	public List<ResolveInfo> getShareList(){
+		return mShareApps;
+	}
+	
 	public void initActionBar(String title){
 		mTitleTextView = (TextView) mTitleBar.findViewById(R.id.title);
 		mTitleBarLeftImg =  (ImageView) mTitleBar.findViewById(R.id.left_img);
@@ -174,6 +194,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		mTitleBarRightEdit = (EditText) mTitleBar.findViewById(R.id.right_txt);
+		mTitleBarRightEdit.setVisibility(View.GONE);
 		mActionBar.show();
 		mTitleTextView.setText(title);
 	}
