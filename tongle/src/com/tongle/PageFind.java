@@ -2,10 +2,8 @@ package com.tongle;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -32,9 +30,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.AdapterView.OnItemClickListener;
@@ -50,19 +53,25 @@ import android.widget.TextView;
 
 public class PageFind extends Page {
 	//
-	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
+	private LeyuAdapter mLeyuAdapter;
 	// search args
 	private String mArea, mDate, mCategory;
 	// Calendar
-	public GregorianCalendar mMonth, mItemMonth;// calendar instances.
-	public CalendarAdapter mAdapter;// adapter instance
-	public Handler mHandler;// for grabbing some event values for showing the dot  marker.
-	public ArrayList<String> mItems; // container to store calendar items which needs showing the event marker
+	private View mCalendarView;
+	private GregorianCalendar mMonth, mItemMonth;// calendar instances.
+	private CalendarAdapter mAdapter;// adapter instance
+	private Handler mHandler;// for grabbing some event values for showing the dot  marker.
+	private ArrayList<String> mItems; // container to store calendar items which needs showing the event marker
 	private ArrayList<String> mEvent;
 	private LinearLayout mLayout;
 	private ArrayList<String> mDesc;
 	private TextView mCalendarText;
-	private String mDateSelected, mToday;
+	private String mDateSelected, mToday, mKeyword;
+	private int duration = 300, mOffset;
+	//
+	private EditText mRightEdit;
+	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
+	private List<ActivityLiteData> m_DataShow = new ArrayList<ActivityLiteData>();
 	// Data
 
 	@Override
@@ -138,33 +147,40 @@ public class PageFind extends Page {
 		
 		//calendar
 		final View calendar = mRootView.findViewById(R.id.calendar);
-		final View calendarView = mRootView.findViewById(R.id.calendar_view);
+		mCalendarView = mRootView.findViewById(R.id.calendar_view);
+		final GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
+		
+		gridview.setOnTouchListener(new OnSwipeTouchListener(mActivity) {
+
+			public void onSwipeTop() {
+				closeCaleandar();
+			}
+
+			public void onSwipeRight() {
+				setPreviousMonth();
+				refreshCalendar();
+			}
+
+			public void onSwipeLeft() {
+				setNextMonth();
+				refreshCalendar();
+			}
+
+			public void onSwipeBottom() {
+			}
+		});
 		mCalendarText = (TextView) mRootView.findViewById(R.id.calendar_text);
 		
 		OnClickListener clickCalendar = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				int offset = -getDeviceHeight() / 3;
+				mOffset = -getDeviceHeight() / 3;
 				int duration = 300;
-				if (calendarView.getVisibility() == View.VISIBLE) {
-					calendarView.animate().translationY(offset).alpha(0.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							calendarView.setTranslationY(0);
-							calendarView.setVisibility(View.GONE);
-						}
-					});
+				if (mCalendarView.getVisibility() == View.VISIBLE) {
+					closeCaleandar();
 				} else {
-					calendarView.setVisibility(View.VISIBLE);
-					calendarView.setAlpha(0.0f);
-					calendarView.setTranslationY(offset);
-					calendarView.animate().translationY(0).alpha(1.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							calendarView.setVisibility(View.VISIBLE);
-						}
-					});
+					openCaleandar();
 				}
 			}
 		};
@@ -179,8 +195,6 @@ public class PageFind extends Page {
 		mItems = new ArrayList<String>();
 
 		mAdapter = new CalendarAdapter(mActivity, mMonth);
-
-		GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
 		gridview.setAdapter(mAdapter);
 		
 		mCalendarText.setText(getString(R.string.today));
@@ -227,7 +241,7 @@ public class PageFind extends Page {
 				((CalendarAdapter) parent.getAdapter()).setToday();
 				String selectedGridDate = CalendarAdapter.dayString.get(position);
 				mDateSelected = selectedGridDate;
-				Log.d("charles", "mToday: " + mToday + " mDateSelected: " + mDateSelected);
+				Log.d(TAG, "mToday: " + mToday + " mDateSelected: " + mDateSelected);
 				if (mDateSelected.equals(mToday)) {
 					mCalendarText.setText(getString(R.string.today));
 				} else {
@@ -274,9 +288,29 @@ public class PageFind extends Page {
 
 		initActionBar("");
 		updateTitlebarLeftImg(R.drawable.logo_s);
-		EditText rightEdit = getTitleBarRightEdit();
-		rightEdit.setVisibility(View.VISIBLE);
-		rightEdit.setHint(R.string.keyword_find);
+		mRightEdit = getTitleBarRightEdit();
+		mRightEdit.setVisibility(View.VISIBLE);
+		mRightEdit.setHint(R.string.keyword_find);
+		mRightEdit.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {				
+			}
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				mKeyword = s.toString();
+				m_DataShow.clear();
+				for (ActivityLiteData item : m_Data) {
+					if (item.mTitle.contains(mKeyword)) {
+						m_DataShow.add(item);
+					}
+				}
+				if (mLeyuAdapter != null) {
+					mLeyuAdapter.notifyDataSetChanged();
+				}
+			}
+			@Override
+			public void afterTextChanged(Editable s) {
+			}});
 		return mRootView;
 	}
 	
@@ -353,7 +387,32 @@ public class PageFind extends Page {
 		mArea = null;
 	}
 	
+	private void closeCaleandar() {
+		mCalendarView.animate().translationY(mOffset).alpha(0.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				mCalendarView.setTranslationY(0);
+				mCalendarView.setVisibility(View.GONE);
+			}
+		});
+	}
+
+	private void openCaleandar() {
+		mCalendarView.setVisibility(View.VISIBLE);
+		mCalendarView.setAlpha(0.0f);
+		mCalendarView.setTranslationY(mOffset);
+		mCalendarView.animate().translationY(0).alpha(1.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				mCalendarView.setVisibility(View.VISIBLE);
+			}
+		});
+	}
+	
 	private void update() {
+		if (mRightEdit != null) {
+			mRightEdit.setText(null);
+		}
 		// get server data
 		Gateway gateway = GatewayImpl.getInstance();
 		gateway.searchActivityMoreData(new searchListener() {
@@ -366,6 +425,7 @@ public class PageFind extends Page {
 				List<ActivityLiteData> data = searchData.mActivitys;
 				if (data == null || data.size() == 0) {
 					m_Data.clear();
+					m_DataShow.clear();
 					showList(data);
 				} else {
 					showList(data);
@@ -381,6 +441,7 @@ public class PageFind extends Page {
 	
 	private void showList(List<ActivityLiteData> data){
 		m_Data = data;
+		m_DataShow = new ArrayList<ActivityLiteData>(m_Data);
 		
 		ListView list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
@@ -389,7 +450,8 @@ public class PageFind extends Page {
 				(int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
 		list.addFooterView(footer);
-		list.setAdapter(new LeyuAdapter());
+		mLeyuAdapter = new LeyuAdapter();
+		list.setAdapter(mLeyuAdapter);
 	}
 	
 	protected void setNextMonth() {
@@ -473,7 +535,7 @@ public class PageFind extends Page {
 		@Override
 		public int getCount() {
 			// TODO Auto-generated method stub
-			return m_Data.size();
+			return m_DataShow.size();
 		}
 
 		@Override
@@ -490,7 +552,7 @@ public class PageFind extends Page {
 
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			if (m_Data.get(position)==null){//m_Data.get(position).mType == 1) {
+			if (m_DataShow.get(position)==null){//m_Data.get(position).mType == 1) {
 				Holder02 holder = new Holder02();
 				if (convertView == null || convertView.getTag() == null
 						|| ((Holder) convertView.getTag()).mType != 1) {
@@ -506,7 +568,7 @@ public class PageFind extends Page {
 					holder = (Holder02) convertView.getTag();
 				}
 				for (TextView title : holder.mTitles) {
-					title.setText(m_Data.get(position).mTitle);
+					title.setText(m_DataShow.get(position).mTitle);
 				}
 				String uriBase = "http://www.sucaifengbao.com/uploadfile/photo/meinvtupianbizhi/meinvtupianbizhi_813_";
 				DecimalFormat df = new DecimalFormat("'0'.jpg");
@@ -530,7 +592,7 @@ public class PageFind extends Page {
 					public void onClick(View v) {
 						Fragment event = new PageDetail();
 						Bundle bundle = new Bundle();
-						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mID, uri.toString(), m_Data.get(position).mTitle, null)));
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_DataShow.get(position).mID, uri.toString(), m_DataShow.get(position).mTitle, null)));
 						event.setArguments(bundle);
 						jumpPage(event, TAG);;
 						
@@ -551,9 +613,10 @@ public class PageFind extends Page {
 				} else {
 					holder = (Holder01) convertView.getTag();
 				}
+				String title = m_DataShow.get(position).mTitle;
 
-				holder.mTitle.setText(m_Data.get(position).mTitle);
-				final Uri uri = Uri.parse(m_Data.get(position).mPicture);
+				holder.mTitle.setText(title);
+				final Uri uri = Uri.parse(m_DataShow.get(position).mPicture);
 				//
 				int width, height;
 				width = height = (int) (mRes.getDisplayMetrics().density * 115);
@@ -572,7 +635,7 @@ public class PageFind extends Page {
 					public void onClick(View v) {
 						Fragment event = new PageDetail();
 						Bundle bundle = new Bundle();
-						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_Data.get(position).mID, uri.toString(), m_Data.get(position).mTitle, null)));
+						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_DataShow.get(position).mID, uri.toString(), m_DataShow.get(position).mTitle, null)));
 						event.setArguments(bundle);
 						jumpPage(event, TAG);;
 						

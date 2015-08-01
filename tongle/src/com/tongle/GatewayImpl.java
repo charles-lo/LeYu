@@ -43,7 +43,7 @@ public class GatewayImpl implements Gateway{
 		sCookie.clear();
 		sCookie.add(token);
 		if (!TextUtils.isEmpty(imei)) {
-			sCookie.add("IMEI=" + sIMEI);
+			sCookie.add("device-id=" + sIMEI);
 		}
 	}
 	
@@ -269,7 +269,7 @@ public class GatewayImpl implements Gateway{
 		String url = baseUrl + "FilterActivity?beginDate=" + beginDate + "&endDate=" + endDate;
 		if(!TextUtils.isEmpty(category)){
 			try {
-				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+				url = url + "&category=" +  URLEncoder.encode(category, "utf-8");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -337,7 +337,7 @@ public class GatewayImpl implements Gateway{
 		String url = baseUrl + "FilterActivity?isFree=true";
 		if(!TextUtils.isEmpty(category)){
 			try {
-				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+				url = url + "&category=" +  URLEncoder.encode(category, "utf-8");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -405,7 +405,7 @@ public class GatewayImpl implements Gateway{
 		String url = baseUrl + "FilterActivity";// + area;
 		if(!TextUtils.isEmpty(category)){
 			try {
-				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+				url = url + "&category=" +  URLEncoder.encode(category, "utf-8");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -476,7 +476,7 @@ public class GatewayImpl implements Gateway{
 		String url = baseUrl + "FilterActivity?lon=" + location.getLongitude() + "&lat=" + location.getLatitude();
 		if(!TextUtils.isEmpty(category)){
 			try {
-				url += url + "&category=" +  URLEncoder.encode(category, "utf-8");
+				url = url + "&category=" +  URLEncoder.encode(category, "utf-8");
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -1091,8 +1091,9 @@ public class GatewayImpl implements Gateway{
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("Content-length", "0");
 				connection.setRequestProperty("content-type", "application/x-www-form-urlencoded; charset=utf-8");
-				String tmp = TextUtils.join(",", sCookie);
-				connection.setRequestProperty("Cookie", TextUtils.join(",", sCookie));
+				String cookie = TextUtils.join("; ", sCookie);
+				Log.d(TAG, "cookie " + cookie);
+				connection.setRequestProperty("Cookie", cookie);
 				connection.setUseCaches(false);
 				connection.setAllowUserInteraction(false);
 				connection.setConnectTimeout(timeout);

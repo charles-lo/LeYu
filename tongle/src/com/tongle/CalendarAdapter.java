@@ -24,6 +24,9 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -154,22 +157,33 @@ public class CalendarAdapter extends BaseAdapter {
 
 	public View setSelected(View view) {
 		if (previousView != null) {
-			previousView.setBackgroundResource(R.drawable.list_item_background);
+			ImageView preIV = (ImageView) previousView.findViewById(R.id.date_select);
+			preIV.setImageDrawable(null);
 		}
 		previousView = view;
-		view.setBackgroundResource(R.drawable.calendar_month_circle_selected);
+		ImageView IV = (ImageView) view.findViewById(R.id.date_select);
+		ShapeDrawable sd = new ShapeDrawable(new OvalShape());
+		sd.setIntrinsicHeight(90);
+		sd.setIntrinsicWidth(90);
+		sd.getPaint().setColor(Color.parseColor("#ff0000"));
+		IV.setImageDrawable(sd);
 		return view;
 	}
 	
 	public void setToday() {
 		if (today != null) {
-			today.setBackgroundResource(R.drawable.calendar_month_circle_today);
+			ImageView IV = (ImageView) today.findViewById(R.id.date_select);
+			IV.setImageResource(R.drawable.ring);
 		}
 		return;
 	}
 
 	public void refreshDays() {
 		// clear items
+		if (today != null) {
+			ImageView IV = (ImageView) today.findViewById(R.id.date_select);
+			IV.setImageDrawable(null);
+		}
 		items.clear();
 		dayString.clear();
 		pmonth = (GregorianCalendar) month.clone();
