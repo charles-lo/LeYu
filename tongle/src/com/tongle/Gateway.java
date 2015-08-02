@@ -48,7 +48,7 @@ public interface Gateway {
 	
 	void searchActivity(searchListener listener, String area, String date, String category);
 	
-	void searchActivityMoreData(searchListener listener, String area, Location location, String date, String category);
+	void searchActivityMoreData(searchListener listener, String area, Location location, String date, String category, String type);
 	
 	//
 	public interface MainPageDataListener {
@@ -170,6 +170,8 @@ public interface Gateway {
 		String mPlace;
 		String mPrice;
 		String mAddress;
+		String mTel;
+		String mWebSite;
 		String mOrganizer;
 		String mDescription;
 		int mPhysical;

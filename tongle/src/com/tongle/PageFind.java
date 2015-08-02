@@ -31,16 +31,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TabHost.TabContentFactory;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -49,19 +49,31 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
 
 public class PageFind extends Page {
 	//
 	private LeyuAdapter mLeyuAdapter;
 	// search args
-	private String mArea, mDate, mCategory;
+	private String mArea, mDate, mCategory, mType;
+	private boolean mNear = true;
+	// tab
+	private List<View> tabs = new ArrayList<View>();
+	private View mTabView;
+	private TabHost mTabHost;
+	private List<String> mCategorys = new ArrayList<String>();
+	private LayoutInflater mInflater;
+	private boolean mTabInitilized;
+	private Runnable mHideTabsRunnable;
 	// Calendar
 	private View mCalendarView;
 	private GregorianCalendar mMonth, mItemMonth;// calendar instances.
 	private CalendarAdapter mAdapter;// adapter instance
-	private Handler mHandler;// for grabbing some event values for showing the dot  marker.
-	private ArrayList<String> mItems; // container to store calendar items which needs showing the event marker
+	private Handler mHandler;// for grabbing some event values for showing the
+								// dot marker.
+	private ArrayList<String> mItems; // container to store calendar items which
+										// needs showing the event marker
 	private ArrayList<String> mEvent;
 	private LinearLayout mLayout;
 	private ArrayList<String> mDesc;
@@ -72,19 +84,22 @@ public class PageFind extends Page {
 	private EditText mRightEdit;
 	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
 	private List<ActivityLiteData> m_DataShow = new ArrayList<ActivityLiteData>();
+
 	// Data
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mInflater = inflater;
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
-		mActivity.hideActionBar();
 		
+		mActivity.hideActionBar();
+
 		updateTypeList(mCacheManager.getTypeList());
 		mGateway.getTypeList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
-				if(!isAdded()){
+				if (!isAdded()) {
 					return;
 				}
 				mCacheManager.setTypeList(data);
@@ -98,13 +113,16 @@ public class PageFind extends Page {
 
 			}
 		});
+		
+		getCategoryList();
+		
 		updateTypeList(mCacheManager.getAreaList());
 		mGateway.getAreaList(new ListListener() {
 
 			@Override
 			public void onComplete(List<String> data) {
 				//
-				if(!isAdded()){
+				if (!isAdded()) {
 					return;
 				}
 				mCacheManager.setAreaList(data);
@@ -118,7 +136,6 @@ public class PageFind extends Page {
 
 			}
 		});
-		
 		//
 		((TextView) mRootView.findViewById(R.id.center)).setTextColor(mRes.getColor(R.color.red));
 		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
@@ -139,17 +156,16 @@ public class PageFind extends Page {
 		ListView list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
 		ViewGroup footer = new LinearLayout(mActivity);
-		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				(int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
+		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
 		list.addFooterView(footer);
 		list.setAdapter(new LeyuAdapter());
-		
-		//calendar
+
+		// calendar
 		final View calendar = mRootView.findViewById(R.id.calendar);
 		mCalendarView = mRootView.findViewById(R.id.calendar_view);
 		final GridView gridview = (GridView) mRootView.findViewById(R.id.gridview);
-		
+
 		gridview.setOnTouchListener(new OnSwipeTouchListener(mActivity) {
 
 			public void onSwipeTop() {
@@ -170,7 +186,7 @@ public class PageFind extends Page {
 			}
 		});
 		mCalendarText = (TextView) mRootView.findViewById(R.id.calendar_text);
-		
+
 		OnClickListener clickCalendar = new OnClickListener() {
 
 			@Override
@@ -187,7 +203,6 @@ public class PageFind extends Page {
 		calendar.setOnClickListener(clickCalendar);
 		mCalendarText.setOnClickListener(clickCalendar);
 
-
 		mLayout = (LinearLayout) mRootView.findViewById(R.id.text);
 		mMonth = (GregorianCalendar) GregorianCalendar.getInstance();
 		mItemMonth = (GregorianCalendar) mMonth.clone();
@@ -196,11 +211,11 @@ public class PageFind extends Page {
 
 		mAdapter = new CalendarAdapter(mActivity, mMonth);
 		gridview.setAdapter(mAdapter);
-		
+
 		mCalendarText.setText(getString(R.string.today));
 		mDateSelected = mToday = mDate = mAdapter.curentDateString;
 		update();
-		
+
 		mHandler = new Handler();
 		mHandler.post(calendarUpdater);
 
@@ -230,8 +245,7 @@ public class PageFind extends Page {
 		});
 
 		gridview.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View v,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				// removing the previous view if added
 				if (((LinearLayout) mLayout).getChildCount() > 0) {
 					((LinearLayout) mLayout).removeAllViews();
@@ -248,8 +262,7 @@ public class PageFind extends Page {
 					mCalendarText.setText(selectedGridDate);
 				}
 				String[] separatedTime = selectedGridDate.split("/");
-				String gridvalueString = separatedTime[2].replaceFirst("^0*",
-						"");// taking last part of date. ie; 2 from 2012-12-02.
+				String gridvalueString = separatedTime[2].replaceFirst("^0*", "");
 				int gridvalue = Integer.parseInt(gridvalueString);
 				// navigate to next or previous month on clicking offdays.
 				if ((gridvalue > 10) && (position < 8)) {
@@ -280,7 +293,7 @@ public class PageFind extends Page {
 					}
 				}
 				mDesc = null;
-				
+
 				mDate = mDateSelected;
 				update();
 			}
@@ -293,8 +306,9 @@ public class PageFind extends Page {
 		mRightEdit.setHint(R.string.keyword_find);
 		mRightEdit.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {				
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				mKeyword = s.toString();
@@ -308,12 +322,14 @@ public class PageFind extends Page {
 					mLeyuAdapter.notifyDataSetChanged();
 				}
 			}
+
 			@Override
 			public void afterTextChanged(Editable s) {
-			}});
+			}
+		});
 		return mRootView;
 	}
-	
+
 	private void updateTypeList(List<String> data) {
 		data.add(0, getString(R.string.all_category));
 		final View category = mRootView.findViewById(R.id.category);
@@ -331,10 +347,19 @@ public class PageFind extends Page {
 						categoryText.setText(data);
 						if (which == 0) {
 							mCategory = null;
+							mTabView.setVisibility(View.GONE);
 						} else {
 							mCategory = data;
-						}
+							mTabView.setVisibility(View.VISIBLE);
+							mHideTabsRunnable = new Runnable() {
 
+								@Override
+								public void run() {
+									mTabView.setVisibility(View.GONE);
+								}
+							};
+							getHandler().postDelayed(mHideTabsRunnable, 3000);
+						}
 						dialog.dismiss();
 						update();
 					}
@@ -348,7 +373,113 @@ public class PageFind extends Page {
 		categoryText.setText(text);
 		mCategory = null;
 	}
-	
+
+	private void getCategoryList() {
+		mCategorys = mCacheManager.getCategoryList();
+		mGateway.getCategoryList(new ListListener() {
+
+			@Override
+			public void onComplete(List<String> data) {
+				if (!isAdded()) {
+					return;
+				}
+				mCacheManager.setCategoryList(data);
+				mCategorys = data;
+				updateTabs();
+			}
+
+			@Override
+			public void onError() {
+			}
+		});
+	}
+
+	private void updateTabs() {
+		if (mCategorys == null || mCategorys.size() == 0) {
+			return;
+		}
+		mTabView = mRootView.findViewById(R.id.tab);
+		mTabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
+		mTabHost.setup();
+		int len = mCategorys.size();
+		View tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
+		tabs.add(tabIndicator);
+		final TextView tvTab = (TextView) tabIndicator.findViewById(R.id.tab_title);
+		tvTab.setText(getString(R.string.all));
+		mTabHost.addTab(mTabHost.newTabSpec("").setIndicator(tabIndicator).setContent(new TabContentFactory() {
+
+			@Override
+			public View createTabContent(String tag) {
+				TextView tv = new TextView(mActivity);
+				tv.setText("The Text of " + tag);
+				return tv;
+			}
+		}));
+		for (int i = 0; i < len; i++) {
+			tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
+			tabs.add(tabIndicator);
+			TextView tvTab1 = (TextView) tabIndicator.findViewById(R.id.tab_title);
+			tvTab1.setText(mCategorys.get(i));
+			mTabHost.addTab(mTabHost.newTabSpec(mCategorys.get(i)).setIndicator(tabIndicator).setContent(new TabContentFactory() {
+
+				@Override
+				public View createTabContent(String tag) {
+					TextView tv = new TextView(mActivity);
+					tv.setText("The Text of " + tag);
+					return tv;
+				}
+			}));
+		}
+
+		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
+			@Override
+			public void onTabChanged(String tabId) {
+				mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
+					@Override
+					public void onTabChanged(String tabId) {
+
+						if (mTabInitilized) {
+							mType = tabId;
+							if (mHideTabsRunnable != null) {
+								getHandler().removeCallbacks(mHideTabsRunnable);
+							}
+							update();
+						}
+						if (mTabHost.getCurrentTabView().findViewById(R.id.tab_title) != null && TextUtils.isEmpty(((TextView) mTabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())) {
+							return;
+						}
+						for (View tab : tabs) {
+							if (mTabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
+								tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
+								((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes.getColor(R.color.footer));
+							}
+						}
+						if (mTabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
+							mTabHost.getCurrentTabView().findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
+							((TextView) mTabHost.getCurrentTabView().findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
+						}
+					}
+				});
+
+			}
+		});
+
+		for (View tab : tabs) {
+			tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
+			tab.performClick();
+		}
+		for (View tab : tabs) {
+			if (mTabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
+				tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
+				((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes.getColor(R.color.footer));
+			}
+		}
+		mTabHost.setCurrentTab(0);
+		tabs.get(0).findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
+		((TextView) tabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
+		mTabInitilized = true;
+	}
+
 	private void updateAreaList(final List<String> data) {
 		final View regions = mRootView.findViewById(R.id.region);
 		final TextView regionsText = (TextView) mRootView.findViewById(R.id.region_text);
@@ -368,10 +499,13 @@ public class PageFind extends Page {
 						regionsText.setText(region);
 						if (which == 0) {
 							mArea = null;
+							mNear = true;
 						} else if (which == data.size() - 1) {
 							mArea = null;
+							mNear = false;
 						} else {
 							mArea = region;
+							mNear = false;
 						}
 
 						dialog.dismiss();
@@ -386,7 +520,7 @@ public class PageFind extends Page {
 		regionsText.setText(region);
 		mArea = null;
 	}
-	
+
 	private void closeCaleandar() {
 		mCalendarView.animate().translationY(mOffset).alpha(0.0f).setDuration(duration).setListener(new AnimatorListenerAdapter() {
 			@Override
@@ -408,7 +542,7 @@ public class PageFind extends Page {
 			}
 		});
 	}
-	
+
 	private void update() {
 		if (mRightEdit != null) {
 			mRightEdit.setText(null);
@@ -419,7 +553,7 @@ public class PageFind extends Page {
 
 			@Override
 			public void onComplete(SearchData searchData) {
-				if(!isAdded()){
+				if (!isAdded()) {
 					return;
 				}
 				List<ActivityLiteData> data = searchData.mActivitys;
@@ -436,48 +570,41 @@ public class PageFind extends Page {
 			public void onError() {
 
 			}
-		},mArea, getLocation(), mDate, mCategory);
+		}, mArea, mNear ? getLocation() : null, mDate, mCategory, mType);
 	}
-	
-	private void showList(List<ActivityLiteData> data){
+
+	private void showList(List<ActivityLiteData> data) {
 		m_Data = data;
 		m_DataShow = new ArrayList<ActivityLiteData>(m_Data);
-		
+
 		ListView list = ((ListView) mRootView.findViewById(R.id.list));
 		list.setDivider(null);
 		ViewGroup footer = new LinearLayout(mActivity);
-		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				(int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
+		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (46.67 * PageFind.this.getResources().getDisplayMetrics().density));
 		footer.setLayoutParams(lp);
 		list.addFooterView(footer);
 		mLeyuAdapter = new LeyuAdapter();
 		list.setAdapter(mLeyuAdapter);
 	}
-	
+
 	protected void setNextMonth() {
-		if (mMonth.get(GregorianCalendar.MONTH) == mMonth
-				.getActualMaximum(GregorianCalendar.MONTH)) {
-			mMonth.set((mMonth.get(GregorianCalendar.YEAR) + 1),
-					mMonth.getActualMinimum(GregorianCalendar.MONTH), 1);
+		if (mMonth.get(GregorianCalendar.MONTH) == mMonth.getActualMaximum(GregorianCalendar.MONTH)) {
+			mMonth.set((mMonth.get(GregorianCalendar.YEAR) + 1), mMonth.getActualMinimum(GregorianCalendar.MONTH), 1);
 		} else {
-			mMonth.set(GregorianCalendar.MONTH,
-					mMonth.get(GregorianCalendar.MONTH) + 1);
+			mMonth.set(GregorianCalendar.MONTH, mMonth.get(GregorianCalendar.MONTH) + 1);
 		}
 
 	}
-	
+
 	protected void setPreviousMonth() {
-		if (mMonth.get(GregorianCalendar.MONTH) == mMonth
-				.getActualMinimum(GregorianCalendar.MONTH)) {
-			mMonth.set((mMonth.get(GregorianCalendar.YEAR) - 1),
-					mMonth.getActualMaximum(GregorianCalendar.MONTH), 1);
+		if (mMonth.get(GregorianCalendar.MONTH) == mMonth.getActualMinimum(GregorianCalendar.MONTH)) {
+			mMonth.set((mMonth.get(GregorianCalendar.YEAR) - 1), mMonth.getActualMaximum(GregorianCalendar.MONTH), 1);
 		} else {
-			mMonth.set(GregorianCalendar.MONTH,
-					mMonth.get(GregorianCalendar.MONTH) - 1);
+			mMonth.set(GregorianCalendar.MONTH, mMonth.get(GregorianCalendar.MONTH) - 1);
 		}
 
 	}
-	
+
 	public void refreshCalendar() {
 		TextView title = (TextView) mRootView.findViewById(R.id.title);
 
@@ -487,7 +614,7 @@ public class PageFind extends Page {
 
 		title.setText(android.text.format.DateFormat.format("MMMM yyyy", mMonth));
 	}
-	
+
 	public Runnable calendarUpdater = new Runnable() {
 
 		@Override
@@ -510,11 +637,10 @@ public class PageFind extends Page {
 			mAdapter.notifyDataSetChanged();
 		}
 	};
-	
+
 	//
 
 	class LeyuAdapter extends BaseAdapter {
-		
 
 		class Item {
 			int mType;
@@ -529,35 +655,31 @@ public class PageFind extends Page {
 		}
 
 		LeyuAdapter() {
-			
+
 		}
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return m_DataShow.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
 		public View getView(final int position, View convertView, ViewGroup parent) {
-			if (m_DataShow.get(position)==null){//m_Data.get(position).mType == 1) {
+			if (m_DataShow.get(position) == null) {// m_Data.get(position).mType
+													// == 1) {
 				Holder02 holder = new Holder02();
-				if (convertView == null || convertView.getTag() == null
-						|| ((Holder) convertView.getTag()).mType != 1) {
-					convertView = LayoutInflater.from(mActivity).inflate(
-							R.layout.listitem_event_02, parent, false);
+				if (convertView == null || convertView.getTag() == null || ((Holder) convertView.getTag()).mType != 1) {
+					convertView = LayoutInflater.from(mActivity).inflate(R.layout.listitem_event_02, parent, false);
 					holder.mTitles.add((TextView) convertView.findViewById(R.id.event_title_01));
 					holder.mTitles.add((TextView) convertView.findViewById(R.id.event_title_02));
 					holder.images.add((SimpleDraweeView) convertView.findViewById(R.id.event_image_01));
@@ -577,16 +699,12 @@ public class PageFind extends Page {
 				int width, height;
 				for (SimpleDraweeView image : holder.images) {
 					width = height = (int) (mRes.getDisplayMetrics().density * 115);
-					ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
-							.setResizeOptions(new ResizeOptions(width, height))
-							.setLocalThumbnailPreviewsEnabled(true)
+					ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri).setResizeOptions(new ResizeOptions(width, height)).setLocalThumbnailPreviewsEnabled(true)
 							.setProgressiveRenderingEnabled(true).build();
-					DraweeController controller = Fresco.newDraweeControllerBuilder()
-							.setImageRequest(request)
-							.setOldController(image.getController()).build();
+					DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(image.getController()).build();
 					image.setController(controller);
 				}
-				convertView.setOnClickListener(new OnClickListener(){
+				convertView.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
@@ -594,17 +712,15 @@ public class PageFind extends Page {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_DataShow.get(position).mID, uri.toString(), m_DataShow.get(position).mTitle, null)));
 						event.setArguments(bundle);
-						jumpPage(event, TAG);;
-						
-					}});
-			}
-			else{
+						jumpPage(event, TAG);
+						;
+
+					}
+				});
+			} else {
 				Holder01 holder = new Holder01();
-				if (convertView == null 
-						|| convertView.getTag() == null 
-						|| ((Holder) convertView.getTag()).mType !=0) {
-					convertView = LayoutInflater.from(mActivity).inflate(R.layout.listitem_event,
-							parent, false);
+				if (convertView == null || convertView.getTag() == null || ((Holder) convertView.getTag()).mType != 0) {
+					convertView = LayoutInflater.from(mActivity).inflate(R.layout.listitem_event, parent, false);
 					holder.mTitle = (TextView) convertView.findViewById(R.id.event_title);
 					holder.image = (SimpleDraweeView) convertView.findViewById(R.id.event_image);
 					holder.mType = 0;
@@ -620,16 +736,12 @@ public class PageFind extends Page {
 				//
 				int width, height;
 				width = height = (int) (mRes.getDisplayMetrics().density * 115);
-				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
-						.setResizeOptions(new ResizeOptions(width, height))
-						.setLocalThumbnailPreviewsEnabled(true).setProgressiveRenderingEnabled(true)
-						.build();
-				DraweeController controller = Fresco.newDraweeControllerBuilder()
-						.setImageRequest(request).setOldController(holder.image.getController())
-						.build();
+				ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri).setResizeOptions(new ResizeOptions(width, height)).setLocalThumbnailPreviewsEnabled(true)
+						.setProgressiveRenderingEnabled(true).build();
+				DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(holder.image.getController()).build();
 				holder.image.setController(controller);
 				//
-				convertView.setOnClickListener(new OnClickListener(){
+				convertView.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
@@ -637,14 +749,16 @@ public class PageFind extends Page {
 						Bundle bundle = new Bundle();
 						bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(m_DataShow.get(position).mID, uri.toString(), m_DataShow.get(position).mTitle, null)));
 						event.setArguments(bundle);
-						jumpPage(event, TAG);;
-						
-					}});
+						jumpPage(event, TAG);
+						;
+
+					}
+				});
 			}
 
 			return convertView;
 		}
-		
+
 		class Holder {
 			int mType;
 		}
@@ -660,6 +774,6 @@ public class PageFind extends Page {
 			List<SimpleDraweeView> images = new ArrayList<SimpleDraweeView>();
 			View root;
 		}
-	
+
 	}
 }

@@ -332,14 +332,14 @@ public class MainActivity extends Activity {
 	public void jumpFragment(Fragment newFragment, String tag) {
 		getFragmentManager().beginTransaction()
 				.replace(R.id.container, newFragment, tag).addToBackStack(tag)
-				.commit();
+				.commitAllowingStateLoss();
 		mFinishOnBack = false;
 	}
 	
 	public void jumpFragment(Fragment newFragment, String tag, boolean finishOnBack) {
 		getFragmentManager().beginTransaction()
 				.replace(R.id.container, newFragment, tag).addToBackStack(tag)
-				.commit();
+				.commitAllowingStateLoss();
 		mFinishOnBack = finishOnBack;
 	}
 

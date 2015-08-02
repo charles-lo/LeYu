@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,6 +44,10 @@ public class Page extends Fragment {
 	
 	public Location getLocation() {
 		return mActivity.getLocation();
+	}
+
+	public Handler getHandler() {
+		return mActivity.getHandler();
 	}
 
 	public int getDeviceHeight() {

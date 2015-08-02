@@ -342,6 +342,9 @@ public class PageDetail extends Page {
 	
 	private Intent getFriendsIntent(){
 		Intent ret = null;
+		if (!isAdded()) {
+			return ret;
+		}
 		try {
 			URL url = new URL(mArgs.mPicture);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -429,6 +432,8 @@ public class PageDetail extends Page {
 		mRootView.findViewById(R.id.holder).setVisibility(View.INVISIBLE);
 		((TextView) mRootView.findViewById(R.id.holder_value)).setText("");
 		((TextView) mRootView.findViewById(R.id.price_value)).setText(data.mPrice);
+		((TextView) mRootView.findViewById(R.id.tel_value)).setText(data.mTel);
+		((TextView) mRootView.findViewById(R.id.website_value)).setText(data.mWebSite);
 
 		final String eventDescriptionOrigin = data.mDescription;
 		if (eventDescriptionOrigin.length() > 60) {

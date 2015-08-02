@@ -16,6 +16,8 @@
     <string name="time">時間:</string>
     <string name="address">地點:</string>
     <string name="price">價錢:</string>
+    <string name="tel">電話:</string>
+    <string name="website">網址:</string>
     <string name="holder">主辦單位:</string>
     <string name="onsale_01">超級</string>
     <string name="onsale_02">優惠</string>

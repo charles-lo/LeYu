@@ -198,6 +198,12 @@ public class GatewayImpl implements Gateway{
 						if (root.has("Address")) {
 							data.mAddress = root.getString("Address");
 						}
+						if (root.has("Tel")) {
+							data.mTel = root.getString("Tel");
+						}
+						if (root.has("WebSite")) {
+							data.mWebSite = root.getString("WebSite");
+						}
 						if (root.has("Organizer")) {
 							data.mOrganizer = root.getString("Organizer");
 						}
@@ -965,7 +971,7 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
-	public void searchActivityMoreData(final searchListener listener, String area, Location location, String date, String type) {
+	public void searchActivityMoreData(final searchListener listener, String area, Location location, String date, String category, String type) {
 		String urlTool = baseUrl + "searchActivityMoreData?";
 		final String url;
 		boolean hasParameter = false;
@@ -994,6 +1000,17 @@ public class GatewayImpl implements Gateway{
 			urlTool += "beginDate=" + date;
 			hasParameter = true;
 		}
+		if (!TextUtils.isEmpty(category)) {
+			try {
+				String categoryNew = URLEncoder.encode(category, "utf-8");
+				if (hasParameter) {
+					urlTool += "&";
+				}
+				urlTool += "category=" + categoryNew;
+				hasParameter = true;
+			} catch (UnsupportedEncodingException e) {
+			}
+		}
 		if (!TextUtils.isEmpty(type)) {
 			try {
 				String typeNew = URLEncoder.encode(type, "utf-8");
@@ -1005,6 +1022,7 @@ public class GatewayImpl implements Gateway{
 			} catch (UnsupportedEncodingException e) {
 			}
 		}
+		
 		url = urlTool;
 		Log.d(TAG, "searchActivity url: " + url);
 		new AsyncTask<Void, Void, SearchData>() {

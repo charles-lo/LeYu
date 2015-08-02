@@ -198,12 +198,69 @@
                         android:textColor="@color/red_01"
                         android:textSize="@dimen/font_06" />
                 </LinearLayout>
+                
+                <LinearLayout
+                    android:id="@+id/tel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/price"
+                    android:layout_marginLeft="12.67dp"
+                    android:layout_marginTop="15dp" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="@string/tel"
+                        android:textColor="#000"
+                        android:textSize="@dimen/font_05" />
+
+                    <TextView
+                        android:id="@+id/tel_value"
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:singleLine="true"
+                        android:textColor="#000"
+                        android:textSize="@dimen/font_05" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:id="@+id/website"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tel"
+                    android:layout_marginLeft="12.67dp"
+                    android:layout_marginTop="15dp" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="@string/website"
+                        android:textColor="#000"
+                        android:textSize="@dimen/font_05" />
+
+                    <TextView
+                        android:id="@+id/website_value"
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:ellipsize="end"
+                        android:autoLink="web"
+                        android:includeFontPadding="false"
+                        android:singleLine="true"
+                        android:textColor="#000"
+                        android:textSize="@dimen/font_05" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/holder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/price"
+                    android:layout_below="@id/website"
                     android:layout_marginBottom="20dp"
                     android:layout_marginLeft="12.67dp"
                     android:layout_marginTop="15dp" >
