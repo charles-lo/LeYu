@@ -6,9 +6,9 @@
     android:thickness="1dp"
     android:useLevel="false">
     
-    <solid android:color="#FF0000" />
+    <solid android:color="@color/red_03" />
     
     <size
-        android:height="30dp"
-        android:width="30dp" />
+        android:height="31dp"
+        android:width="31dp" />
 </shape>

@@ -160,6 +160,27 @@ public class PageFind extends Page {
 		footer.setLayoutParams(lp);
 		list.addFooterView(footer);
 		list.setAdapter(new LeyuAdapter());
+		
+		
+		list.setOnTouchListener(new OnSwipeTouchListener(mActivity) {
+
+			public void onSwipeTop() {
+				Log.d(TAG, "charles Top");
+			}
+
+			public void onSwipeRight() {
+				Log.d(TAG, "charles Right");
+			}
+
+			public void onSwipeLeft() {
+				Log.d(TAG, "charles Left");
+			}
+
+			public void onSwipeBottom() {
+				Log.d(TAG, "charles Bottom");
+				showType();
+			}
+		});
 
 		// calendar
 		final View calendar = mRootView.findViewById(R.id.calendar);
@@ -350,15 +371,7 @@ public class PageFind extends Page {
 							mTabView.setVisibility(View.GONE);
 						} else {
 							mCategory = data;
-							mTabView.setVisibility(View.VISIBLE);
-							mHideTabsRunnable = new Runnable() {
-
-								@Override
-								public void run() {
-									mTabView.setVisibility(View.GONE);
-								}
-							};
-							getHandler().postDelayed(mHideTabsRunnable, 3000);
+							showType();
 						}
 						dialog.dismiss();
 						update();
@@ -374,6 +387,21 @@ public class PageFind extends Page {
 		mCategory = null;
 	}
 
+	private void showType() {
+		if (mHideTabsRunnable != null) {
+			getHandler().removeCallbacks(mHideTabsRunnable);
+		}
+		mTabView.setVisibility(View.VISIBLE);
+		mHideTabsRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				mTabView.setVisibility(View.GONE);
+			}
+		};
+		getHandler().postDelayed(mHideTabsRunnable, 5000);
+	}
+	
 	private void getCategoryList() {
 		mCategorys = mCacheManager.getCategoryList();
 		mGateway.getCategoryList(new ListListener() {
@@ -440,9 +468,7 @@ public class PageFind extends Page {
 
 						if (mTabInitilized) {
 							mType = tabId;
-							if (mHideTabsRunnable != null) {
-								getHandler().removeCallbacks(mHideTabsRunnable);
-							}
+							showType();
 							update();
 						}
 						if (mTabHost.getCurrentTabView().findViewById(R.id.tab_title) != null && TextUtils.isEmpty(((TextView) mTabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())) {
