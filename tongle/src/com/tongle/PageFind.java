@@ -246,7 +246,7 @@ public class PageFind extends Page {
 		mHandler = new Handler();
 		mHandler.post(calendarUpdater);
 
-		TextView title = (TextView) mRootView.findViewById(R.id.title);
+		TextView title = (TextView) mRootView.findViewById(R.id.calendar_title);
 		title.setText(android.text.format.DateFormat.format("MMMM yyyy", mMonth));
 
 		RelativeLayout previous = (RelativeLayout) mRootView.findViewById(R.id.previous);
@@ -655,7 +655,7 @@ public class PageFind extends Page {
 	}
 
 	public void refreshCalendar() {
-		TextView title = (TextView) mRootView.findViewById(R.id.title);
+		TextView title = (TextView) mRootView.findViewById(R.id.calendar_title);
 
 		mAdapter.refreshDays();
 		mAdapter.notifyDataSetChanged();
