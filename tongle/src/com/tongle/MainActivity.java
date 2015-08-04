@@ -59,6 +59,10 @@ public class MainActivity extends Activity {
     private View mTitleBarLeft;
     private ImageView mTitleBarLeftImg;
     private EditText mTitleBarRightEdit;
+    // page 
+    public PageRecommand mPageRecommand = new PageRecommand();
+    public PageFind mPageFind = new PageFind();
+    public PageMine mPageMine = new PageMine();
 	
 	static private final String TAG = MainActivity.class.getSimpleName();
 
@@ -107,7 +111,7 @@ public class MainActivity extends Activity {
 		//
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PageRecommand(), PageRecommand.TAG).commit();
+					.add(R.id.container, mPageRecommand, PageRecommand.TAG).commit();
 		}
 	}
 	
@@ -316,11 +320,22 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		mActionBar.hide();
 		if (mFinishOnBack || !getFragmentManager().popBackStackImmediate()) {
 			finish();
 		}
 	}
+	
+    public void switchContent(Fragment from, Fragment to) {
+//        if (mContent != to) {
+//            mContent = to;
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            if (!to.isAdded()) {    // 先判断是否被add过
+                transaction.hide(from).add(R.id.container, to).commit(); // 隐藏当前的fragment，add下一个到Activity中
+            } else {
+                transaction.hide(from).show(to).commit(); // 隐藏当前的fragment，显示下一个
+            }
+//        }
+    }
 	
 	public void replaceFragment(String newTag, Fragment newFrg) {
 		getFragmentManager().popBackStackImmediate();

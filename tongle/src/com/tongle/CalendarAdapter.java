@@ -163,8 +163,8 @@ public class CalendarAdapter extends BaseAdapter {
 		previousView = view;
 		ImageView IV = (ImageView) view.findViewById(R.id.date_select);
 		ShapeDrawable sd = new ShapeDrawable(new OvalShape());
-		sd.setIntrinsicHeight(92);
-		sd.setIntrinsicWidth(92);
+		sd.setIntrinsicHeight(98);
+		sd.setIntrinsicWidth(98);
 		sd.getPaint().setColor(mContext.getResources().getColor(R.color.red_03));
 		IV.setImageDrawable(sd);
 		return view;

@@ -12,45 +12,53 @@
         android:background="@drawable/calendar_month_title" >
 
         <RelativeLayout
-            android:id="@+id/previous"
-            android:layout_width="40dip"
-            android:layout_height="30dip"
-            android:layout_toLeftOf="@+id/title" >
+            android:id="@+id/title_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
-            <ImageView
+            <RelativeLayout
+                android:id="@+id/previous"
+                android:layout_width="40dip"
+                android:layout_height="30dip"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/title" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/footprint_left_arrow" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:background="@drawable/footprint_left_arrow" />
-        </RelativeLayout>
+                android:layout_marginTop="5dip"
+                android:textColor="#000000"
+                android:textSize="18dip"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dip"
-            android:textColor="#000000"
-            android:textSize="18dip"
-            android:textStyle="bold" />
+            <RelativeLayout
+                android:id="@+id/next"
+                android:layout_width="40dip"
+                android:layout_height="30dip"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/title" >
 
-        <RelativeLayout
-            android:id="@+id/next"
-            android:layout_width="40dip"
-            android:layout_height="30dip"
-            android:layout_toRightOf="@id/title" >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@drawable/footprint_arrow" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/footprint_arrow" />
+            </RelativeLayout>
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title" >
+            android:layout_below="@+id/title_parent" >
 
             <TextView
                 android:layout_width="wrap_content"

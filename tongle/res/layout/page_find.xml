@@ -4,10 +4,18 @@
     android:layout_height="match_parent"
     android:background="@android:color/white" >
 
+    <include
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="53.33dp"
+        android:layout_alignParentTop="true"
+        layout="@layout/title_bar" />
+
     <RelativeLayout
         android:id="@+id/top_menu"
         android:layout_width="match_parent"
         android:layout_height="53.33dp"
+        android:layout_below="@+id/title_bar"
         android:background="@android:color/white" >
 
         <LinearLayout
@@ -96,14 +104,15 @@
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
+
     <include
         android:id="@+id/tab"
         android:layout_width="match_parent"
         android:layout_height="37dp"
         android:layout_below="@id/top_menu"
-        android:visibility="gone"
-        layout="@layout/top_tabbar" />
-    
+        layout="@layout/top_tabbar"
+        android:visibility="gone" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

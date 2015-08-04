@@ -44,6 +44,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class PageRecommand extends Page {
+
 	static final String TAG = PageRecommand.class.getSimpleName();
 	
 	ValueAnimator mDrawerAnimator = null;
@@ -62,21 +63,20 @@ public class PageRecommand extends Page {
 		mRootView = inflater.inflate(R.layout.page_recommand, container, false);
 		mItemHeight = mRes.getDimensionPixelOffset(R.dimen.list_item_height);
 		mMax = 3 * mItemHeight;
-		mActivity.hideActionBar();
 		//
-		((TextView) mRootView.findViewById(R.id.left)).setTextColor(mRes.getColor(R.color.red));
-		mRootView.findViewById(R.id.center).setOnClickListener(new OnClickListener(){
+		((TextView) mRootView.findViewById(R.id.footer_left)).setTextColor(mRes.getColor(R.color.red));
+		mRootView.findViewById(R.id.footer_center).setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(TAG, new PageFind());
+				switchContent(mActivity.mPageRecommand, mActivity.mPageFind);
 				
 			}});
-		mRootView.findViewById(R.id.right).setOnClickListener(new OnClickListener() {
+		mRootView.findViewById(R.id.footer_right).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(TAG, new PageMine());
+				switchContent(mActivity.mPageRecommand, mActivity.mPageMine);
 			}
 		});
 
@@ -146,9 +146,6 @@ public class PageRecommand extends Page {
 				jumpPage(event, TAG);
 				
 			}});
-
-		
-
 		mList = ((ListView) mRootView.findViewById(R.id.list));
 		ViewGroup footer = new LinearLayout(mActivity);
 		LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -189,6 +186,24 @@ public class PageRecommand extends Page {
 			}
 		}, adminArea);
 		return mRootView;
+	}
+	
+	@Override
+	public void onResume() {
+		initActionBar();
+		super.onResume();
+	}
+	
+	@Override
+	public void onHiddenChanged(boolean hidden) {
+		if (!hidden) {
+			initActionBar();
+		}
+		super.onHiddenChanged(hidden);
+	}
+	
+	private void initActionBar() {
+		mActivity.hideActionBar();
 	}
 	
 	private void updateMainPage(final MainPageData data, boolean hideStatus) {

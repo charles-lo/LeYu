@@ -1,6 +1,7 @@
 package com.tongle;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Location;
@@ -80,5 +81,9 @@ public class Page extends Fragment {
 
 	protected void jumpPage(Fragment newFragment, String tag, boolean finishOnBack) {
 		mActivity.jumpFragment(newFragment, TAG, finishOnBack);
+	}
+	
+	public void switchContent(Fragment from, Fragment to) {
+		mActivity.switchContent(from, to);
 	}
 }

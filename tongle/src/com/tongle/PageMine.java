@@ -32,7 +32,7 @@ public class PageMine extends Page {
 		mRes = getResources();
 		//
 		mActivity = (MainActivity) getActivity();
-		mActivity.initActionBar(getString(R.string.my_baby));
+		initTitleBar();
 		//
 		final TextView name = (TextView) mRootView.findViewById(R.id.name);
 		name.setText("冠成");
@@ -41,19 +41,19 @@ public class PageMine extends Page {
 		tabHost.setup();
 
 		final Context context = mActivity;
-		((TextView) mRootView.findViewById(R.id.right)).setTextColor(mRes.getColor(R.color.red));
-		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
+		((TextView) mRootView.findViewById(R.id.footer_right)).setTextColor(mRes.getColor(R.color.red));
+		mRootView.findViewById(R.id.footer_left).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(TAG, new PageRecommand());
+				switchContent(mActivity.mPageMine, mActivity.mPageRecommand);
 			}
 		});
-		mRootView.findViewById(R.id.center).setOnClickListener(new OnClickListener() {
+		mRootView.findViewById(R.id.footer_center).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(TAG, new PageFind());
+				switchContent(mActivity.mPageMine, mActivity.mPageFind);
 			}
 		});
 		//
@@ -149,6 +149,10 @@ public class PageMine extends Page {
 		Gateway gateway = GatewayImpl.getInstance();
 
 		return mRootView;
+	}
+	
+	private void initTitleBar() {
+		((TextView)mRootView.findViewById(R.id.title)).setText(R.string.my_baby);
 	}
 
 	private class MyPageAdapter extends PagerAdapter {

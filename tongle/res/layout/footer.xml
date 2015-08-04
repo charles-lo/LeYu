@@ -5,7 +5,7 @@
     android:background="@android:color/white" >
 
     <Button
-        android:id="@+id/left"
+        android:id="@+id/footer_left"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -16,7 +16,7 @@
         android:textSize="@dimen/font_01" />
     
     <Button
-        android:id="@+id/center"
+        android:id="@+id/footer_center"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -27,7 +27,7 @@
         android:textSize="@dimen/font_01" />
 
     <Button
-        android:id="@+id/right"
+        android:id="@+id/footer_right"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

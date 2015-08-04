@@ -62,6 +62,9 @@ public class PageTopic extends Page {
 
 			@Override
 			public void onComplete(TopicData data) {
+				if (!isAdded()) {
+					return;
+				}
 				status.setVisibility(View.GONE);
 				// headline
 				int width, height;

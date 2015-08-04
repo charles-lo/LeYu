@@ -46,6 +46,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -84,6 +85,12 @@ public class PageFind extends Page {
 	private EditText mRightEdit;
 	private List<ActivityLiteData> m_Data = new ArrayList<ActivityLiteData>();
 	private List<ActivityLiteData> m_DataShow = new ArrayList<ActivityLiteData>();
+	// title bar
+    private TextView mTitleTextView;
+    private View mTitleBar;
+    private View mTitleBarLeft;
+    private ImageView mTitleBarLeftImg;
+    private EditText mTitleBarRightEdit;
 
 	// Data
 
@@ -137,19 +144,19 @@ public class PageFind extends Page {
 			}
 		});
 		//
-		((TextView) mRootView.findViewById(R.id.center)).setTextColor(mRes.getColor(R.color.red));
-		mRootView.findViewById(R.id.left).setOnClickListener(new OnClickListener() {
+		((TextView) mRootView.findViewById(R.id.footer_center)).setTextColor(mRes.getColor(R.color.red));
+		mRootView.findViewById(R.id.footer_left).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(TAG, new PageRecommand());
+				switchContent(mActivity.mPageFind, mActivity.mPageRecommand);
 			}
 		});
-		mRootView.findViewById(R.id.right).setOnClickListener(new OnClickListener() {
+		mRootView.findViewById(R.id.footer_right).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				replaceFragment(TAG, new PageMine());
+				switchContent(mActivity.mPageFind, mActivity.mPageMine);
 			}
 		});
 		//
@@ -213,7 +220,6 @@ public class PageFind extends Page {
 			@Override
 			public void onClick(View v) {
 				mOffset = -getDeviceHeight() / 3;
-				int duration = 300;
 				if (mCalendarView.getVisibility() == View.VISIBLE) {
 					closeCaleandar();
 				} else {
@@ -319,10 +325,20 @@ public class PageFind extends Page {
 				update();
 			}
 		});
+		initTitleBar();
+		
+		return mRootView;
+	}
 
-		initActionBar("");
-		updateTitlebarLeftImg(R.drawable.logo_s);
-		mRightEdit = getTitleBarRightEdit();
+	private void initTitleBar() {
+		mTitleTextView = (TextView) mRootView.findViewById(R.id.title);
+		mTitleBarLeftImg =  (ImageView) mRootView.findViewById(R.id.left_img);
+		mTitleBarRightEdit = (EditText) mRootView.findViewById(R.id.right_txt);
+		mRootView.findViewById(R.id.title).setVisibility(View.GONE);
+		
+		mTitleBarLeftImg.setImageResource(R.drawable.logo_s);
+		
+		mRightEdit = (EditText) mRootView.findViewById(R.id.right_txt);
 		mRightEdit.setVisibility(View.VISIBLE);
 		mRightEdit.setHint(R.string.keyword_find);
 		mRightEdit.addTextChangedListener(new TextWatcher() {
@@ -348,7 +364,6 @@ public class PageFind extends Page {
 			public void afterTextChanged(Editable s) {
 			}
 		});
-		return mRootView;
 	}
 
 	private void updateTypeList(List<String> data) {
@@ -360,6 +375,10 @@ public class PageFind extends Page {
 
 			@Override
 			public void onClick(View v) {
+				if (mCalendarView.getVisibility() == View.VISIBLE) {
+					closeCaleandar();
+				} else {
+				}
 				new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.category)).setAdapter(categoryAdapter, new DialogInterface.OnClickListener() {
 
 					@Override
@@ -517,6 +536,10 @@ public class PageFind extends Page {
 
 			@Override
 			public void onClick(View v) {
+				if (mCalendarView.getVisibility() == View.VISIBLE) {
+					closeCaleandar();
+				} else {
+				}
 				new AlertDialog.Builder(mActivity).setTitle(mRes.getString(R.string.region)).setAdapter(regionsAdapter, new DialogInterface.OnClickListener() {
 
 					@Override
