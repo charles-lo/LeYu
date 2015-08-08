@@ -1,10 +1,16 @@
 package com.tongle;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.gson.Gson;
+import com.tongle.PageDetail.DetailArgs;
 import com.tongle.accounts.AccountGeneral;
 
 import android.accounts.Account;
@@ -24,6 +30,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,7 +70,8 @@ public class MainActivity extends Activity {
     public PageRecommand mPageRecommand = new PageRecommand();
     public PageFind mPageFind = new PageFind();
     public PageMine mPageMine = new PageMine();
-	
+
+    static private final String SHARE_LINK_PATTERN = "http://leibaoserver.azurewebsites.net/ActivityPage/Details/(([\\w-]+))";
 	static private final String TAG = MainActivity.class.getSimpleName();
 
 	@Override
@@ -108,10 +116,34 @@ public class MainActivity extends Activity {
 		mGeocoder = new Geocoder(this, Locale.TAIWAN);
 		mLocation = mLocationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		updateAddress();
-		//
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, mPageRecommand, PageRecommand.TAG).commit();
+		
+		Uri uri = getIntent().getData();
+		if (uri != null) {
+			try {
+				boolean matchedResult = false;
+				int matchedCount = -1;
+				String link = URLDecoder.decode(uri.toString(), "UTF-8");
+				Pattern pattern = Pattern.compile(SHARE_LINK_PATTERN);
+				Matcher matcher = pattern.matcher(link);
+				matchedResult = matcher.find();
+				matchedCount = matcher.groupCount();
+
+				if (matchedCount > 0) {
+					String inviteId = matcher.group(1);
+					Log.d(TAG, "charles activity id:" + inviteId);
+					Fragment event = new PageDetail();
+					Bundle bundle = new Bundle();
+					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(inviteId, null, null, null)));
+					event.setArguments(bundle);
+					getFragmentManager().beginTransaction().add(R.id.container, event, PageDetail.TAG).commit();
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		} else {
+			if (savedInstanceState == null) {
+				getFragmentManager().beginTransaction().add(R.id.container, mPageRecommand, PageRecommand.TAG).commit();
+			}
 		}
 	}
 	
@@ -154,7 +186,9 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onPause() {
-		mLocationMgr.removeUpdates(mLocationListener);
+		if (mLocationMgr != null) {
+			mLocationMgr.removeUpdates(mLocationListener);
+		}
 		GatewayImpl.getInstance().userActionLeave();
 		super.onPause();
 	}

@@ -16,6 +16,8 @@ public interface Gateway {
 	
 	void getActivity(ActivityListener listener, String id);
 	
+	void getActivityDetail(ActivityListener listener, String id);
+	
 	void getWeekend(ActivitysListener listener, String category);
 	
 	void getFree(ActivitysListener listener, String category);
@@ -175,6 +177,7 @@ public interface Gateway {
 		String mWebSite;
 		String mOrganizer;
 		String mDescription;
+		String mShareUri;
 		int mPhysical;
 		int mAesthetic;
 		int mScience;

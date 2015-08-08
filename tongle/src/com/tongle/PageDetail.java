@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -57,18 +58,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class PageDetail extends Page {
-
-	public static final String ARG = "detail_arg";
+	
+	static final String TAG = PageRecommand.class.getSimpleName();
+	static public final String ARG = "detail_arg";
 	// view
 	private BarChart mChart;
 	private TextView mBtn01, mBtn02, mBtn03, mBtn04;
 	private View mShare;
-	SimpleDraweeView mImage;
+	private SimpleDraweeView mImage;
+	private int coverWidth, coverHeight;
 	// Data
 	private DetailArgs mArgs;
 	private List<String> category;
 	private List<ResolveInfo> mShareApps;
 	private Intent mFriendsIntent;
+	private String mShareLink;
+	private ConcurrentLinkedQueue<AsyncTask> mTaskQueue = new ConcurrentLinkedQueue<AsyncTask>();
 	// share
 	private ResolveInfo mWechat, mWeibo, mFacebook;
 
@@ -77,22 +82,10 @@ public class PageDetail extends Page {
 
 		mArgs = new Gson().fromJson((String) getArguments().getString(ARG), DetailArgs.class);
 
+		mActivity.initActionBar(mArgs.mTitle);
 		category = Arrays.asList(mRes.getStringArray(R.array.category));
 		//
-		mActivity.initActionBar(mArgs.mTitle);
-		mShareApps = mActivity.getShareList();
-		
-		for (ResolveInfo info : mShareApps) {
-			if (info.activityInfo.packageName.contains("com.tencent.mm") && info.activityInfo.name.contains("com.tencent.mm.ui.tools.ShareImgUI")) {
-				mWechat = info;
-			}
-			if (info.activityInfo.packageName.contains("com.sina.weibo")) {
-				mWeibo = info;
-			}
-			if (info.activityInfo.packageName.contains("com.facebook.katana")) {
-				mFacebook = info;
-			}
-		}
+		initShares();
 		//
 		mRootView = inflater.inflate(R.layout.page_detail, container, false);
 
@@ -153,6 +146,7 @@ public class PageDetail extends Page {
 
 			@Override
 			public void onClick(View v) {
+				initShares();
 				if (mWechat == null) {
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.wechat.com"));
 					startActivity(browserIntent);
@@ -161,7 +155,7 @@ public class PageDetail extends Page {
 					intent.setComponent(new ComponentName(mWechat.activityInfo.packageName, mWechat.activityInfo.name));
 					intent.setAction(Intent.ACTION_SEND);
 					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
+					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mShareLink);
 					intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 					intent.setPackage(mWechat.activityInfo.packageName);
 					startActivity(intent);
@@ -173,6 +167,7 @@ public class PageDetail extends Page {
 
 			@Override
 			public void onClick(View v) {
+				initShares();
 				if (mWeibo == null) {
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://m.weibo.cn"));
 					startActivity(browserIntent);
@@ -181,7 +176,7 @@ public class PageDetail extends Page {
 					intent.setComponent(new ComponentName(mWeibo.activityInfo.packageName, mWeibo.activityInfo.name));
 					intent.setAction(Intent.ACTION_SEND);
 					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
+					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mShareLink);
 					intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 					intent.setPackage(mWeibo.activityInfo.packageName);
 					startActivity(intent);
@@ -193,6 +188,7 @@ public class PageDetail extends Page {
 
 			@Override
 			public void onClick(View v) {
+				initShares();
 				if (mFacebook == null) {
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/mobile"));
 					startActivity(browserIntent);
@@ -201,7 +197,7 @@ public class PageDetail extends Page {
 					intent.setComponent(new ComponentName(mFacebook.activityInfo.packageName, mFacebook.activityInfo.name));
 					intent.setAction(Intent.ACTION_SEND);
 					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
+					intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mShareLink);
 					intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 					intent.setPackage(mFacebook.activityInfo.packageName);
 					startActivity(intent);
@@ -239,7 +235,7 @@ public class PageDetail extends Page {
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("message/rfc822");
-				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
+				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name) + " \n title: " + mArgs.mTitle + "\n  " + mShareLink);
 
 				startActivity(Intent.createChooser(intent, getString(R.string.mail)));
 			}
@@ -251,7 +247,7 @@ public class PageDetail extends Page {
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.setData(Uri.parse("sms:"));
-				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + mArgs.mTitle + "\n  " + mArgs.mPicture);
+				intent.putExtra(Intent.EXTRA_TEXT, "樂育 \n title: " + mArgs.mTitle + "\n  " + mShareLink);
 
 				startActivity(Intent.createChooser(intent, getString(R.string.message)));
 			}
@@ -262,7 +258,7 @@ public class PageDetail extends Page {
 		//
 		mStatus = (TextView) mRootView.findViewById(R.id.status);
 		
-		mGateway.getActivity(new ActivityListener() {
+		mGateway.getActivityDetail(new ActivityListener() {
 
 			@Override
 			public void onComplete(ActivityData data) {
@@ -279,20 +275,21 @@ public class PageDetail extends Page {
 		mGateway.userActionActivity(mArgs.mID);
 		//
 		mImage = (SimpleDraweeView) mRootView.findViewById(R.id.cover);
-		int width, height;
-		width = height = (int) (mRes.getDisplayMetrics().density * 115);
-		ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(mArgs.mPicture)).setResizeOptions(new ResizeOptions(width, height)).setLocalThumbnailPreviewsEnabled(true)
-				.setProgressiveRenderingEnabled(true).build();
-		DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(mImage.getController()).build();
-		mImage.setController(controller);
+		coverWidth = coverHeight = (int) (mRes.getDisplayMetrics().density * 115);
+		if (mArgs.mPicture != null) {
+			ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(mArgs.mPicture)).setResizeOptions(new ResizeOptions(coverWidth, coverHeight)).setLocalThumbnailPreviewsEnabled(true)
+					.setProgressiveRenderingEnabled(true).build();
+			DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(mImage.getController()).build();
+			mImage.setController(controller);
+		}
 		//
-		new AsyncTask<Void, Void, Void>() {
+		mTaskQueue.add(new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
 				mFriendsIntent = getFriendsIntent();
 				return null;
 			}
-		}.execute();
+		}.execute());
 		// data
 
 		((TextView) mRootView.findViewById(R.id.price_onsale)).setVisibility(View.INVISIBLE);
@@ -340,6 +337,27 @@ public class PageDetail extends Page {
 		return mRootView;
 	}
 	
+	private void initShares() {
+		if (mShareApps != null) {
+			return;
+		}
+		mShareApps = mActivity.getShareList();
+
+		if (mShareApps != null) {
+			for (ResolveInfo info : mShareApps) {
+				if (info.activityInfo.packageName.contains("com.tencent.mm") && info.activityInfo.name.contains("com.tencent.mm.ui.tools.ShareImgUI")) {
+					mWechat = info;
+				}
+				if (info.activityInfo.packageName.contains("com.sina.weibo")) {
+					mWeibo = info;
+				}
+				if (info.activityInfo.packageName.contains("com.facebook.katana")) {
+					mFacebook = info;
+				}
+			}
+		}
+	}
+	
 	private Intent getFriendsIntent(){
 		Intent ret = null;
 		if (!isAdded()) {
@@ -352,15 +370,18 @@ public class PageDetail extends Page {
 			connection.connect();
 			InputStream input = connection.getInputStream();
 			final BitmapFactory.Options options = new BitmapFactory.Options();
-			int width = (int) (mRes.getDisplayMetrics().density * 115);
-			options.inSampleSize = calculateInSampleSize(options, width, width);
+			options.inSampleSize = calculateInSampleSize(options, coverWidth, coverHeight);
 			options.inPreferredConfig = Bitmap.Config.RGB_565;
 			
 			Bitmap immutableBpm = BitmapFactory.decodeStream(input, null, options);
+			if(immutableBpm == null){
+				return null;
+			}
 			Bitmap mutableBitmap = immutableBpm.copy(Bitmap.Config.RGB_565, true);
 
 			String path = Images.Media.insertImage(mActivity.getContentResolver(), mutableBitmap, "", null);
 			Uri uri = Uri.parse(path);
+			initShares();
 			if (mWechat == null) {
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.wechat.com"));
 				ret = browserIntent;
@@ -413,6 +434,14 @@ public class PageDetail extends Page {
 		if (hideStatus) {
 			mStatus.setVisibility(View.GONE);
 		}
+		
+		mActivity.initActionBar(data.mTitle);
+		if (data.mPicture != null) {
+			ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(data.mPicture)).setResizeOptions(new ResizeOptions(coverWidth, coverHeight)).setLocalThumbnailPreviewsEnabled(true)
+					.setProgressiveRenderingEnabled(true).build();
+			DraweeController controller = Fresco.newDraweeControllerBuilder().setImageRequest(request).setOldController(mImage.getController()).build();
+			mImage.setController(controller);
+		}
 		// time
 		Date beginDate = null, endDate = null;
 		SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ");
@@ -426,6 +455,8 @@ public class PageDetail extends Page {
 			mStatus.setText(R.string.server_error);
 			return;
 		}
+		
+		mShareLink = data.mShareUri;
 
 		((TextView) mRootView.findViewById(R.id.time_value)).setText(writeFormat.format(beginDate) + " ~ " + writeFormat.format(endDate));
 		((TextView) mRootView.findViewById(R.id.address_value)).setText(data.mAddress);
@@ -531,5 +562,13 @@ public class PageDetail extends Page {
 
 		mChart.setData(data);
 		mChart.requestLayout();
+	}
+	
+	@Override
+	public void onDetach() {
+		if (mTaskQueue.size() > 0) {
+			mTaskQueue.poll().cancel(true);
+		}
+		super.onDetach();
 	}
 }

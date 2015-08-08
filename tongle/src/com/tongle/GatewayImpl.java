@@ -247,6 +247,101 @@ public class GatewayImpl implements Gateway{
 	}
 	
 	@Override
+	public void getActivityDetail(final ActivityListener listener, String id) {
+		final String url = baseUrl + "GetActivityDetail?id=" + id;
+		Log.d(TAG, "getActivityDetail " + url);
+		new AsyncTask<Void,Void,ActivityData>(){
+
+			@Override
+			protected void onPostExecute(ActivityData result) {
+				if (result == null){
+					listener.onError();
+				}else{
+					listener.onComplete(result);
+				}
+				super.onPostExecute(result);
+			}
+
+			@Override
+			protected ActivityData doInBackground(Void... params) {
+				ActivityData data = null;
+				try {
+					String response = getResponse(url, 10000);
+					data = new ActivityData();
+					if (response == null){
+					}else{
+						JSONObject root = new JSONObject(response);
+						
+						if (root.has("Activity")) {
+							JSONObject activityRoot = root.getJSONObject("Activity");							
+							if (activityRoot.has("Title")) {
+								data.mTitle = activityRoot.getString("Title");
+							}
+							if (activityRoot.has("Picture")) {
+								data.mPicture = activityRoot.getString("Picture");
+							}
+							if (activityRoot.has("BeginDate")) {
+								data.mBeginDate = activityRoot.getString("BeginDate");
+							}
+							if (activityRoot.has("EndDate")) {
+								data.mEndDate = activityRoot.getString("EndDate");
+							}
+							if (activityRoot.has("Place")) {
+								data.mPlace = activityRoot.getString("Place");
+							}
+							if (activityRoot.has("Address")) {
+								data.mAddress = activityRoot.getString("Address");
+							}
+							if (activityRoot.has("Tel")) {
+								data.mTel = activityRoot.getString("Tel");
+							}
+							if (activityRoot.has("WebSite")) {
+								data.mWebSite = activityRoot.getString("WebSite");
+							}
+							if (activityRoot.has("Organizer")) {
+								data.mOrganizer = activityRoot.getString("Organizer");
+							}
+							if (activityRoot.has("Description")) {
+								data.mDescription = activityRoot.getString("Description");
+							}
+							if (activityRoot.has("Physical")) {
+								data.mPhysical = activityRoot.getInt("Physical");
+							}
+							if (activityRoot.has("Aesthetic")) {
+								data.mAesthetic = activityRoot.getInt("Aesthetic");
+							}
+							if (activityRoot.has("Science")) {
+								data.mScience = activityRoot.getInt("Science");
+							}
+							if (activityRoot.has("Socially")) {
+								data.mSocially = activityRoot.getInt("Socially");
+							}
+							if (activityRoot.has("Culture")) {
+								data.mCulture = activityRoot.getInt("Culture");
+							}
+							if (activityRoot.has("ActivityAgeLevels")) {
+								JSONObject objectInArray = null;
+								JSONArray tmpArray = activityRoot.getJSONArray("ActivityAgeLevels");
+								for (int i = 0, size = tmpArray.length(); i < size; i++) {
+									objectInArray = tmpArray.getJSONObject(i).getJSONObject("ActivityAgeLevelSetting");
+									data.mActivityAgeLevelSettings.add(new ActivityAgeLevelSetting(objectInArray.getString("ID"), objectInArray.getString("Description")));
+								}
+							}
+						}
+						if (root.has("ShareUri")){
+							data.mShareUri = root.getString("ShareUri");
+						}
+					}
+				} catch (JSONException e) {
+					data = null;
+					e.printStackTrace();
+				}
+				return data;
+			}}.execute();
+		
+	}
+	
+	@Override
 	public void getWeekend(final ActivitysListener listener, String category) {
 		String beginDate, endDate;
 		Calendar calendar = Calendar.getInstance();
@@ -1050,7 +1145,7 @@ public class GatewayImpl implements Gateway{
 						if (root.has("TypeList")) {
 							JSONArray tmpArray = root.getJSONArray("TypeList");
 							for (int i = 0, size = tmpArray.length(); i < size; i++) {
-								data.mTypeList.add(tmpArray.getString(i));
+								data.mTypeList.add(tmpArray.getJSONObject(i).getString("Text"));
 							}
 						}
 						if (root.has("TotalCount")) {

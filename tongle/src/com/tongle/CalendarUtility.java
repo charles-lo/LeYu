@@ -22,6 +22,7 @@ import java.util.Calendar;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.TextUtils;
 
 /**
  * @author Mukesh Y
@@ -47,15 +48,20 @@ public class CalendarUtility {
 		startDates.clear();
 		endDates.clear();
 		descriptions.clear();
+		String startDate, endDate;
 		for (int i = 0; i < CNames.length; i++) {
-
 			nameOfEvent.add(cursor.getString(1));
-			startDates.add(getDate(Long.parseLong(cursor.getString(3))));
-			endDates.add(getDate(Long.parseLong(cursor.getString(4))));
+			startDate = cursor.getString(3);
+			if (!TextUtils.isEmpty(startDate)) {
+				startDates.add(getDate(Long.parseLong(startDate)));
+			}
+			endDate = cursor.getString(4);
+			if (!TextUtils.isEmpty(endDate)) {
+				endDates.add(getDate(Long.parseLong(endDate)));
+			}
 			descriptions.add(cursor.getString(2));
 			CNames[i] = cursor.getString(1);
 			cursor.moveToNext();
-
 		}
 		return nameOfEvent;
 	}

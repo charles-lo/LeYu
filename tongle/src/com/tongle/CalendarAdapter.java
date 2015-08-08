@@ -209,11 +209,9 @@ public class CalendarAdapter extends BaseAdapter {
 		 * filling calendar gridview.
 		 */
 		for (int n = 0; n < mnthlength; n++) {
-
 			itemvalue = df.format(pmonthmaxset.getTime());
 			pmonthmaxset.add(GregorianCalendar.DATE, 1);
 			dayString.add(itemvalue);
-
 		}
 	}
 

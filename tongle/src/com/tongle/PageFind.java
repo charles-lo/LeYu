@@ -100,8 +100,11 @@ public class PageFind extends Page {
 		mRootView = inflater.inflate(R.layout.page_find, container, false);
 		
 		mActivity.hideActionBar();
+		mTabView = mRootView.findViewById(R.id.tab);
+		mTabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
+		mTabHost.setup();
 
-		updateTypeList(mCacheManager.getCategoryList());
+		updateCategoryList(mCacheManager.getCategoryList());
 		mGateway.getCategoryList(new ListListener() {
 
 			@Override
@@ -110,7 +113,7 @@ public class PageFind extends Page {
 					return;
 				}
 				mCacheManager.setCategoryList(data);
-				updateTypeList(data);
+				updateCategoryList(data);
 			}
 
 			@Override
@@ -365,7 +368,7 @@ public class PageFind extends Page {
 		});
 	}
 
-	private void updateTypeList(List<String> data) {
+	private void updateCategoryList(List<String> data) {
 		data.add(0, getString(R.string.all_category));
 		final View category = mRootView.findViewById(R.id.category);
 		final TextView categoryText = (TextView) mRootView.findViewById(R.id.category_text);
@@ -406,6 +409,10 @@ public class PageFind extends Page {
 	}
 
 	private void showType() {
+		if (mTypes.size() == 0) {
+			return;
+		}
+
 		if (mHideTabsRunnable != null) {
 			getHandler().removeCallbacks(mHideTabsRunnable);
 		}
@@ -424,9 +431,6 @@ public class PageFind extends Page {
 		if (mTypes == null || mTypes.size() == 0) {
 			return;
 		}
-		mTabView = mRootView.findViewById(R.id.tab);
-		mTabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
-		mTabHost.setup();
 		int len = mTypes.size();
 		View tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
 		tabs.add(tabIndicator);
