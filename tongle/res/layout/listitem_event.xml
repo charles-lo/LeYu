@@ -8,9 +8,9 @@
         android:id="@+id/event_image"
         android:layout_width="match_parent"
         android:layout_height="186.67dp"
-        android:layout_marginTop="6.67dp"
         android:layout_marginLeft="6.67dp"
         android:layout_marginRight="6.67dp"
+        android:layout_marginTop="6.67dp"
         fresco:placeholderImage="@drawable/placeholder"
         fresco:roundedCornerRadius="10dp" />
 
@@ -18,11 +18,11 @@
         android:id="@+id/event_bg"
         android:layout_width="match_parent"
         android:layout_height="53.33dp"
-        android:layout_marginTop="130dp"
         android:layout_marginLeft="6.67dp"
         android:layout_marginRight="6.67dp"
-        android:background="@android:color/white"
-        android:alpha="0.8" >
+        android:layout_marginTop="130dp"
+        android:alpha="0.8"
+        android:background="@android:color/white" >
 
         <TextView
             android:id="@+id/event_title"
@@ -31,6 +31,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="11dp"
             android:drawableLeft="@drawable/dot"
+            android:textColor="@color/footer"
             android:textSize="@dimen/font_01" />
     </RelativeLayout>
 

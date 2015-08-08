@@ -1047,6 +1047,12 @@ public class GatewayImpl implements Gateway{
 					} else {
 						JSONObject root = new JSONObject(response);
 						data = new SearchData();
+						if (root.has("TypeList")) {
+							JSONArray tmpArray = root.getJSONArray("TypeList");
+							for (int i = 0, size = tmpArray.length(); i < size; i++) {
+								data.mTypeList.add(tmpArray.getString(i));
+							}
+						}
 						if (root.has("TotalCount")) {
 							data.mTotalCount = root.getString("TotalCount");
 						}

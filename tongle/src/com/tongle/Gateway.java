@@ -147,6 +147,7 @@ public interface Gateway {
 	
 	class SearchData {
 		String mTotalCount;
+		List<String> mTypeList = new ArrayList<String>();
 		List<String> mActivityDates = new ArrayList<String>();
 		List<ActivityLiteData> mActivitys = new ArrayList<ActivityLiteData>();
 	}
