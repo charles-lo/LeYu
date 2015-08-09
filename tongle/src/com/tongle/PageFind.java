@@ -434,7 +434,6 @@ public class PageFind extends Page {
 			return;
 		}
 		showType();
-		Log.d(TAG, "charles updateTabs " + mTypes);
 		mTabInitilized = false;
 		mTabs.clear();
 		mTabHost.clearAllTabs();
@@ -481,7 +480,6 @@ public class PageFind extends Page {
 							update(false);
 						}
 						if (mTabHost.getCurrentTabView().findViewById(R.id.tab_title) != null && TextUtils.isEmpty(((TextView) mTabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())) {
-							Log.d(TAG, "charles fail");
 							return;
 						}
 						for (View tab : mTabs) {

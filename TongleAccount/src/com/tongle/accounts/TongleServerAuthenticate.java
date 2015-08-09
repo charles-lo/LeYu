@@ -43,7 +43,8 @@ public class TongleServerAuthenticate implements ServerAuthenticate{
     @Override
     public String userSignUp(String name, String email, String pass, String authType) throws Exception {
     	
-    	final String url = baseUrl + "RegisterUserByEmail?email=" + email + "&password=" + md5(pass);
+    	final String url = baseUrl + "RegisterUserByEmail?email=" + email + "&password=" + md5(pass) + "&username=" + name;
+    	Log.d(TAG, "userSignUp:" + url);
     	String authtoken = null;
     	String response = getResponse(url, 10000);
     	if (response == null){

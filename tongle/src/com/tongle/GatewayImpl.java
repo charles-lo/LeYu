@@ -1147,7 +1147,6 @@ public class GatewayImpl implements Gateway{
 							for (int i = 0, size = tmpArray.length(); i < size; i++) {
 								data.mTypeList.add(tmpArray.getJSONObject(i).getString("Text"));
 							}
-							Log.d("charles", "" + data.mTypeList);
 						}
 						if (root.has("TotalCount")) {
 							data.mTotalCount = root.getString("TotalCount");
