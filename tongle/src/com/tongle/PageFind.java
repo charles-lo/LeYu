@@ -1,8 +1,6 @@
 package com.tongle;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -33,12 +31,18 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
+import android.view.View.OnHoverListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.HorizontalScrollView;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.AdapterView;
@@ -60,8 +64,8 @@ public class PageFind extends Page {
 	private String mArea, mDate, mCategory, mType;
 	private boolean mNear = true;
 	// tab
-	private List<View> tabs = new ArrayList<View>();
-	private View mTabView;
+	private List<View> mTabs = new ArrayList<View>();
+	private HorizontalScrollView mTabView;
 	private TabHost mTabHost;
 	private List<String> mTypes = new ArrayList<String>();
 	private LayoutInflater mInflater;
@@ -91,16 +95,22 @@ public class PageFind extends Page {
     private View mTitleBarLeft;
     private ImageView mTitleBarLeftImg;
     private EditText mTitleBarRightEdit;
-
 	// Data
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mInflater = inflater;
-		mRootView = inflater.inflate(R.layout.page_find, container, false);
+		mRootView = inflater.inflate(R.layout.page_find, container, false);		
 		
 		mActivity.hideActionBar();
-		mTabView = mRootView.findViewById(R.id.tab);
+		mTabView = (HorizontalScrollView) mRootView.findViewById(R.id.tab);
+		mTabView.setOnTouchListener(new OnTouchListener(){
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				showType();
+				return false;
+			}});
 		mTabHost = (TabHost) mRootView.findViewById(R.id.tabhost);
 		mTabHost.setup();
 
@@ -123,8 +133,6 @@ public class PageFind extends Page {
 
 			}
 		});
-		
-//		getTypeList();
 
 		mGateway.getAreaList(new ListListener() {
 
@@ -174,19 +182,19 @@ public class PageFind extends Page {
 		list.setOnTouchListener(new OnSwipeTouchListener(mActivity) {
 
 			public void onSwipeTop() {
-				Log.d(TAG, "charles Top");
+				Log.d(TAG, " onSwipeTop");
 			}
 
 			public void onSwipeRight() {
-				Log.d(TAG, "charles Right");
+				Log.d(TAG, " onSwipeRight");
 			}
 
 			public void onSwipeLeft() {
-				Log.d(TAG, "charles Left");
+				Log.d(TAG, " onSwipeLeft");
 			}
 
 			public void onSwipeBottom() {
-				Log.d(TAG, "charles Bottom");
+				Log.d(TAG, " onSwipeBottom");
 				showType();
 			}
 		});
@@ -243,11 +251,7 @@ public class PageFind extends Page {
 
 		mCalendarText.setText(getString(R.string.today));
 		mDateSelected = mToday = mDate = mAdapter.curentDateString;
-		update();
-
-		mHandler = new Handler();
-		mHandler.post(calendarUpdater);
-
+		update(true);
 		TextView title = (TextView) mRootView.findViewById(R.id.calendar_title);
 		title.setText(android.text.format.DateFormat.format("MMMM yyyy", mMonth));
 
@@ -324,7 +328,7 @@ public class PageFind extends Page {
 				mDesc = null;
 
 				mDate = mDateSelected;
-				update();
+				update(true);
 			}
 		});
 		initTitleBar();
@@ -389,13 +393,11 @@ public class PageFind extends Page {
 						categoryText.setText(data);
 						if (which == 0) {
 							mCategory = null;
-							mTabView.setVisibility(View.GONE);
 						} else {
 							mCategory = data;
-							showType();
 						}
 						dialog.dismiss();
-						update();
+						update(true);
 					}
 				}).create().show();
 
@@ -431,9 +433,14 @@ public class PageFind extends Page {
 		if (mTypes == null || mTypes.size() == 0) {
 			return;
 		}
+		showType();
+		Log.d(TAG, "charles updateTabs " + mTypes);
+		mTabInitilized = false;
+		mTabs.clear();
+		mTabHost.clearAllTabs();
 		int len = mTypes.size();
 		View tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
-		tabs.add(tabIndicator);
+		mTabs.add(tabIndicator);
 		final TextView tvTab = (TextView) tabIndicator.findViewById(R.id.tab_title);
 		tvTab.setText(getString(R.string.all));
 		mTabHost.addTab(mTabHost.newTabSpec("").setIndicator(tabIndicator).setContent(new TabContentFactory() {
@@ -447,7 +454,7 @@ public class PageFind extends Page {
 		}));
 		for (int i = 0; i < len; i++) {
 			tabIndicator = mInflater.inflate(R.layout.tabwidget, null);
-			tabs.add(tabIndicator);
+			mTabs.add(tabIndicator);
 			TextView tvTab1 = (TextView) tabIndicator.findViewById(R.id.tab_title);
 			tvTab1.setText(mTypes.get(i));
 			mTabHost.addTab(mTabHost.newTabSpec(mTypes.get(i)).setIndicator(tabIndicator).setContent(new TabContentFactory() {
@@ -471,12 +478,13 @@ public class PageFind extends Page {
 						if (mTabInitilized) {
 							mType = tabId;
 							showType();
-							update();
+							update(false);
 						}
 						if (mTabHost.getCurrentTabView().findViewById(R.id.tab_title) != null && TextUtils.isEmpty(((TextView) mTabHost.getCurrentTabView().findViewById(R.id.tab_title)).getText())) {
+							Log.d(TAG, "charles fail");
 							return;
 						}
-						for (View tab : tabs) {
+						for (View tab : mTabs) {
 							if (mTabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
 								tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
 								((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes.getColor(R.color.footer));
@@ -492,19 +500,19 @@ public class PageFind extends Page {
 			}
 		});
 
-		for (View tab : tabs) {
+		for (View tab : mTabs) {
 			tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
 			tab.performClick();
 		}
-		for (View tab : tabs) {
+		for (View tab : mTabs) {
 			if (mTabHost.getCurrentTabView().findViewById(R.id.tab_image) != null) {
 				tab.findViewById(R.id.tab_image).setVisibility(View.INVISIBLE);
 				((TextView) tab.findViewById(R.id.tab_title)).setTextColor(mRes.getColor(R.color.footer));
 			}
 		}
 		mTabHost.setCurrentTab(0);
-		tabs.get(0).findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
-		((TextView) tabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
+		mTabs.get(0).findViewById(R.id.tab_image).setVisibility(View.VISIBLE);
+		((TextView) mTabs.get(0).findViewById(R.id.tab_title)).setTextColor(Color.WHITE);
 		mTabInitilized = true;
 	}
 
@@ -541,7 +549,7 @@ public class PageFind extends Page {
 						}
 
 						dialog.dismiss();
-						update();
+						update(true);
 					}
 				}).create().show();
 			}
@@ -575,7 +583,7 @@ public class PageFind extends Page {
 		});
 	}
 
-	private void update() {
+	private void update(final boolean updateType) {
 		if (mRightEdit != null) {
 			mRightEdit.setText(null);
 		}
@@ -588,9 +596,12 @@ public class PageFind extends Page {
 				if (!isAdded()) {
 					return;
 				}
-				mCacheManager.setTypeList(searchData.mTypeList);
-				mTypes = searchData.mTypeList; 
-				updateTabs();
+				if (updateType) {
+					mTypes.clear();
+					mCacheManager.setTypeList(searchData.mTypeList);
+					mTypes.addAll(searchData.mTypeList);
+					updateTabs();
+				}
 				
 				List<ActivityLiteData> data = searchData.mActivitys;
 				if (data == null || data.size() == 0) {
@@ -646,33 +657,9 @@ public class PageFind extends Page {
 
 		mAdapter.refreshDays();
 		mAdapter.notifyDataSetChanged();
-		mHandler.post(calendarUpdater); // generate some calendar items
 
 		title.setText(android.text.format.DateFormat.format("MMMM yyyy", mMonth));
 	}
-
-	public Runnable calendarUpdater = new Runnable() {
-
-		@Override
-		public void run() {
-			mItems.clear();
-
-			// Print dates of the current week
-			DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-			String itemvalue;
-			mEvent = CalendarUtility.readCalendarEvent(mActivity);
-			Log.d("=====Event====", mEvent.toString());
-			Log.d("=====Date ARRAY====", CalendarUtility.startDates.toString());
-
-			for (int i = 0; i < CalendarUtility.startDates.size(); i++) {
-				itemvalue = df.format(mItemMonth.getTime());
-				mItemMonth.add(GregorianCalendar.DATE, 1);
-				mItems.add(CalendarUtility.startDates.get(i).toString());
-			}
-			mAdapter.setItems(mItems);
-			mAdapter.notifyDataSetChanged();
-		}
-	};
 
 	//
 

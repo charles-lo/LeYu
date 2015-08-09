@@ -1137,7 +1137,7 @@ public class GatewayImpl implements Gateway{
 				SearchData data = null;
 				try {
 					String response = getResponse(url, 10000);
-					Log.d(TAG, "searchActivity response" + response);
+					Log.d(TAG, "searchActivityMoreData response" + response);
 					if (response == null) {
 					} else {
 						JSONObject root = new JSONObject(response);
@@ -1147,6 +1147,7 @@ public class GatewayImpl implements Gateway{
 							for (int i = 0, size = tmpArray.length(); i < size; i++) {
 								data.mTypeList.add(tmpArray.getJSONObject(i).getString("Text"));
 							}
+							Log.d("charles", "" + data.mTypeList);
 						}
 						if (root.has("TotalCount")) {
 							data.mTotalCount = root.getString("TotalCount");
@@ -1265,8 +1266,8 @@ public class GatewayImpl implements Gateway{
 						Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 					}
 				}
-			}
-			retry++;
+				retry++;
+			}			
 			continue;
 		}
 		return null;

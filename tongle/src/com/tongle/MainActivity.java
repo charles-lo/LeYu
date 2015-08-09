@@ -130,7 +130,7 @@ public class MainActivity extends Activity {
 
 				if (matchedCount > 0) {
 					String inviteId = matcher.group(1);
-					Log.d(TAG, "charles activity id:" + inviteId);
+					Log.d(TAG, "activity id:" + inviteId);
 					Fragment event = new PageDetail();
 					Bundle bundle = new Bundle();
 					bundle.putString(PageDetail.ARG, new Gson().toJson(new DetailArgs(inviteId, null, null, null)));

@@ -446,14 +446,16 @@ public class PageDetail extends Page {
 		Date beginDate = null, endDate = null;
 		SimpleDateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ");
 		SimpleDateFormat writeFormat = new SimpleDateFormat("yyyy/MMdd-HH:mm");
-		try {
-			beginDate = readFormat.parse(data.mBeginDate);
-			endDate = readFormat.parse(data.mEndDate);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			mStatus.setVisibility(View.VISIBLE);
-			mStatus.setText(R.string.server_error);
-			return;
+		if (data.mBeginDate != null && data.mEndDate != null) {
+			try {
+				beginDate = readFormat.parse(data.mBeginDate);
+				endDate = readFormat.parse(data.mEndDate);
+			} catch (ParseException e) {
+				e.printStackTrace();
+				mStatus.setVisibility(View.VISIBLE);
+				mStatus.setText(R.string.server_error);
+				return;
+			}
 		}
 		
 		mShareLink = data.mShareUri;

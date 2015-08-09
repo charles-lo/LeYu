@@ -33,7 +33,7 @@ public class PageMain extends Page {
 	
 	@Override
 	public void onResume() {
-		Log.d(TAG, "charles PageMain onResume");
+		Log.d(TAG, "PageMain onResume");
 		mRootView.requestLayout();
 		mRootView.invalidate();
 		super.onResume();

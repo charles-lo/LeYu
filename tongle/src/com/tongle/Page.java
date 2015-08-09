@@ -1,7 +1,6 @@
 package com.tongle;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Location;

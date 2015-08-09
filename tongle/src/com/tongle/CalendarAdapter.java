@@ -45,7 +45,7 @@ public class CalendarAdapter extends BaseAdapter {
 	/**
 	 * calendar instance for previous month for getting complete view
 	 */
-	public GregorianCalendar pmonthmaxset;
+	public GregorianCalendar pmonthmaxset, week;
 	private GregorianCalendar selectedDate;
 	int firstDay;
 	int maxWeeknumber;
@@ -144,7 +144,6 @@ public class CalendarAdapter extends BaseAdapter {
 		if (monthStr.length() == 1) {
 			monthStr = "0" + monthStr;
 		}
-
 		// show icon if date is not empty and it exists in the items array
 		ImageView iw = (ImageView) v.findViewById(R.id.date_icon);
 		if (date.length() > 0 && items != null && items.contains(date)) {
@@ -205,6 +204,7 @@ public class CalendarAdapter extends BaseAdapter {
 		 */
 		pmonthmaxset.set(GregorianCalendar.DAY_OF_MONTH, calMaxP + 1);
 
+		week = (GregorianCalendar) selectedDate.clone();
 		/**
 		 * filling calendar gridview.
 		 */

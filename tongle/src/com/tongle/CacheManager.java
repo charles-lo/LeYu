@@ -90,7 +90,8 @@ class CacheManager {
 	
 	public void setTypeList(List<String> data) {
 		if (data != null) {
-			mTypeList = data;
+			mTypeList.clear();
+			mTypeList.addAll(data);
 		}
 	}
 	
