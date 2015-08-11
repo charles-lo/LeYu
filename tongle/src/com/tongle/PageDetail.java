@@ -262,6 +262,9 @@ public class PageDetail extends Page {
 
 			@Override
 			public void onComplete(ActivityData data) {
+				if (!isAdded()) {
+					return;
+				}
 				mCacheManager.setActivity(mArgs.mID, data);
 				updateActivity(data, true);
 			}
